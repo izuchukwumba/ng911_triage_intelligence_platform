@@ -85,9 +85,28 @@ export default function App() {
               initialBreakdown={selectedBreakdown}
             />
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', flexDirection: 'column', gap: '8px' }}>
-              <span style={{ fontSize: '32px' }}>←</span>
-              <span>Select an incident to view details</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', gap: '16px', padding: '32px', textAlign: 'center' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>
+                NG911 Triage Intelligence Platform
+              </div>
+              <div style={{ maxWidth: '340px', fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.8 }}>
+                Submit a transcript on the left to triage it, or select an existing incident to see its priority tier, score breakdown, and the plain-English explanation of why it was classified that way.
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxWidth: '340px', width: '100%' }}>
+                {[
+                  { tier: 'P0', label: 'IMMEDIATE', desc: 'Life-threatening', color: 'var(--p0)' },
+                  { tier: 'P1', label: 'URGENT',    desc: 'Active danger',    color: 'var(--p1)' },
+                  { tier: 'P2', label: 'ELEVATED',  desc: 'Moderate severity',color: 'var(--p2)' },
+                  { tier: 'P3', label: 'STANDARD',  desc: 'Low to moderate',  color: 'var(--p3)' },
+                  { tier: 'P4', label: 'NON-URGENT',desc: 'Monitor or defer', color: 'var(--p4)' },
+                ].map(({ tier, label, desc, color }) => (
+                  <div key={tier} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '5px 10px', borderRadius: '5px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
+                    <span style={{ fontFamily: 'var(--mono)', fontWeight: 700, fontSize: '13px', color, minWidth: '24px' }}>{tier}</span>
+                    <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color, minWidth: '80px' }}>{label}</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{desc}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { IncidentRecord, ScoreBreakdown, ReplayResponse } from '../api/client';
 import { api } from '../api/client';
 import { PriorityBadge } from './PriorityBadge';
@@ -14,39 +14,39 @@ interface Props {
 // ---------------------------------------------------------------------------
 
 const CODE_PROSE: Record<string, string> = {
-  NOT_BREATHING:          'patient is not breathing',
-  CARDIAC_EVENT:          'cardiac event reported',
-  VICTIM_UNCONSCIOUS:     'victim is unconscious',
-  WEAPON_PRESENT:         'weapon present at scene',
-  ACTIVE_BLEEDING:        'active bleeding reported',
-  ACTIVE_VIOLENCE:        'active violence in progress',
-  RESPIRATORY_DISTRESS:   'patient in respiratory distress',
-  MULTIPLE_VICTIMS:       'multiple victims reported',
-  CHILD_INVOLVED:         'child involved',
-  CALLER_HIGH_DISTRESS:   'caller is in extreme distress',
-  FIRE_SPREADING:         'fire is spreading',
-  HAZARDOUS_ENVIRONMENT:  'hazardous environment reported',
-  SEIZURE:                'active or recent seizure',
-  VICTIM_COUNT_MULTIPLIER:'victim count increases severity',
-  POSSIBLE_PRANK:         'possible prank call',
-  LOW_LOCATION_CONFIDENCE:'location cannot be reliably dispatched',
-  LOW_PARSE_CONFIDENCE:   'transcript could not be parsed with confidence',
+  NOT_BREATHING:           'patient is not breathing',
+  CARDIAC_EVENT:           'cardiac event reported',
+  VICTIM_UNCONSCIOUS:      'victim is unconscious',
+  WEAPON_PRESENT:          'weapon present at scene',
+  ACTIVE_BLEEDING:         'active bleeding reported',
+  ACTIVE_VIOLENCE:         'active violence in progress',
+  RESPIRATORY_DISTRESS:    'patient in respiratory distress',
+  MULTIPLE_VICTIMS:        'multiple victims reported',
+  CHILD_INVOLVED:          'child involved',
+  CALLER_HIGH_DISTRESS:    'caller is in extreme distress',
+  FIRE_SPREADING:          'fire is spreading',
+  HAZARDOUS_ENVIRONMENT:   'hazardous environment reported',
+  SEIZURE:                 'active or recent seizure',
+  VICTIM_COUNT_MULTIPLIER: 'victim count increases severity',
+  POSSIBLE_PRANK:          'possible prank call',
+  LOW_LOCATION_CONFIDENCE: 'location cannot be reliably dispatched',
+  LOW_PARSE_CONFIDENCE:    'transcript could not be parsed with confidence',
 };
 
 const TIER_LABELS: Record<string, string> = {
   P0: 'IMMEDIATE',  P1: 'URGENT',  P2: 'ELEVATED',  P3: 'STANDARD',  P4: 'NON-URGENT',
 };
 
+const TIER_COLOR: Record<string, string> = {
+  P0: 'var(--p0)',  P1: 'var(--p1)',  P2: 'var(--p2)',  P3: 'var(--p3)',  P4: 'var(--p4)',
+};
+
 const TIER_BG: Record<string, string> = {
-  P0: 'rgba(255,77,79,0.08)',
-  P1: 'rgba(255,122,69,0.08)',
+  P0: 'rgba(255,77,79,0.10)',
+  P1: 'rgba(255,122,69,0.10)',
   P2: 'rgba(255,169,64,0.08)',
   P3: 'rgba(82,196,26,0.08)',
   P4: 'rgba(139,148,158,0.08)',
-};
-
-const TIER_COLOR: Record<string, string> = {
-  P0: 'var(--p0)',  P1: 'var(--p1)',  P2: 'var(--p2)',  P3: 'var(--p3)',  P4: 'var(--p4)',
 };
 
 // ---------------------------------------------------------------------------
@@ -59,12 +59,11 @@ function WhyPanel({ tier, score, breakdown, reasonCodes }: {
   breakdown: ScoreBreakdown[];
   reasonCodes: string[];
 }) {
-  const t = tier ?? '—';
+  const t     = tier ?? '—';
   const color = TIER_COLOR[t] ?? 'var(--text-muted)';
   const bg    = TIER_BG[t]    ?? 'rgba(139,148,158,0.08)';
   const label = TIER_LABELS[t] ?? t;
 
-  // Build prose from breakdown if available, otherwise fall back to reason codes
   let prose: string;
 
   if (breakdown.length > 0) {
@@ -74,7 +73,6 @@ function WhyPanel({ tier, score, breakdown, reasonCodes }: {
     const penalties = breakdown.filter((b) => b.weight < 0);
 
     if (positives.length === 0) {
-      // Only base score + maybe penalties
       prose = `Scored ${t} (${score?.toFixed(3) ?? '—'}) from the domain baseline alone.`;
       if (penalties.length > 0) {
         prose += ` Penalised for ${penalties.map((p) => CODE_PROSE[p.reason_code] ?? p.reason_code.toLowerCase()).join(' and ')}.`;
@@ -100,16 +98,17 @@ function WhyPanel({ tier, score, breakdown, reasonCodes }: {
 
   return (
     <div style={{
-      padding: '10px 12px',
-      borderRadius: '6px',
+      padding: '12px 14px',
+      borderRadius: '7px',
       background: bg,
-      border: `1px solid ${color}`,
-      marginBottom: '14px',
+      border: `1.5px solid ${color}`,
+      marginBottom: '16px',
     }}>
-      <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color, marginBottom: '5px' }}>
+      {/* Prominent heading — the key question a viewer asks */}
+      <div style={{ fontSize: '13px', fontWeight: 700, color, marginBottom: '7px' }}>
         Why {t} — {label}?
       </div>
-      <div style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--text)' }}>{prose}</div>
+      <div style={{ fontSize: '13px', lineHeight: 1.65, color: 'var(--text)' }}>{prose}</div>
     </div>
   );
 }
@@ -119,7 +118,7 @@ function WhyPanel({ tier, score, breakdown, reasonCodes }: {
 // ---------------------------------------------------------------------------
 
 function ConfidenceMeter({ label, value, tooltip }: { label: string; value: number; tooltip: string }) {
-  const pct = Math.round(value * 100);
+  const pct   = Math.round(value * 100);
   const color = value >= 0.65 ? 'var(--p3)' : value >= 0.35 ? 'var(--p2)' : 'var(--p0)';
 
   return (
@@ -137,7 +136,7 @@ function ConfidenceMeter({ label, value, tooltip }: { label: string; value: numb
 
 function ConfidenceMeters({ inc }: { inc: IncidentRecord }) {
   return (
-    <div style={{ marginBottom: '14px' }}>
+    <div style={{ marginBottom: '16px' }}>
       <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-muted)', marginBottom: '8px' }}>
         Confidence Signals
       </div>
@@ -236,9 +235,30 @@ function AuditBlock({ inc }: { inc: IncidentRecord }) {
 
 export function IncidentDetail({ incident: inc, initialBreakdown }: Props) {
   const [breakdown, setBreakdown] = useState<ScoreBreakdown[]>(initialBreakdown ?? []);
+  const [breakdownLoading, setBreakdownLoading] = useState(false);
   const [replay, setReplay]       = useState<ReplayResponse | null>(null);
   const [replayLoading, setReplayLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'triage' | 'location' | 'caller' | 'replay'>('triage');
+
+  // When an incident is selected from the queue (no breakdown provided), silently
+  // replay it to populate the score breakdown. This keeps the triage tab useful
+  // without requiring the user to manually trigger a replay.
+  useEffect(() => {
+    if (breakdown.length > 0) return;
+    let cancelled = false;
+    setBreakdownLoading(true);
+    api.replay(inc.incident_id)
+      .then((result) => {
+        if (!cancelled) {
+          setBreakdown(result.score_breakdown);
+          setBreakdownLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBreakdownLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [inc.incident_id]); // re-run only when the selected incident changes
 
   async function handleReplay() {
     setReplayLoading(true);
@@ -267,13 +287,14 @@ export function IncidentDetail({ incident: inc, initialBreakdown }: Props) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
 
-      {/* Title bar */}
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexShrink: 0 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '5px', lineHeight: 1.4 }}>{inc.incident.summary}</div>
+      {/* Title bar — large priority badge on the right, summary + ID on the left */}
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', flexShrink: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, paddingTop: '4px' }}>
+          <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '6px', lineHeight: 1.4 }}>{inc.incident.summary}</div>
           <span style={{ fontFamily: 'var(--mono)', fontSize: '10px', color: 'var(--text-muted)' }}>{inc.incident_id}</span>
         </div>
-        <PriorityBadge tier={inc.triage.priority_tier} score={inc.triage.priority_score} />
+        {/* Large badge — the tier is the primary output; make it visually obvious */}
+        <PriorityBadge tier={inc.triage.priority_tier} score={inc.triage.priority_score} size="lg" />
       </div>
 
       {/* Raw transcript */}
@@ -296,7 +317,7 @@ export function IncidentDetail({ incident: inc, initialBreakdown }: Props) {
         {/* ── TRIAGE ── */}
         {activeTab === 'triage' && (
           <div>
-            {/* Why this priority? */}
+            {/* Why this priority? — the most important UI element */}
             <WhyPanel
               tier={inc.triage.priority_tier}
               score={inc.triage.priority_score}
@@ -323,9 +344,15 @@ export function IncidentDetail({ incident: inc, initialBreakdown }: Props) {
               <ReasonCodeChips codes={inc.triage.reason_codes} />
             } />
 
-            {/* Score breakdown */}
+            {/* Score breakdown — auto-populated via silent replay when viewing from queue */}
             <div style={{ marginTop: '16px' }}>
-              <ScoreBreakdownPanel breakdown={breakdown} totalScore={inc.triage.priority_score} />
+              {breakdownLoading ? (
+                <div style={{ color: 'var(--text-muted)', fontSize: '12px', padding: '8px 0' }}>
+                  Loading score breakdown…
+                </div>
+              ) : (
+                <ScoreBreakdownPanel breakdown={breakdown} totalScore={inc.triage.priority_score} />
+              )}
             </div>
           </div>
         )}

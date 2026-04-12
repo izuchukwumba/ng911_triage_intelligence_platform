@@ -1,6 +1,7 @@
 interface Props {
   tier: string | null;
   score?: number | null;
+  size?: 'sm' | 'lg';
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -11,6 +12,14 @@ const TIER_COLORS: Record<string, string> = {
   P4: 'var(--p4)',
 };
 
+const TIER_BG: Record<string, string> = {
+  P0: 'rgba(255,77,79,0.12)',
+  P1: 'rgba(255,122,69,0.10)',
+  P2: 'rgba(255,169,64,0.10)',
+  P3: 'rgba(82,196,26,0.08)',
+  P4: 'rgba(139,148,158,0.06)',
+};
+
 const TIER_LABELS: Record<string, string> = {
   P0: 'IMMEDIATE',
   P1: 'URGENT',
@@ -19,10 +28,59 @@ const TIER_LABELS: Record<string, string> = {
   P4: 'NON-URGENT',
 };
 
-export function PriorityBadge({ tier, score }: Props) {
+export function PriorityBadge({ tier, score, size = 'sm' }: Props) {
   const color = TIER_COLORS[tier ?? ''] ?? 'var(--text-muted)';
+  const bg    = TIER_BG[tier ?? '']    ?? 'rgba(139,148,158,0.06)';
   const label = TIER_LABELS[tier ?? ''] ?? tier ?? '—';
 
+  // Large variant — used in the incident detail header
+  if (size === 'lg') {
+    return (
+      <div style={{
+        padding: '10px 16px',
+        borderRadius: '8px',
+        border: `1.5px solid ${color}`,
+        background: bg,
+        textAlign: 'center',
+        minWidth: '96px',
+        flexShrink: 0,
+      }}>
+        <div style={{
+          fontFamily: 'var(--mono)',
+          fontSize: '26px',
+          fontWeight: 800,
+          color,
+          lineHeight: 1,
+          letterSpacing: '-0.02em',
+        }}>
+          {tier ?? '—'}
+        </div>
+        <div style={{
+          fontSize: '9px',
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color,
+          opacity: 0.85,
+          marginTop: '5px',
+        }}>
+          {label}
+        </div>
+        {score !== undefined && score !== null && (
+          <div style={{
+            fontFamily: 'var(--mono)',
+            fontSize: '11px',
+            color: 'var(--text-muted)',
+            marginTop: '4px',
+          }}>
+            {score.toFixed(3)}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Small variant — used in the queue rows (default)
   return (
     <span style={{
       display: 'inline-flex',

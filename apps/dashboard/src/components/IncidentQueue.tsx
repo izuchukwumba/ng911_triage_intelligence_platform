@@ -13,7 +13,7 @@ const DOMAIN_ICONS: Record<string, string> = {
   other: '⚠',   unknown: '?',
 };
 
-// Reason codes that are important enough to surface in the queue row
+// Reason codes important enough to surface in the queue row
 const HIGH_SIGNAL_CODES = new Set([
   'NOT_BREATHING', 'CARDIAC_EVENT', 'VICTIM_UNCONSCIOUS',
   'WEAPON_PRESENT', 'ACTIVE_BLEEDING', 'ACTIVE_VIOLENCE',
@@ -21,21 +21,33 @@ const HIGH_SIGNAL_CODES = new Set([
 ]);
 
 const CODE_SHORT: Record<string, string> = {
-  NOT_BREATHING:     'not breathing',
-  CARDIAC_EVENT:     'cardiac',
-  VICTIM_UNCONSCIOUS:'unconscious',
-  WEAPON_PRESENT:    'weapon',
-  ACTIVE_BLEEDING:   'bleeding',
-  ACTIVE_VIOLENCE:   'violence',
-  FIRE_SPREADING:    'spreading',
-  MULTIPLE_VICTIMS:  'multi-victim',
-  POSSIBLE_PRANK:    'prank?',
+  NOT_BREATHING:      'not breathing',
+  CARDIAC_EVENT:      'cardiac',
+  VICTIM_UNCONSCIOUS: 'unconscious',
+  WEAPON_PRESENT:     'weapon',
+  ACTIVE_BLEEDING:    'bleeding',
+  ACTIVE_VIOLENCE:    'violence',
+  FIRE_SPREADING:     'spreading',
+  MULTIPLE_VICTIMS:   'multi-victim',
+  POSSIBLE_PRANK:     'prank?',
 };
 
-const STRESS_COLOR: Record<string, string> = {
-  high:     'var(--p0)',
-  moderate: 'var(--p2)',
-  low:      'var(--p3)',
+// Permanent left-border accent per tier (shows urgency even when unselected)
+const TIER_ACCENT_BORDER: Record<string, string> = {
+  P0: '3px solid rgba(255,77,79,0.7)',
+  P1: '3px solid rgba(255,122,69,0.55)',
+  P2: '3px solid rgba(255,169,64,0.4)',
+  P3: '3px solid transparent',
+  P4: '3px solid transparent',
+};
+
+// Subtle background tint per tier — makes queue scannable by color
+const TIER_ROW_BG: Record<string, string> = {
+  P0: 'rgba(255,77,79,0.06)',
+  P1: 'rgba(255,122,69,0.04)',
+  P2: 'rgba(255,169,64,0.025)',
+  P3: 'transparent',
+  P4: 'transparent',
 };
 
 function timeAgo(iso: string): string {
@@ -62,7 +74,7 @@ export function IncidentQueue({ incidents, selectedId, onSelect, loading }: Prop
         display: 'grid',
         gridTemplateColumns: '130px 70px 1fr 64px',
         gap: '8px',
-        padding: '5px 16px',
+        padding: '5px 16px 5px 19px', // 19px = 16px + 3px border offset
         color: 'var(--text-muted)',
         fontSize: '10px',
         fontWeight: 700,
@@ -80,14 +92,14 @@ export function IncidentQueue({ incidents, selectedId, onSelect, loading }: Prop
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {incidents.length === 0 && !loading && (
           <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
-            No incidents yet. Submit one via <code>POST /ingest</code>.
+            No incidents yet. Submit one via the panel above.
           </div>
         )}
 
         {incidents.map((inc) => {
+          const tier       = inc.triage.priority_tier;
           const isSelected = selectedId === inc.incident_id;
 
-          // Top reason codes to surface in the row
           const surfacedCodes = inc.triage.reason_codes.filter((c) => HIGH_SIGNAL_CODES.has(c));
           const showStress    = inc.caller_context.caller_stress_level === 'high' || inc.caller_context.caller_stress_level === 'moderate';
 
@@ -103,8 +115,14 @@ export function IncidentQueue({ incidents, selectedId, onSelect, loading }: Prop
                 width: '100%',
                 border: 'none',
                 borderBottom: '1px solid var(--border)',
-                borderLeft: isSelected ? '3px solid var(--accent)' : '3px solid transparent',
-                background: isSelected ? 'rgba(88,166,255,0.07)' : 'transparent',
+                // Selected: accent blue left rail; unselected: tier-colored left rail for P0/P1/P2
+                borderLeft: isSelected
+                  ? '3px solid var(--accent)'
+                  : (TIER_ACCENT_BORDER[tier ?? ''] ?? '3px solid transparent'),
+                // Selected: accent tint; unselected: tier tint (P0 red, P1 orange, etc.)
+                background: isSelected
+                  ? 'rgba(88,166,255,0.07)'
+                  : (TIER_ROW_BG[tier ?? ''] ?? 'transparent'),
                 color: 'var(--text)',
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -113,7 +131,7 @@ export function IncidentQueue({ incidents, selectedId, onSelect, loading }: Prop
             >
               {/* Main row: grid-aligned */}
               <div style={{ display: 'grid', gridTemplateColumns: '130px 70px 1fr 64px', gap: '8px', alignItems: 'center', width: '100%' }}>
-                <PriorityBadge tier={inc.triage.priority_tier} score={inc.triage.priority_score} />
+                <PriorityBadge tier={tier} score={inc.triage.priority_score} />
 
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
                   <span>{DOMAIN_ICONS[inc.incident.domain] ?? '?'}</span>
@@ -131,7 +149,7 @@ export function IncidentQueue({ incidents, selectedId, onSelect, loading }: Prop
 
               {/* Signal row: reason code chips + stress badge */}
               {(surfacedCodes.length > 0 || showStress) && (
-                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', paddingLeft: '0' }}>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   {surfacedCodes.slice(0, 4).map((code) => {
                     const isPenalty = code === 'POSSIBLE_PRANK';
                     return (
@@ -161,7 +179,7 @@ export function IncidentQueue({ incidents, selectedId, onSelect, loading }: Prop
                       fontWeight: 600,
                       background: 'rgba(255,77,79,0.08)',
                       border: '1px solid rgba(255,77,79,0.25)',
-                      color: STRESS_COLOR[inc.caller_context.caller_stress_level ?? ''] ?? 'var(--text-muted)',
+                      color: inc.caller_context.caller_stress_level === 'high' ? 'var(--p0)' : 'var(--p2)',
                     }}>
                       {inc.caller_context.caller_stress_level} stress
                     </span>
