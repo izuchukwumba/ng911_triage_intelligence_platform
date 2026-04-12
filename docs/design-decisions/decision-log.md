@@ -88,3 +88,61 @@ Monorepo structure makes the platform's coherence visible. Internal packages sha
 
 **Rationale:**
 Operators using the platform need to understand not just the score but why it was assigned. `score_breakdown` provides the machine-readable basis for a "why this score?" panel in the dashboard. It is also essential for the evaluation harness.
+
+---
+
+## DDL-008: TypeScript/Node.js for the full backend stack
+
+**Decision:** Implement all backend services, packages, and tooling in TypeScript running on Node.js, rather than Python or a mixed-language approach.
+
+**Rationale:**
+The platform's schema layer (Zod) is the single source of truth for both TypeScript types and runtime validation. Keeping the entire backend in one language means schema definitions, API handlers, scoring logic, and test harnesses all share the same type system without serialization boundaries or codegen steps.
+
+Python was the primary alternative considered (strong NLP ecosystem, familiar for data-heavy work). It was deferred for the following reasons:
+- Zod's design — one definition for both type inference and runtime parsing — does not have a direct Python equivalent without significantly more boilerplate
+- The cross-package import story in a Python monorepo (editable installs, path manipulation) is more fragile than npm workspaces + `paths` aliases
+- The NLP work here is rule-based, not model-based; Python's NLP library advantage does not apply to a keyword-matching pipeline
+
+**Alternatives considered:**
+- Python + Pydantic for the full stack: loses the Zod single-source-of-truth property
+- Mixed stack (TypeScript API + Python scoring service): adds a network boundary and serialization overhead for no gain in Phase 1–2
+
+**Impact:** All packages and services use the same `tsconfig.base.json`, test runner (jest + ts-jest), and `@ng911/*` import namespace. Adding Python components later remains feasible as advisory services communicating via HTTP.
+
+---
+
+## DDL-009: Replay as a first-class architectural feature, not a debug tool
+
+**Decision:** Design `POST /replay/:id` and `POST /replay/stream` as core platform capabilities from the start, storing the full raw input alongside every incident record.
+
+**Rationale:**
+In emergency response, a priority assignment that cannot be re-examined is an audit liability. Post-incident review and quality assurance both depend on being able to answer: "given this call, what would the system decide today — and how does that compare to what it decided then?"
+
+This requires:
+1. Storing `raw_input` (the original transcript text) on every incident record — not just the parsed output
+2. Attaching `audit.parser_version` and `audit.scoring_version` so the replay can detect when logic has changed
+3. Returning a structured diff (score delta, tier change, indicator changes) rather than just the replayed record
+
+The alternative — adding replay capability later as a debugging feature — would have required retrofitting raw input storage to existing records and would have missed incidents ingested before the feature landed.
+
+**Impact:** The `replay/stream` endpoint makes it possible to evaluate the full impact of a scoring rule change across all stored incidents before deploying the change, which is the foundation of the scoring comparison workflow in `packages/evaluation-harness`.
+
+---
+
+## DDL-010: Negation filtering with token-window boundary awareness
+
+**Decision:** Implement negation handling as a token-position-aware filter with an 8-token lookback window and sentence boundary detection, rather than simple prefix matching.
+
+**Rationale:**
+Simple negation detection ("if 'not' appears anywhere before a keyword, suppress it") produces false positives at sentence boundaries. The phrase "He is not conscious of how serious this is. He is bleeding heavily" should not suppress `ACTIVE_BLEEDING` because "not" appears earlier in the paragraph.
+
+The 8-token window was chosen to cover natural phrasing distances ("he is definitely not", "does not appear to be", "I was told he is not") while not being so wide that it crosses clause boundaries in compound sentences.
+
+Sentence boundary characters (`.`, `!`, `?`, `;`) are treated as hard stops for the negation window. A negation word that precedes a sentence boundary cannot negate an indicator that follows it.
+
+**Alternatives considered:**
+- Dependency parsing (spaCy-style): accurate but requires a model dependency and is overkill for a rules-based keyword pipeline
+- Simple "not" prefix matching within 3 tokens: too narrow — misses "he is no longer breathing" (4 tokens between "no" and "breathing")
+- Negation blocklist per indicator: maintainable but requires curating negative phrases for every indicator keyword
+
+**Impact:** The negation filter is called from `extractSeverityIndicators()` in the transcript parser. False negatives (indicators that should fire but don't) remain possible with unusual phrasing; the conservative default is to allow ambiguous indicators through for operator review.
