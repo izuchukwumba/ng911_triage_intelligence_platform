@@ -29,6 +29,7 @@ export function runFixture(fixture: Fixture): FixtureResult {
     actual_tier:      merged.triage.priority_tier,
     tier_correct:     merged.triage.priority_tier === fixture.expected_priority_tier,
     priority_score:   merged.triage.priority_score,
+    score_breakdown:  scoring.score_breakdown,
     reason_codes:     merged.triage.reason_codes,
     language_detected: merged.caller_context.language_hint,
     caller_stress:    merged.caller_context.caller_stress_level,
