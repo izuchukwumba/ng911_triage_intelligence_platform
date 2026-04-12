@@ -1,0 +1,19 @@
+{
+  "name": "@ng911/transcript-parser",
+  "version": "0.1.0",
+  "description": "Rules-based transcript-to-incident parser for emergency call triage",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ng911/incident-schema": "*",
+    "@ng911/location-validator": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
