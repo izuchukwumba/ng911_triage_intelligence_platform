@@ -1,0 +1,46 @@
+{
+  "name": "ng911-triage-intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NG911-aligned decision-support platform for emergency incident triage, prioritization, and post-incident review",
+  "workspaces": [
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev --workspaces --if-present",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint . --ext .ts --ignore-path .eslintignore",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/packages",
+      "<rootDir>/services"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "moduleNameMapper": {
+      "^@ng911/incident-schema$": "<rootDir>/packages/incident-schema/src/index.ts",
+      "^@ng911/location-validator$": "<rootDir>/packages/location-validator/src/index.ts",
+      "^@ng911/transcript-parser$": "<rootDir>/services/transcript-parser/src/index.ts",
+      "^@ng911/prioritization-engine$": "<rootDir>/services/prioritization-engine/src/index.ts",
+      "^@ng911/test-data-generator$": "<rootDir>/packages/test-data-generator/src/index.ts"
+    }
+  }
+}
