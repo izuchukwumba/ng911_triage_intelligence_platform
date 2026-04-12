@@ -1,0 +1,27 @@
+{
+  "name": "@ng911/evaluation-harness",
+  "version": "0.1.0",
+  "description": "Runs labeled fixture scenarios through the parse+score pipeline and reports accuracy metrics",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "ng911-eval": "dist/cli.js",
+    "ng911-compare": "dist/compare-versions.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "eval": "ts-node src/cli.ts",
+    "compare": "ts-node src/compare-versions.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ng911/incident-schema": "*",
+    "@ng911/transcript-parser": "*",
+    "@ng911/prioritization-engine": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
