@@ -8,6 +8,12 @@ export interface Fixture {
   notes?: string;
 }
 
+export interface ScoreBreakdownEntry {
+  reason_code: string;
+  weight: number;
+  description: string;
+}
+
 export interface FixtureResult {
   fixture_id: string;
   transcript_excerpt: string;
@@ -21,6 +27,7 @@ export interface FixtureResult {
   actual_tier: string | null;
   tier_correct: boolean;
   priority_score: number | null;
+  score_breakdown: ScoreBreakdownEntry[];
   reason_codes: string[];
   language_detected: string | null;
   caller_stress: string | null;

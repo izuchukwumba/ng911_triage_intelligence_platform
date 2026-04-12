@@ -149,9 +149,10 @@ npx ts-node src/compare-versions.ts \
 
 ## Limitations and Honest Caveats
 
-- The fixture set is small (10 scenarios in Phase 1). Accuracy figures have high uncertainty and are directional, not statistically validated.
-- Fixtures were created to test the system, not as a statistically representative sample of real emergency calls.
+- The fixture set is 20 scenarios. Accuracy figures have high uncertainty and are directional, not statistically validated.
+- Fixtures were designed to exercise the system's decision logic and edge cases, not as a statistically representative sample of real emergency calls.
 - The system has not been evaluated against real PSAP call data.
 - Subtype accuracy is sensitive to vocabulary coverage, not classification methodology.
+- Edge-case fixtures (fixture-011 through fixture-020) test boundary conditions — vague location, prank calls, Spanish-language inputs, extreme stress, unknown victim count. These should not be interpreted as representing the distribution of real calls.
 
 These limitations should be stated when reporting results.
