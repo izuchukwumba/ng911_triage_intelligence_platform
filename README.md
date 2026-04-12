@@ -232,28 +232,55 @@ Every incident record stores the exact `parser_version`, `scoring_version`, and 
 
 ```json
 {
-  "original": { "priority_score": 0.62, "priority_tier": "P1" },
-  "replayed": { "priority_score": 0.71, "priority_tier": "P1" },
+  "original": { "priority_score": 0.80, "priority_tier": "P1" },
+  "replayed": { "priority_score": 0.92, "priority_tier": "P0" },
   "diff": {
-    "score_delta": 0.09,
-    "tier_changed": false,
-    "indicator_changes": []
+    "score_delta": 0.12,
+    "priority_tier_changed": true,
+    "reason_codes_added": [],
+    "reason_codes_removed": []
   }
 }
 ```
 
-This answers the question: *"If we had used the current scoring rules when this call came in, would the tier have been different?"* — without separate tooling or manual re-analysis.
+This answers the question: *"If we had used today's scoring rules when this call came in, would the tier have been different?"* — without separate tooling or manual re-analysis.
 
-The `POST /replay/stream` endpoint replays all stored incidents at once and returns aggregate change stats. The evaluation harness `compare-versions.ts` CLI runs the same comparison against labeled fixtures and shows a tier transition matrix:
+The v0.1.0 → v0.2.0 upgrade is a concrete example of why this matters: the shift from a flat domain base score (0.10 for all domains) to domain-specific base scores (EMS: 0.22) caused two critical EMS incidents to correctly move from P1 to P0 in evaluation — incidents that were being under-triaged under the original config. The replay system surfaced these regressions-in-reverse before deployment.
+
+**Scoring version comparison** across the labeled fixture set:
 
 ```bash
 cd packages/evaluation-harness
 npx ts-node src/compare-versions.ts \
-  --baseline ../../services/prioritization-engine/config/scoring-rules.json \
-  --revised  ./config/scoring-rules-candidate.json \
-  --fixtures ../../data/fixtures/sample-incidents.json \
-  --only-changed
+  --baseline ../../services/prioritization-engine/config/scoring-rules-v0.1.0.json \
+  --revised  ../../services/prioritization-engine/config/scoring-rules.json \
+  --fixtures ../../data/fixtures/sample-incidents.json
 ```
+
+Output includes a tier transition matrix showing exactly which fixtures changed and in which direction:
+
+```
+Tier Transition Matrix  (row = baseline tier, col = revised tier)
+
+                P0      P1      P2      P3      P4
+  ──────────────────────────────────────────────────
+  P0            10       ·       ·       ·       ·
+  P1             2       2       ·       ·       ·
+  P2             ·       ·       2       ·       ·
+  P3             ·       ·       ·       3       ·
+  P4             ·       ·       ·       ·       2
+
+Summary
+  Improved : 2   (baseline wrong → revised correct)
+  Degraded : 0   (baseline correct → revised wrong)
+  Net change: +2
+
+  No regressions. Safe to bump scoring_version if manual review passes.
+```
+
+The two P1 → P0 entries are the under-triaged critical EMS incidents. Zero entries on the P0 row confirm no missed-P0 regressions were introduced.
+
+Full replay and version comparison workflow: [docs/evaluation/replay-workflow.md](docs/evaluation/replay-workflow.md)
 
 ---
 
@@ -289,7 +316,7 @@ ng911-triage-intelligence/
   docs/
     architecture/             System overview and data flow
     design-decisions/         Decision log (DDL-001 through DDL-010)
-    evaluation/               Evaluation plan, benchmark reports
+    evaluation/               Evaluation plan, benchmark reports, replay workflow
     scoring/                  Reason code taxonomy
     standards-alignment/      NG911 alignment narrative
   infra/
@@ -299,6 +326,8 @@ ng911-triage-intelligence/
 Detailed data flow with per-module responsibilities: [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
 
 Key design decisions with rationale: [docs/design-decisions/decision-log.md](docs/design-decisions/decision-log.md)
+
+Replay and version comparison workflow with worked example: [docs/evaluation/replay-workflow.md](docs/evaluation/replay-workflow.md)
 
 ---
 
