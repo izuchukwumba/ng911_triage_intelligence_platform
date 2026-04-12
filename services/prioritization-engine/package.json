@@ -1,0 +1,18 @@
+{
+  "name": "@ng911/prioritization-engine",
+  "version": "0.1.0",
+  "description": "Explainable weighted-rule prioritization engine with reason codes for emergency incident scoring",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ng911/incident-schema": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
