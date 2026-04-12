@@ -14,6 +14,13 @@
   --p3: #52c41a;
   --p4: #8b949e;
 
+  /* Tinted panel backgrounds — use in explainability panels */
+  --p0-bg:     rgba(255,77,79,0.08);
+  --p1-bg:     rgba(255,122,69,0.08);
+  --p2-bg:     rgba(255,169,64,0.08);
+  --p3-bg:     rgba(82,196,26,0.08);
+  --p4-bg:     rgba(139,148,158,0.06);
+
   --font: 'Inter', system-ui, sans-serif;
   --mono: 'JetBrains Mono', monospace;
 }
