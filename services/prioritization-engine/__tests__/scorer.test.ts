@@ -79,13 +79,15 @@ describe('scoreIncident', () => {
       }
     });
 
-    it('all breakdown weights sum to match score (within base offset)', () => {
+    it('breakdown weights sum to the clamped final score', () => {
+      // score_breakdown now includes the DOMAIN_BASE entry, so the sum of all
+      // weights in the breakdown equals the pre-clamp score directly.
+      // Do NOT add an extra base offset — that would double-count it.
       const { result } = triageTranscript(
         'There is a fire at 742 Evergreen Terrace and it is spreading.',
       );
       const weightSum = result.score_breakdown.reduce((acc, b) => acc + b.weight, 0);
-      // base_score (0.10) + weights = approximately final score
-      const expected = Math.max(0, Math.min(1, 0.10 + weightSum));
+      const expected = Math.max(0, Math.min(1, weightSum));
       expect(result.priority_score).toBeCloseTo(expected, 2);
     });
   });
@@ -113,7 +115,7 @@ describe('scoreIncident', () => {
   });
 
   describe('fixture-based acceptance tests', () => {
-    const fixtures = [
+    const fixtures: Array<{ id: string; text: string; expected_tier: string }> = [
       {
         id: 'fixture-001',
         text: 'Someone has been shot near 5th street and Oak Avenue. There is a lot of blood. He is still conscious but bleeding badly.',
@@ -137,5 +139,82 @@ describe('scoreIncident', () => {
         expect(result.priority_tier).toBe(fixture.expected_tier);
       });
     }
+  });
+
+  // ---------------------------------------------------------------------------
+  // Edge-case scoring behaviour
+  // ---------------------------------------------------------------------------
+
+  describe('edge-case scoring behaviour', () => {
+    it('vague location + extreme life-threat still reaches P0 (LOW_LOCATION_CONFIDENCE does not suppress critical incidents)', () => {
+      // fixture-011 equivalent: caller doesn't know address but victim is not breathing
+      const { result } = triageTranscript(
+        "I don't know where I am exactly. Somewhere near downtown. My wife is not breathing. Please hurry.",
+      );
+      expect(result.priority_tier).toBe('P0');
+      expect(result.reason_codes).toContain('NOT_BREATHING');
+      expect(result.reason_codes).toContain('LOW_LOCATION_CONFIDENCE');
+    });
+
+    it('precise address with minor injury does not inflate priority (fixture-012)', () => {
+      const { result } = triageTranscript(
+        'I need an ambulance at 2210 West Ridgeway Boulevard apartment 4B. I think I twisted my ankle walking down the stairs.',
+      );
+      expect(['P3', 'P4']).toContain(result.priority_tier);
+      // High dispatchable location score should NOT push tier up
+      expect(result.reason_codes).not.toContain('NOT_BREATHING');
+      expect(result.reason_codes).not.toContain('CARDIAC_EVENT');
+    });
+
+    it('partial address + multiple critical indicators still scores P0 (fixture-023)', () => {
+      // Route reference without number — LOW_LOCATION_CONFIDENCE fires but gets overwhelmed
+      const { result } = triageTranscript(
+        "There's been a multi-car crash on Route 9 near the old overpass. One driver is on the ground, completely unresponsive and not breathing. There is a lot of blood everywhere. I cannot see a street number, just Route 9.",
+      );
+      expect(result.priority_tier).toBe('P0');
+      expect(result.reason_codes).toContain('NOT_BREATHING');
+      expect(result.reason_codes).toContain('LOW_LOCATION_CONFIDENCE');
+    });
+
+    it('prank call in English reduces score below P3', () => {
+      const { result } = triageTranscript(
+        'Ha ha relax it was a prank, we were filming a YouTube video. Nobody is actually hurt.',
+      );
+      expect(result.priority_score ?? 0).toBeLessThan(0.40);
+      expect(result.reason_codes).toContain('POSSIBLE_PRANK');
+    });
+
+    it('multiple victims increases score via victim count multiplier', () => {
+      const singleVictim = triageTranscript('My father collapsed at 456 Elm Road and is not breathing.');
+      const multiVictim  = triageTranscript('There are five people injured at the crash at 456 Elm Road. Several are not breathing.');
+      expect((multiVictim.result.priority_score ?? 0))
+        .toBeGreaterThan((singleVictim.result.priority_score ?? 0));
+      expect(multiVictim.result.reason_codes).toContain('MULTIPLE_VICTIMS');
+    });
+
+    it('POSSIBLE_PRANK does not suppress score below 0', () => {
+      // Score must stay in [0, 1] even with heavy penalty
+      const { result } = triageTranscript('prank prank prank prank prank just kidding false alarm disregard');
+      expect(result.priority_score ?? 0).toBeGreaterThanOrEqual(0);
+      expect(result.priority_score ?? 0).toBeLessThanOrEqual(1);
+    });
+
+    it('DOMAIN_BASE entry is always first in score_breakdown', () => {
+      const { result } = triageTranscript('Someone has been shot at 123 Main Street. There is a lot of blood.');
+      expect(result.score_breakdown[0]?.reason_code).toBe('DOMAIN_BASE');
+    });
+
+    it('score_breakdown for a low-severity incident contains only DOMAIN_BASE and possibly location penalty', () => {
+      const { result } = triageTranscript(
+        'I need an ambulance at 99 Cedar Lane. My elderly neighbour fell and her hip hurts.',
+      );
+      const positiveIndicatorCodes = result.score_breakdown
+        .filter((b) => b.weight > 0 && b.reason_code !== 'DOMAIN_BASE')
+        .map((b) => b.reason_code);
+      // No severe indicators should have fired
+      expect(positiveIndicatorCodes).not.toContain('NOT_BREATHING');
+      expect(positiveIndicatorCodes).not.toContain('CARDIAC_EVENT');
+      expect(positiveIndicatorCodes).not.toContain('WEAPON_PRESENT');
+    });
   });
 });

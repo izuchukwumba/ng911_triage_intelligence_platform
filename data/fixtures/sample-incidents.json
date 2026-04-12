@@ -178,5 +178,32 @@
     "expected_severity": "high",
     "expected_priority_tier": "P1",
     "notes": "Edge case: domestic violence with no address. Active violence indicator should produce P1. Low location score applies penalty but should not drop below P1 given the violence indicators."
+  },
+  {
+    "id": "fixture-021",
+    "transcript": "Someone is acting erratic and making threats near the bus stop at Main and 3rd. I think he might have had a gun in his jacket — I couldn't clearly see it. He's gone now, ran northbound.",
+    "expected_domain": "police",
+    "expected_subtype": "suspicious_person",
+    "expected_severity": "moderate",
+    "expected_priority_tier": "P2",
+    "notes": "Edge case: hedged weapon phrasing ('I think he might have had a gun'). The current parser extracts weapon_present from 'gun' regardless of the hedge — the negation filter handles hard negation ('no gun') but not uncertainty markers ('might have', 'I think'). Expected P2 documents this known behavior. A future improvement could downweight uncertain indicator language."
+  },
+  {
+    "id": "fixture-022",
+    "transcript": "Sorry to call, false alarm — I thought I heard gunshots in the alley but my neighbor says it was just a car backfiring. Nobody seems to be hurt and I don't see anything wrong. Disregard, everything is fine.",
+    "expected_domain": "police",
+    "expected_subtype": "unclassified",
+    "expected_severity": "low",
+    "expected_priority_tier": "P4",
+    "notes": "Known gap: false alarm retraction. The caller explicitly retracts ('false alarm', 'disregard', 'everything is fine') but 'gunshots' still triggers weapon_present extraction, producing a higher score than P4. This fixture is EXPECTED TO FAIL under the current parser — it documents the gap in false-alarm suppression. Resolving it requires adding 'false alarm' and 'disregard' to the POSSIBLE_PRANK keyword set or implementing retraction-aware parsing."
+  },
+  {
+    "id": "fixture-023",
+    "transcript": "There's been a multi-car crash on Route 9 near the old overpass. One driver is on the ground — completely unresponsive and not breathing. There is a lot of blood everywhere. I cannot see a street number, just Route 9.",
+    "expected_domain": "ems",
+    "expected_subtype": "trauma",
+    "expected_severity": "critical",
+    "expected_priority_tier": "P0",
+    "notes": "Edge case: partial address (highway reference, no number) with multiple critical indicators (not_breathing, victim_unconscious, active_bleeding). LOW_LOCATION_CONFIDENCE penalty fires but three life-threat indicators overwhelm it. Tests that route/landmark references without street numbers still score critical incidents correctly."
   }
 ]

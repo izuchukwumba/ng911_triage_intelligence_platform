@@ -206,4 +206,65 @@ export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
     generate: ({ address, extraDetail }) =>
       `There's a person slumped over on the bench near ${address}. ${extraDetail} I don't know if they're sleeping or something is wrong.`,
   },
+
+  // -------------------------------------------------------------------------
+  // Uncertain / hedged weapon mention
+  //
+  // Tests whether the parser fires weapon_present from ambiguous phrasing.
+  // Current behaviour: weapon_present fires (keyword match is not
+  // uncertainty-aware). Expectation: P2 at most.
+  // -------------------------------------------------------------------------
+  {
+    domain: 'police',
+    subtype: 'suspicious_person',
+    severity: 'moderate',
+    generate: ({ address, extraDetail }) =>
+      `Someone threatening near ${address}. I think he might have had a gun or something in his jacket — I couldn't clearly see. ${extraDetail} He left the area.`,
+  },
+
+  // -------------------------------------------------------------------------
+  // False alarm / retraction
+  //
+  // Caller explicitly retracts the emergency report. Known gap: the parser
+  // may still score weapon_present from words like "gunshots" before
+  // seeing the retraction. Documents the need for retraction-aware parsing.
+  // -------------------------------------------------------------------------
+  {
+    domain: 'police',
+    subtype: 'unclassified',
+    severity: 'low',
+    generate: ({ address, extraDetail }) =>
+      `Sorry, false alarm near ${address} — I thought I heard gunshots but it was just a car backfiring. ${extraDetail} Nobody is hurt, disregard.`,
+  },
+
+  // -------------------------------------------------------------------------
+  // Partial address with high severity
+  //
+  // Route or intersection reference without a building number. Expected to
+  // trigger LOW_LOCATION_CONFIDENCE but still score P0 when multiple
+  // life-threat indicators are present.
+  // -------------------------------------------------------------------------
+  {
+    domain: 'ems',
+    subtype: 'trauma',
+    severity: 'critical',
+    generate: ({ address, extraDetail }) =>
+      `Bad crash on ${address} near the overpass. One driver is on the ground, unresponsive and not breathing. ${extraDetail} There is blood everywhere. No street number visible.`,
+  },
+
+  // -------------------------------------------------------------------------
+  // High-stress overwhelmed caller
+  //
+  // Extreme affect: repetition, fragmentation, caps-style phrasing.
+  // Caller stress detection should flag HIGH. Used to test that stress
+  // signals add CALLER_HIGH_DISTRESS without incorrectly suppressing
+  // other indicator extraction.
+  // -------------------------------------------------------------------------
+  {
+    domain: 'ems',
+    subtype: 'respiratory_distress',
+    severity: 'critical',
+    generate: ({ address, extraDetail }) =>
+      `PLEASE HELP PLEASE HELP. He is not breathing he is not breathing. We are at ${address}. ${extraDetail} PLEASE COME NOW PLEASE.`,
+  },
 ];

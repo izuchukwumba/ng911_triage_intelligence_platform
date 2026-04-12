@@ -124,4 +124,117 @@ describe('parseTranscript', () => {
       }
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // Negation filtering
+  // ---------------------------------------------------------------------------
+
+  describe('negation filtering', () => {
+    it('does not extract weapon_present when weapon keyword is negated ("no weapon")', () => {
+      const record = parseTranscript('Officers searched the vehicle but found no weapon and no contraband.');
+      expect(record.incident.severity_indicators).not.toContain('weapon_present');
+    });
+
+    it('does not extract weapon_present when negated at close range ("no gun")', () => {
+      const record = parseTranscript('I looked around and there was no gun, he was unarmed.');
+      expect(record.incident.severity_indicators).not.toContain('weapon_present');
+    });
+
+    it('still extracts weapon_present when the weapon is present despite other negation in the sentence', () => {
+      // "no injuries" negates nothing related to weapon; weapon_present should fire
+      const record = parseTranscript('He had a gun and was threatening people. No injuries so far at 45 Oak Street.');
+      expect(record.incident.severity_indicators).toContain('weapon_present');
+    });
+
+    it('extracts not_breathing when the phrasing is a direct statement', () => {
+      const record = parseTranscript('She stopped breathing completely. She is not breathing.');
+      expect(record.incident.severity_indicators).toContain('not_breathing');
+    });
+
+    it('does not extract active_bleeding when negated ("no bleeding")', () => {
+      const record = parseTranscript('The patient has a wound but there is no bleeding visible at this time.');
+      expect(record.incident.severity_indicators).not.toContain('active_bleeding');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Language detection
+  // ---------------------------------------------------------------------------
+
+  describe('language detection', () => {
+    it('detects Spanish from high-frequency function words', () => {
+      const record = parseTranscript('Mi esposo no está respirando en la Calle Pino 789. Por favor vengan rápido.');
+      expect(record.caller_context.language_hint).toBe('es');
+    });
+
+    it('detects English for a typical English transcript', () => {
+      const record = parseTranscript('My father is not breathing and there is no pulse. We are at 123 Oak Street.');
+      expect(record.caller_context.language_hint).toBe('en');
+    });
+
+    it('classifies EMS domain correctly for a Spanish cardiac arrest transcript', () => {
+      const record = parseTranscript('Mi padre tuvo un ataque al corazón. No respira y no tiene pulso.');
+      expect(record.incident.domain).toBe('ems');
+    });
+
+    it('extracts not_breathing from a Spanish transcript using ES keyword set', () => {
+      const record = parseTranscript('Él no está respirando. Necesito ayuda ahora mismo.');
+      expect(record.incident.severity_indicators).toContain('not_breathing');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Caller stress detection
+  // ---------------------------------------------------------------------------
+
+  describe('caller stress detection', () => {
+    it('detects high stress from all-caps and word repetition', () => {
+      const record = parseTranscript('PLEASE HELP HE IS NOT BREATHING HE IS NOT BREATHING PLEASE COME NOW PLEASE.');
+      expect(record.caller_context.caller_stress_level).toBe('high');
+    });
+
+    it('detects moderate stress from high-distress phrases', () => {
+      const record = parseTranscript('I need help please. He collapsed and I am panicking. Please hurry, please hurry.');
+      expect(['moderate', 'high']).toContain(record.caller_context.caller_stress_level);
+    });
+
+    it('returns null or low stress for a calm descriptive report', () => {
+      const record = parseTranscript('There is a gas leak at 88 Lincoln Drive. We have evacuated the building and are waiting outside.');
+      expect(['low', null]).toContain(record.caller_context.caller_stress_level);
+    });
+
+    it('CALLER_HIGH_DISTRESS does not suppress other severity indicators', () => {
+      // High stress call that also contains a real indicator — both should be present
+      const record = parseTranscript('HELP HELP PLEASE MY SON IS NOT BREATHING HELP. We are at 789 Pine Street. PLEASE HURRY.');
+      expect(record.incident.severity_indicators).toContain('not_breathing');
+      expect(record.caller_context.caller_stress_level).toBe('high');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Victim count extraction
+  // ---------------------------------------------------------------------------
+
+  describe('victim count extraction', () => {
+    it('extracts a specific victim count from the transcript', () => {
+      const record = parseTranscript('There are four people injured at the scene on Route 9.');
+      expect(record.incident.victim_count_estimate).toBeGreaterThanOrEqual(4);
+    });
+
+    it('extracts a victim count from range language', () => {
+      const record = parseTranscript('I can see at least five or six people on the ground, they look injured.');
+      expect(record.incident.victim_count_estimate).toBeGreaterThanOrEqual(4);
+    });
+
+    it('returns 1 for single-victim incidents with no count language', () => {
+      const record = parseTranscript('My father collapsed and is not breathing at 456 Elm Road.');
+      // No multiple-victim language → count should be 1 (or null if not determinable)
+      expect(record.incident.victim_count_estimate).toBeLessThanOrEqual(1);
+    });
+
+    it('fires multiple_victims indicator when count exceeds one', () => {
+      const record = parseTranscript('There are multiple people who were injured. At least three or four people down at 88 Lincoln Drive.');
+      expect(record.incident.severity_indicators).toContain('multiple_victims');
+    });
+  });
 });
