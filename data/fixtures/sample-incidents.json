@@ -1,0 +1,92 @@
+[
+  {
+    "id": "fixture-001",
+    "transcript": "Someone has been shot near 5th street and Oak Avenue. There's a lot of blood. He's still conscious but bleeding badly.",
+    "expected_domain": "police",
+    "expected_subtype": "shooting",
+    "expected_severity": "critical",
+    "expected_priority_tier": "P0",
+    "notes": "High-severity police incident with weapon and bleeding indicators"
+  },
+  {
+    "id": "fixture-002",
+    "transcript": "My brother is not breathing at all, please help! We are at 123 Oak Street.",
+    "expected_domain": "ems",
+    "expected_subtype": "respiratory_distress",
+    "expected_severity": "critical",
+    "expected_priority_tier": "P0",
+    "notes": "Immediate life-threat, clear address — should score P0"
+  },
+  {
+    "id": "fixture-003",
+    "transcript": "The house on Maple Avenue is on fire. The flames are spreading to the second floor and I think there are people inside.",
+    "expected_domain": "fire",
+    "expected_subtype": "structure_fire",
+    "expected_severity": "critical",
+    "expected_priority_tier": "P0",
+    "notes": "Structure fire with spreading indicator and possible trapped victims"
+  },
+  {
+    "id": "fixture-004",
+    "transcript": "My father just collapsed at 456 Elm Road. He's not breathing and I can't find a pulse. I don't know how to do CPR.",
+    "expected_domain": "ems",
+    "expected_subtype": "cardiac_arrest",
+    "expected_severity": "critical",
+    "expected_priority_tier": "P0",
+    "notes": "Cardiac arrest with clear address"
+  },
+  {
+    "id": "fixture-005",
+    "transcript": "My roommate overdosed at 789 Pine Street. He's unresponsive and won't wake up. I think he took something.",
+    "expected_domain": "ems",
+    "expected_subtype": "overdose",
+    "expected_severity": "critical",
+    "expected_priority_tier": "P0",
+    "notes": "Overdose with unconscious victim"
+  },
+  {
+    "id": "fixture-006",
+    "transcript": "My neighbor is fighting with her husband and I heard screaming. I think she's being hurt.",
+    "expected_domain": "police",
+    "expected_subtype": "domestic_violence",
+    "expected_severity": "high",
+    "expected_priority_tier": "P1",
+    "notes": "Domestic violence — no specific address, active violence signal"
+  },
+  {
+    "id": "fixture-007",
+    "transcript": "There's a strong smell of gas at 88 Lincoln Drive. We evacuated the building.",
+    "expected_domain": "fire",
+    "expected_subtype": "gas_leak",
+    "expected_severity": "high",
+    "expected_priority_tier": "P1",
+    "notes": "Gas leak with address — hazardous environment"
+  },
+  {
+    "id": "fixture-008",
+    "transcript": "An elderly woman fell on the sidewalk near the park. She can't get up and says her hip hurts badly.",
+    "expected_domain": "ems",
+    "expected_subtype": "trauma",
+    "expected_severity": "moderate",
+    "expected_priority_tier": "P2",
+    "notes": "Fall with injury, vague location — moderate priority"
+  },
+  {
+    "id": "fixture-009",
+    "transcript": "There's a suspicious person walking around near the school. They've been there for about an hour.",
+    "expected_domain": "police",
+    "expected_subtype": "suspicious_person",
+    "expected_severity": "low",
+    "expected_priority_tier": "P3",
+    "notes": "Suspicious person welfare check — low severity"
+  },
+  {
+    "id": "fixture-010",
+    "transcript": "Someone just robbed me near 350 Fifth Avenue. He had a gun and ran east.",
+    "expected_domain": "police",
+    "expected_subtype": "robbery",
+    "expected_severity": "high",
+    "expected_priority_tier": "P1",
+    "notes": "Armed robbery, partial address"
+  }
+]
