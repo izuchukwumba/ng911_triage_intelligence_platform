@@ -32,7 +32,23 @@ export interface FixtureResult {
   language_detected: string | null;
   caller_stress: string | null;
   location_quality: number;
+  parse_score_ms: number;
   notes?: string;
+}
+
+export interface BucketResult {
+  tier: string;
+  total: number;
+  correct: number;
+  accuracy: number;
+}
+
+export interface LatencyStats {
+  mean_ms: number;
+  p50_ms: number;
+  p95_ms: number;
+  min_ms: number;
+  max_ms: number;
 }
 
 export interface EvaluationReport {
@@ -46,5 +62,7 @@ export interface EvaluationReport {
   false_p0_rate: number;
   missed_p0_rate: number;
   score_distribution: Record<string, number>;
+  bucket_results: BucketResult[];
+  latency: LatencyStats;
   results: FixtureResult[];
 }
