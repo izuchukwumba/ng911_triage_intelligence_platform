@@ -2,6 +2,21 @@
 
 An NG911-aligned decision-support platform that converts emergency-call inputs into structured, scored, replayable incident records — purpose-built for transparent prioritization and audit accountability.
 
+**Stack:** TypeScript · Node.js · React 18 · Express · PostgreSQL · Zod · Vite
+
+---
+
+## What This Project Demonstrates
+
+This platform addresses three concrete engineering problems in emergency call triage that are not solved by off-the-shelf tools:
+
+- **Multilingual NLP with negation filtering** — a rules-based parser that extracts severity indicators from English and Spanish transcripts, distinguishes "he's not breathing" from "he's breathing on his own again", and measures caller stress from linguistic signals
+- **Versioned, explainable scoring** — a weighted rule engine where every priority assignment comes with a machine-readable breakdown of every factor that contributed and by how much; the config is versioned independently so historical scores are always reproducible
+- **Replay as an audit mechanism** — every incident stores the exact raw input and version identifiers used to produce it; any incident can be replayed against any scoring version and the system returns a structured diff, enabling retrospective analysis without separate tooling
+- **Formal evaluation methodology** — a fixture-based harness that measures domain accuracy, tier accuracy, false-P0 rate, missed-P0 rate, scenario bucket performance, and latency against hand-labeled ground truth
+
+See the [v0.2.0 benchmark report](docs/evaluation/benchmark-report-v0.2.0.md) for the current measured results.
+
 ---
 
 ## The Problem
@@ -15,6 +30,42 @@ This platform targets three gaps that persist even as 911 infrastructure migrate
 2. **Prioritization** — scoring must be explainable to the operator reviewing it. A P0 label with no justification is worse than no label. Every score in this system comes with a full breakdown of what contributed and why.
 
 3. **Accountability** — when a priority assignment is questioned after the fact, operators should be able to replay the incident against any historical scoring version and see exactly how the decision was made.
+
+---
+
+## What This Is / What This Is Not
+
+**This is:**
+- A research and decision-support prototype demonstrating explainable, auditable triage logic
+- An engineering platform for exploring and measuring prioritization algorithms in the emergency dispatch domain
+- A reference implementation of a rules-based NLP pipeline with formal evaluation methodology
+
+**This is not:**
+- A production emergency dispatch system or CAD replacement
+- Compliant with NENA i3 or the full NG911 protocol stack
+- Connected to real telephony infrastructure (SIP/i3 streams, PSAP networks, or ESInet)
+- A replacement for trained dispatchers or human judgment
+
+See [docs/standards-alignment/ng911-alignment.md](docs/standards-alignment/ng911-alignment.md) for a full accounting of what "NG911-aligned" means here, and [docs/design-decisions/decision-log.md](docs/design-decisions/decision-log.md) for why these scope limits are intentional.
+
+---
+
+## Measured Results (v0.2.0)
+
+Evaluated against 23 hand-labeled emergency call transcripts covering five domains (EMS, police, fire, hazmat, other), five priority tiers, and eight edge-case categories. Full report: [docs/evaluation/benchmark-report-v0.2.0.md](docs/evaluation/benchmark-report-v0.2.0.md).
+
+| Metric | Result | Target | Status |
+|--------|--------|--------|--------|
+| Domain accuracy | 91.3% | ≥ 90% | PASS |
+| Tier accuracy | 87.0% | ≥ 80% | PASS |
+| False-P0 rate | 0.0% | ≤ 5% | PASS |
+| Missed-P0 rate | 0.0% | ≤ 10% | PASS |
+| Subtype accuracy | 69.6% | ≥ 75% | FAIL |
+| Ranking stability | 100% | 100% | PASS |
+| Mean latency | 8ms | ≤ 50ms | PASS |
+| P95 latency | 14ms | ≤ 150ms | PASS |
+
+P0 (life-threatening) and P1 (urgent) scenario buckets both score 100%. The subtype failure is a vocabulary coverage gap, not an architectural issue — detailed in the report.
 
 ---
 
@@ -75,6 +126,8 @@ Caller transcript (raw text)
                            + score delta
 ```
 
+Full data flow with module-level detail: [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
+
 ---
 
 ## Demo Walkthrough
@@ -102,9 +155,9 @@ Output:
   "tier": "P0",
   "score": 0.84,
   "breakdown": [
-    { "rule": "DOMAIN_BASE",             "contribution": 0.22, "description": "Base score for ems domain" },
-    { "rule": "NOT_BREATHING",           "contribution": 0.32, "description": "Not breathing indicator present" },
-    { "rule": "CARDIAC_EVENT",           "contribution": 0.30, "description": "Cardiac event indicator present" }
+    { "rule": "DOMAIN_BASE",   "contribution": 0.22, "description": "Base score for ems domain" },
+    { "rule": "NOT_BREATHING", "contribution": 0.32, "description": "Not breathing indicator present" },
+    { "rule": "CARDIAC_EVENT", "contribution": 0.30, "description": "Cardiac event indicator present" }
   ]
 }
 ```
@@ -127,13 +180,14 @@ Output:
 }
 ```
 
-**See the ranked queue:**
+**See the ranked incident queue:**
 
 ```bash
-curl -s "http://localhost:3001/incidents?limit=5" | jq '.incidents[] | {id: .incident_id, tier: .triage.priority_tier, domain: .incident.domain}'
+curl -s "http://localhost:3001/incidents?limit=5" \
+  | jq '.incidents[] | {id: .incident_id, tier: .triage.priority_tier, domain: .incident.domain}'
 ```
 
-**Replay an incident to inspect the original scoring decision:**
+**Replay an incident to inspect the scoring decision:**
 
 ```bash
 INCIDENT_ID="<uuid-from-ingest-response>"
@@ -146,7 +200,7 @@ curl -s -X POST "http://localhost:3001/replay/${INCIDENT_ID}" | jq '{
 }'
 ```
 
-**Batch replay all stored incidents** (returns aggregate diff stats):
+**Batch replay all stored incidents:**
 
 ```bash
 curl -s -X POST http://localhost:3001/replay/stream | jq '{
@@ -156,6 +210,17 @@ curl -s -X POST http://localhost:3001/replay/stream | jq '{
   degraded: .summary.score_degraded
 }'
 ```
+
+### Dashboard
+
+The operator dashboard runs at `http://localhost:5173` after `cd apps/dashboard && npm run dev`.
+
+It displays the live incident queue ranked by priority tier, with a detail panel showing:
+- "Why this priority?" — plain-English prose generated from the score breakdown
+- Per-factor contribution bars (domain base / severity indicators / penalties)
+- Three confidence meters: parse quality, location semantic, location dispatchable
+- Reason code chips linking to [docs/scoring/reason-code-taxonomy.md](docs/scoring/reason-code-taxonomy.md)
+- Full audit block (parser version, scoring version, schema version)
 
 ---
 
@@ -177,16 +242,17 @@ Every incident record stores the exact `parser_version`, `scoring_version`, and 
 }
 ```
 
-This makes it possible to answer the question: *"If we had used the current scoring rules when this call came in, would the tier have been different?"* — without requiring separate tooling or manual re-analysis.
+This answers the question: *"If we had used the current scoring rules when this call came in, would the tier have been different?"* — without separate tooling or manual re-analysis.
 
-The `POST /replay/stream` endpoint replays all stored incidents at once and returns aggregate change stats, which feeds directly into the scoring comparison workflow:
+The `POST /replay/stream` endpoint replays all stored incidents at once and returns aggregate change stats. The evaluation harness `compare-versions.ts` CLI runs the same comparison against labeled fixtures and shows a tier transition matrix:
 
 ```bash
 cd packages/evaluation-harness
 npx ts-node src/compare-versions.ts \
   --baseline ../../services/prioritization-engine/config/scoring-rules.json \
   --revised  ./config/scoring-rules-candidate.json \
-  --fixtures ../../data/fixtures/sample-incidents.json
+  --fixtures ../../data/fixtures/sample-incidents.json \
+  --only-changed
 ```
 
 ---
@@ -197,7 +263,9 @@ Every incident record carries a `score_breakdown` array that lists each rule tha
 
 The breakdown is stored alongside the incident record — not recomputed on read — so the explanation is always tied to the exact scoring version that produced it.
 
-Operators can inspect, replay, and compare without any ML introspection tooling, model weights, or black-box reasoning.
+Operators can inspect, replay, and compare without ML introspection tooling, model weights, or black-box reasoning.
+
+Full reason code reference: [docs/scoring/reason-code-taxonomy.md](docs/scoring/reason-code-taxonomy.md)
 
 ---
 
@@ -217,15 +285,20 @@ ng911-triage-intelligence/
   apps/
     dashboard/                React 18 + Vite — operator queue, tabbed detail, score breakdown panel
   data/
-    fixtures/                 Labeled incident fixtures for evaluation
+    fixtures/                 23 hand-labeled incident fixtures for evaluation
   docs/
-    architecture/
-    design-decisions/
-    evaluation/
-    standards-alignment/
+    architecture/             System overview and data flow
+    design-decisions/         Decision log (DDL-001 through DDL-010)
+    evaluation/               Evaluation plan, benchmark reports
+    scoring/                  Reason code taxonomy
+    standards-alignment/      NG911 alignment narrative
   infra/
     docker/                   docker-compose (postgres:16 + ingestion-api)
 ```
+
+Detailed data flow with per-module responsibilities: [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
+
+Key design decisions with rationale: [docs/design-decisions/decision-log.md](docs/design-decisions/decision-log.md)
 
 ---
 
@@ -271,6 +344,14 @@ npm run dev
 ```bash
 cd packages/evaluation-harness
 npx ts-node src/cli.ts --fixtures ../../data/fixtures/sample-incidents.json
+```
+
+Save a JSON report:
+
+```bash
+npx ts-node src/cli.ts \
+  --fixtures ../../data/fixtures/sample-incidents.json \
+  --output   ./results/eval-$(date +%Y-%m-%d).json
 ```
 
 ### Run tests
@@ -340,23 +421,7 @@ Driven by `services/prioritization-engine/config/scoring-rules.json`. The config
 
 **Victim count multiplier:** each additional victim beyond one adds 0.04, capped at 0.20.
 
-Full taxonomy: [docs/scoring/reason-code-taxonomy.md](docs/scoring/reason-code-taxonomy.md)
-
----
-
-## Operational Limitations
-
-This platform is a research and decision-support prototype. It is **not** suitable for production emergency dispatch without significant additional work:
-
-- **No real telephony** — inputs are text strings, not SIP/i3 call streams
-- **No GIS integration** — location scoring is heuristic; there is no geocoding or ESInet routing
-- **No NG911 compliance** — the platform is informed by NENA i3 concepts but does not implement the protocol stack
-- **Rules-based NLP only** — parsing relies on keyword matching with negation filtering, not a trained NLP model
-- **English and Spanish only** — language detection supports two languages; all others fall back to `unknown`
-- **No CAD integration** — incidents are not dispatched; the platform supports operator review, not autonomous action
-- **In-memory store resets on restart** — persistent storage requires Docker + PostgreSQL
-
-See [docs/standards-alignment/ng911-alignment.md](docs/standards-alignment/ng911-alignment.md) for a full honest accounting of what "NG911-aligned" means here.
+Full reason code taxonomy with negation behavior and stability contract: [docs/scoring/reason-code-taxonomy.md](docs/scoring/reason-code-taxonomy.md)
 
 ---
 
@@ -368,25 +433,27 @@ See [docs/standards-alignment/ng911-alignment.md](docs/standards-alignment/ng911
 - **Replayability is first-class** — every incident can be re-processed against any scoring version; the audit trail is the feature
 - **Location quality as a priority signal** — low dispatchability is a penalty, not a footnote
 
-See [docs/design-decisions/decision-log.md](docs/design-decisions/decision-log.md) for full rationale on each decision.
+Full rationale for each decision: [docs/design-decisions/decision-log.md](docs/design-decisions/decision-log.md)
 
 ---
 
-## Scope Boundaries
+## Operational Limitations
 
-This project does **not** implement or claim:
+This platform is a research and decision-support prototype. It is **not** suitable for production emergency dispatch:
 
-- Full NG911 / ESInet compliance or certification
-- Direct SIP/i3 call routing or PSAP integration
-- Replacement of dispatchers or CAD systems
-- Autonomous dispatching decisions
-- Production GIS, telephony, or network infrastructure
+- **No real telephony** — inputs are text strings, not SIP/i3 call streams
+- **No GIS integration** — location scoring is heuristic; there is no geocoding or ESInet routing
+- **No NG911 compliance** — the platform is informed by NENA i3 concepts but does not implement the protocol stack
+- **Rules-based NLP only** — parsing relies on keyword matching with negation filtering, not a trained NLP model
+- **English and Spanish only** — language detection supports two languages; all others fall back to `unknown`
+- **No CAD integration** — incidents are not dispatched; the platform supports operator review, not autonomous action
+- **In-memory store resets on restart** — persistent storage requires Docker + PostgreSQL
 
 ---
 
 ## Roadmap
 
 - **Phase 1** (complete): Schema, parser, scorer, ingestion API, fixtures, tests
-- **Phase 2** (complete): React dashboard, PostgreSQL store, replay engine, evaluation harness
-- **Phase 3** (next): Advanced location validation, scenario stress-testing, operator simulation mode
-- **Phase 4**: Public demo environment, architecture writeup, external evaluation
+- **Phase 2** (complete): React dashboard, PostgreSQL store, replay engine, test data generator, location validator
+- **Phase 3** (complete): Evaluation harness, benchmark reporting, reason code taxonomy, fixture expansion to 23 labeled scenarios
+- **Phase 4** (next): Public demo environment, expanded fixture set with real linguistic variation, architecture writeup for external audiences
