@@ -15,9 +15,17 @@ const NEGATION_WORDS = new Set([
   'not', 'no', "isn't", "aren't", "wasn't", "weren't",
   "doesn't", "don't", "didn't", "haven't", "hasn't", "hadn't",
   "won't", "wouldn't", "can't", "cannot", "couldn't",
-  "needn't", "never", "without', 'denies", 'deny', 'denied',
-  'negative', 'ruled out', 'no sign of', 'no evidence of',
+  "needn't", 'never', 'without', 'denies', 'deny', 'denied',
+  'negative',
 ]);
+
+// Multi-token cues. Tokens are compared one at a time, so phrases cannot live
+// in NEGATION_WORDS — they are matched as token sequences in isNegated().
+const NEGATION_PHRASES: string[][] = [
+  ['ruled', 'out'],
+  ['no', 'sign', 'of'],
+  ['no', 'evidence', 'of'],
+];
 
 // Sentence boundary — negation scope does not cross these
 const SENTENCE_BOUNDARY = /[.!?;]/;
@@ -33,6 +41,22 @@ function tokenise(text: string): Array<{ word: string; start: number; end: numbe
     tokens.push({ word: m[0].toLowerCase().replace(/[^\w']/g, ''), start: m.index, end: m.index + m[0].length });
   }
   return tokens;
+}
+
+/**
+ * Returns true if a NEGATION_PHRASES entry starts at token `start` and ends
+ * before the keyword token.
+ */
+function startsNegationPhrase(
+  tokens: ReturnType<typeof tokenise>,
+  start: number,
+  keywordTokenIndex: number,
+): boolean {
+  return NEGATION_PHRASES.some(
+    (phrase) =>
+      start + phrase.length <= keywordTokenIndex &&
+      phrase.every((word, offset) => tokens[start + offset]?.word === word),
+  );
 }
 
 /**
@@ -56,6 +80,7 @@ function isNegated(
     if (SENTENCE_BOUNDARY.test(between)) break;
 
     if (NEGATION_WORDS.has(tok.word)) return true;
+    if (startsNegationPhrase(tokens, i, keywordTokenIndex)) return true;
   }
 
   return false;
