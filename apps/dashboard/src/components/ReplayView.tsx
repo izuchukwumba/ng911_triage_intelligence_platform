@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { components } from '../api/schema';
 import { api } from '../api/client';
+import { ReviewComparisonView } from './ReviewComparisonView';
 
 type ReplayRun = components['schemas']['ReplayRun'];
 type Ruleset = components['schemas']['RulesetOut'];
@@ -88,6 +89,7 @@ export function ReplayView() {
           <p className="muted" style={{ fontSize: '11px', marginTop: '8px' }}>{run.note}</p>
         </div>
       )}
+      <ReviewComparisonView />
     </section>
   );
 }
