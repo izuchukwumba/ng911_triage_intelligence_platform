@@ -35,11 +35,14 @@ class Settings:
     rate_limit_per_minute: int = 0
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls, *, serves_api: bool = True) -> "Settings":
+        """Settings from the environment. A process that serves the API refuses to
+        start without authentication configured; a background worker (e.g. the
+        conveyance subscriber) serves no API and skips that check."""
         origins = os.environ.get("NTIP_CORS_ORIGINS")
         api_tokens = _parse_api_tokens(os.environ.get("NTIP_API_TOKENS", ""))
         auth_disabled = os.environ.get("NTIP_AUTH_DISABLED") == "1"
-        if not api_tokens and not auth_disabled:
+        if serves_api and not api_tokens and not auth_disabled:
             raise ConfigurationError(
                 "Set NTIP_API_TOKENS (token:principal:role,...) or, for an isolated local "
                 "demo only, NTIP_AUTH_DISABLED=1."
