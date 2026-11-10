@@ -81,6 +81,7 @@ Last updated: 2026-11-10.
 | Append-only events enforced by the database (§9.2) | Done | Triggers on every table; safety case S12 |
 | Restricted database role (§9.2) | Done | Migration 0006 (`ntip_app`); contract tests run as the role; `tests/store/test_postgres_app_role.py`; compose backend connects as `ntip_api` |
 | Replay: reproducibility and version comparison (§10.1–10.4) | Done | `POST /v1/replay-runs`; dashboard Replay tab |
+| Human-review replay: machine output beside operator correction, not ground truth (§10.2) | Done | `GET /v1/review-comparison` (`ntip/review_replay.py`): latest decision per reviewed assessment, raised/lowered/confirmed/reclassified, tenant-scoped; dashboard Replay tab; `tests/test_review_replay.py`, end-to-end test |
 | Stream replay with relative timing (§10.2) | Done | `python -m ntip.stream` (simulated clock, queue timeline, time to P0, candidate comparison; streams from files or stored traffic); `tests/test_stream.py`; [example](evaluation/results/stream-escalation-research-1.1.0-vs-1.0.0.md) |
 | Latency baseline (§10.5, §13.3) | Done | `ntip.evaluation.latency`; results README |
 | Human-factors study (§10.5, §16.1 RQ4) | External | Needs a controlled study with consent |

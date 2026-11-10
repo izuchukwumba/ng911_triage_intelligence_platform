@@ -69,6 +69,11 @@ release version identifies the platform as a whole.
 - **CI run summaries** now show test results and the evaluation report, and a
   **weekly benchmark workflow** measures latency and PostgreSQL load.
 
+- **Human-review replay** (`GET /v1/review-comparison`, dashboard Replay tab): each
+  reviewed assessment's machine output beside the operator's decision (confirmed,
+  raised, lowered, reclassified, escalated), labelled as human judgement rather
+  than ground truth.
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.
