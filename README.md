@@ -58,6 +58,8 @@ Evaluation
 
 Full module-level detail: [docs/architecture/system-overview.md](docs/architecture/system-overview.md)
 
+Target design (v1.2, proposed — not yet implemented in full): [docs/design/technical-design-v1.2.md](docs/design/technical-design-v1.2.md)
+
 ---
 
 ## Demo Walkthrough
@@ -323,6 +325,7 @@ ng911-triage-intelligence/
     fixtures/                 23 hand-labeled incident fixtures
   docs/
     architecture/             System overview and data flow
+    design/                   Technical design specification (target architecture)
     design-decisions/         Decision log (DDL-001 through DDL-010)
     evaluation/               Evaluation plan, benchmark reports, replay workflow
     scoring/                  Reason code taxonomy
