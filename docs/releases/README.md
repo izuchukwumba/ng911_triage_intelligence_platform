@@ -15,7 +15,8 @@ evaluation reports.
 
 | Version | Date | Notes |
 |---|---|---|
-| 0.1.0 | 2026-11-10 | [0.1.0.md](0.1.0.md) |
+| 0.2.0 | 2026-11-10 | [0.2.0.md](0.2.0.md) |
+| 0.1.0 | 2026-11-10 | [0.1.0.md](0.1.0.md) (not tagged; superseded by 0.2.0) |
 
 ## How to release
 
