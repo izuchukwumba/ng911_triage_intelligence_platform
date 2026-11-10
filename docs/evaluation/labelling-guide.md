@@ -1,4 +1,4 @@
-# Labelling guide (v1.0)
+# Labelling guide (v1.1)
 
 How to label a synthetic case in `data/eval/*.jsonl` so that labels are
 consistent and can be checked by a second annotator (design v1.2, §3A.7).
@@ -30,6 +30,7 @@ Put a cue in `absent_cues` when it is mentioned but **denied** ("no fire"),
 | `FIRE_REPORTED` / `SMOKE_REPORTED` / `FIRE_SPREADING` / `EXPLOSION_REPORTED` | as named |
 | `HAZARDOUS_ENVIRONMENT` | gas smell or leak, chemicals, fumes, carbon monoxide |
 | `INJURY_REPORTED` | an injury or pain not covered above |
+| `UNABLE_TO_GET_UP` | the person cannot get up, stand or move from where they fell (added in v1.1) |
 | `MULTIPLE_VICTIMS` | two or more people affected |
 | `CHILD_INVOLVED` | a baby, toddler or child (an explicit age under 18 also counts) |
 
@@ -63,3 +64,10 @@ when several people are mentioned without a number, omitted when not mentioned.
 
 The primary service: `police`, `fire`, `ems`, `hazmat`; `other` for non-emergency
 calls such as pranks; `unknown` when it cannot be told.
+
+## Changes
+
+- v1.1: added `UNABLE_TO_GET_UP`; relabelled `fx-008` accordingly. A critical
+  cue reported only in the past ("wasn't breathing earlier") stays in
+  `absent_cues` and the case is labelled elevated, as before.
+
