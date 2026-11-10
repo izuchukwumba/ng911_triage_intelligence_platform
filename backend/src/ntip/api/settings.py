@@ -7,6 +7,7 @@ from pathlib import Path
 
 from ntip.api.auth import Principal, Role
 from ntip.evaluation.runner import REPO_ROOT
+from ntip.location.reference import ReferenceLayer
 from ntip.ml.extractors import HttpExtractor, ModelExtractor
 from ntip.schema.base import DEFAULT_TENANT
 from ntip.schema.canonical import InferenceMode
@@ -31,6 +32,9 @@ class Settings:
     database_url: str | None = None
     # Maximum PostgreSQL connections held by the event store's pool.
     database_pool_size: int = 10
+    # Location level L3: a Site/Structure Address Point layer (CSV, NENA field
+    # names) to check addresses against. Unset: L3 is off.
+    gis_reference: Path | None = None
     # Directory of the committed evaluation datasets (for the evaluation report).
     eval_data_dir: Path = REPO_ROOT / "data" / "eval"
     # Browser origins allowed to call the API (the dashboard in development).
@@ -79,6 +83,9 @@ class Settings:
             auth_disabled=auth_disabled and not api_tokens,
             database_url=os.environ.get("NTIP_DATABASE_URL") or None,
             database_pool_size=int(os.environ.get("NTIP_DATABASE_POOL_SIZE", "10")),
+            gis_reference=Path(os.environ["NTIP_GIS_REFERENCE"])
+            if os.environ.get("NTIP_GIS_REFERENCE")
+            else None,
             eval_data_dir=Path(os.environ.get("NTIP_EVAL_DATA_DIR") or REPO_ROOT / "data" / "eval"),
             cors_origins=[o.strip() for o in origins.split(",")] if origins else cls().cors_origins,
             inference_mode=InferenceMode(os.environ.get("NTIP_INFERENCE_MODE", "rules_only")),
@@ -86,6 +93,9 @@ class Settings:
             inference_timeout_s=float(os.environ.get("NTIP_INFERENCE_TIMEOUT_S", "2.0")),
             interop_tokens=_parse_tokens(os.environ.get("NTIP_INTEROP_TOKENS", "")),
         )
+
+    def build_reference(self) -> ReferenceLayer | None:
+        return ReferenceLayer.load(self.gis_reference) if self.gis_reference else None
 
     def build_extractor(self) -> ModelExtractor | None:
         if self.inference_mode is InferenceMode.RULES_ONLY or self.inference_url is None:

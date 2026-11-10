@@ -58,6 +58,8 @@ services:
       NTIP_CORS_ORIGINS: http://localhost:8080
       # The only mode there is; stated explicitly (design v1.2, section 13.2).
       NTIP_DEPLOYMENT_MODE: simulation
+      # Location level L3 against the synthetic reference layer (data/gis).
+      NTIP_GIS_REFERENCE: /app/data/gis/synthetic-ssap-1.0.0.csv
       # token:principal:role (viewer | operator | analyst | admin). Development
       # tokens only; override NTIP_API_TOKENS for anything shared.
       NTIP_API_TOKENS: ${NTIP_API_TOKENS:-dev-operator:operator_1:operator,dev-analyst:analyst_1:analyst,dev-viewer:viewer_1:viewer}

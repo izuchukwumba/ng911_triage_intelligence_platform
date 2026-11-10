@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 
+from ntip.location.reference import ReferenceLayer, validate_locations
 from ntip.ml.contract import InferenceMessage, InferenceRequest, ModelOutput
 from ntip.ml.extractors import ModelExtractor
 from ntip.ml.fusion import fuse
@@ -76,6 +77,8 @@ class Pipeline:
     # always runs; a model can only add to it, and never blocks it.
     inference_mode: InferenceMode = InferenceMode.RULES_ONLY
     extractor: ModelExtractor | None = None
+    # Location level L3: a GIS reference layer to check addresses against.
+    reference: ReferenceLayer | None = None
 
     # ------------------------------------------------------------------ ingest
 
@@ -162,6 +165,8 @@ class Pipeline:
             incident, model_records = self._with_model(
                 self.parser(sources, derived_at=now), sources
             )
+            if self.reference is not None:
+                incident = validate_locations(incident, self.reference)
             assessment = assess(
                 incident,
                 assessment_id=assessment_id,

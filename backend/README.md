@@ -67,6 +67,7 @@ the role existed, recreate it (`docker compose ... down --volumes`).
 | `NTIP_DATABASE_POOL_SIZE` | `10` | Maximum connections in the event store's pool, per API process |
 | `NTIP_DEPLOYMENT_MODE` | `simulation` | The only accepted value; anything else refuses to start |
 | `NTIP_LOG_FORMAT` / `NTIP_LOG_LEVEL` | `json` / `INFO` | One JSON object per line with the correlation id (`text` for local reading). Logs never contain transcript text |
+| `NTIP_GIS_REFERENCE` | unset (L3 off) | A Site/Structure Address Point layer (CSV, NENA field names) for location level L3, e.g. `data/gis/synthetic-ssap-1.0.0.csv` |
 | `NTIP_EVAL_DATA_DIR` | `data/eval` in the repository | Committed evaluation datasets, for `GET /v1/evaluation/report` |
 | `NTIP_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated dashboard origins |
 | `NTIP_API_TOKENS` | none | `token:principal:role[:tenant],...`; roles `viewer`, `operator` (+ingest, review), `analyst` (+replay), `admin`; tenant defaults to `default`. Users see only their tenant's incidents and replay runs; EIDO imports belong to the submitting interop tenant |

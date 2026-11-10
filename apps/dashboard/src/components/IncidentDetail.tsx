@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { AuditEvent, IncidentDetail as Detail, Observation } from '../api/client';
+import type { AuditEvent, IncidentDetail as Detail, LocationCandidate, Observation } from '../api/client';
 import { api } from '../api/client';
 import {
   LOCATION_QUALITY_LABELS,
@@ -29,6 +29,19 @@ function describe(o: Observation): string {
   if (o.temporality !== 'current') parts.push(o.temporality);
   if (o.attribution === 'second_hand') parts.push('second-hand');
   return `${codeLabel(o.code)} — ${parts.join(', ')}`;
+}
+
+// Where a location came from; a reference match confirms the address exists,
+// not that the caller is there.
+const LOCATION_ROLE_LABELS: Record<string, string> = {
+  reported: 'said by caller',
+  device_provided: 'supplied by a system',
+  geocoded: 'reference match',
+};
+
+function formatAddress(a: NonNullable<LocationCandidate['civic_address']>): string {
+  const first = [a.house_number, a.street].filter(Boolean).join(' ');
+  return [first, a.locality, a.region, a.postal_code].filter(Boolean).join(', ');
 }
 
 export function IncidentDetail({ incidentId, onChanged }: Props) {
@@ -209,13 +222,17 @@ export function IncidentDetail({ incidentId, onChanged }: Props) {
           )}
 
           <section aria-label="Locations" className="panel">
-            <h3 className="section-title">Reported locations · {LOCATION_QUALITY_LABELS[assessment.location_quality.status]}</h3>
+            <h3 className="section-title">Locations · {LOCATION_QUALITY_LABELS[assessment.location_quality.status]}</h3>
             {(incident?.locations ?? []).length === 0 && <p style={{ fontSize: '13px', color: 'var(--p2)' }}>No location reported — verify with the caller. Severity is not reduced.</p>}
             <ul style={{ listStyle: 'none', display: 'grid', gap: '4px' }}>
               {(incident?.locations ?? []).map((l) => (
                 <li key={l.location_id} style={{ fontSize: '13px' }} onMouseEnter={() => setFocus(l.location_id)} onMouseLeave={() => setFocus(null)}>
-                  <span className="mono">{l.raw_text}</span>{' '}
-                  <span className="muted" style={{ fontSize: '11px' }}>{l.validation}{l.missing_fields.length ? ` · missing ${l.missing_fields.join(', ')}` : ''}</span>
+                  <span className="mono">{l.role === 'geocoded' && l.civic_address ? formatAddress(l.civic_address) : l.raw_text}</span>{' '}
+                  <span className="muted" style={{ fontSize: '11px' }}>
+                    {LOCATION_ROLE_LABELS[l.role] ?? l.role} · {l.validation.replace(/_/g, ' ')}
+                    {l.missing_fields.length ? ` · missing ${l.missing_fields.join(', ')}` : ''}
+                    {l.coordinates ? ` · ${l.coordinates.lat.toFixed(5)}, ${l.coordinates.lng.toFixed(5)}` : ''}
+                  </span>
                 </li>
               ))}
             </ul>
