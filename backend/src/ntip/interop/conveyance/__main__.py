@@ -32,7 +32,10 @@ def main() -> int:
     settings = Settings.from_env(serves_api=False)
     store = settings.build_store()
     pipeline = Pipeline(
-        store=store, inference_mode=settings.inference_mode, extractor=settings.build_extractor()
+        store=store,
+        inference_mode=settings.inference_mode,
+        extractor=settings.build_extractor(),
+        reference=settings.build_reference(),
     )
     gateway = EidoGateway(pipeline)
 

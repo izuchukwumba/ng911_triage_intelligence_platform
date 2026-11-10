@@ -4,11 +4,12 @@
 - L1 completeness: which components (house number, street, locality, ...) are missing?
 - L2 consistency:  do the reported locations disagree?
 
-L3 (checking against authoritative GIS data) and L4 (standards-specific
-validation) are out of scope until a licensed reference dataset is available,
-so a location is only ``sufficient`` once a human or an authoritative source
-has verified it. Everything the parser extracted on its own therefore
-"requires verification" — and says exactly what is missing.
+L3 (a unique match in a GIS reference layer) is done by
+``ntip.location.reference`` when a layer is configured; L4 (standards-specific
+validation such as an LVF) is out of scope. A location is only ``sufficient``
+once a person or a reference has verified it. Everything the parser extracted
+on its own therefore "requires verification", and says exactly what is
+missing.
 """
 
 from ntip.schema.advisory import LocationQuality, LocationQualityStatus

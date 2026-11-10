@@ -53,6 +53,7 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
         store=store,
         inference_mode=settings.inference_mode,
         extractor=settings.build_extractor(),
+        reference=settings.build_reference(),
     )
     app.state.rate_limiter = RateLimiter(settings.rate_limit_per_minute)
     app.state.api_tokens = settings.api_tokens
