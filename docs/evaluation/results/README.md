@@ -147,7 +147,10 @@ present and that each incident's latest version covers every message.
 | memory, after | 800 | 0 | 0 | ~480/s | 13 ms / 90 ms |
 | PostgreSQL, before DDL-016 | 400 | 0 | 100 (stale versions) | — | — |
 | PostgreSQL, after | 400 | 0 | 0 | ~17/s | 0.7 s / 1.7 s |
+| PostgreSQL, pooled connections | 400 | 0 | 0 | ~310/s | 49 ms / 90 ms |
 
-The PostgreSQL figures reflect a new connection per store call under
-deliberately extreme contention; they are a correctness baseline, not a
-performance target.
+Before pooling, every store call opened a new PostgreSQL connection; a
+pool of 10 (`NTIP_DATABASE_POOL_SIZE`) raised throughput about 18-fold on
+the same run. The workload is deliberately extreme contention (every
+incident receives simultaneous follow-ups), measured on one development
+machine; treat the figures as a regression baseline, not a capacity claim.
