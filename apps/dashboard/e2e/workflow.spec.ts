@@ -17,6 +17,10 @@ test('an operator triages, overrides with a reason, and the decision is replayab
   await expect(detail.getByText('P0').first()).toBeVisible();
   // The evidence is quoted from the transcript.
   await expect(detail.getByRole('region', { name: 'Transcript' })).toContainText('people are trapped');
+  // Location level L3: the address is found in the (synthetic) reference layer.
+  const locations = detail.getByRole('region', { name: 'Locations' });
+  await expect(locations).toContainText('9 Birch Lane, Springfield, IL, 62701');
+  await expect(locations).toContainText('reference match');
 
   // Override with a reason; the human decision is shown as such.
   await detail.getByRole('tab', { name: /^Review/ }).click();

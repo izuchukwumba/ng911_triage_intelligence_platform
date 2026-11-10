@@ -22,7 +22,11 @@ export default defineConfig({
     {
       command: BACKEND_CMD,
       url: 'http://localhost:8000/health/live',
-      env: { NTIP_AUTH_DISABLED: '1', NTIP_RATE_LIMIT_PER_MINUTE: '0' },
+      env: {
+        NTIP_AUTH_DISABLED: '1',
+        NTIP_RATE_LIMIT_PER_MINUTE: '0',
+        NTIP_GIS_REFERENCE: '../../data/gis/synthetic-ssap-1.0.0.csv',
+      },
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },

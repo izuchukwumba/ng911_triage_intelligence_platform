@@ -22,6 +22,8 @@ RUN uv sync --locked --extra ml
 # Committed synthetic datasets: B1 trains from the generated one when it is
 # selected, and the evaluation report runs over both.
 COPY data/eval/curated.jsonl data/eval/generated-1.0.0-seed42.jsonl ./data/eval/
+# Synthetic GIS reference layer (NENA field names) for location level L3.
+COPY data/gis/synthetic-ssap-1.0.0.csv ./data/gis/
 
 RUN useradd --system --uid 10001 ntip
 USER ntip
