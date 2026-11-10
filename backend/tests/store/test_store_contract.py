@@ -142,3 +142,24 @@ def test_replay_runs_round_trip(store: EventStore) -> None:
     assert store.replay_run(run.run_id) == run
     assert store.replay_runs(limit=10) == [run]
     assert store.audit_events("inc_1")[-1].event_type == "incident.replayed"
+
+
+def test_model_outputs_round_trip(store: EventStore) -> None:
+    from ntip.ml.contract import InferenceMessage, InferenceRequest, ModelOutput
+    from ntip.schema.canonical import InferenceMode
+
+    output = ModelOutput(
+        output_id="mo_1",
+        incident_id="inc_1",
+        recorded_at=T0,
+        mode=InferenceMode.ML_SHADOW,
+        request=InferenceRequest(
+            request_id="r1",
+            incident_id="inc_1",
+            messages=[InferenceMessage(source_event_id="e1", text="Fire.")],
+        ),
+        response=None,
+        error="timeout",
+    )
+    store.append([output])
+    assert store.model_outputs("inc_1") == [output]

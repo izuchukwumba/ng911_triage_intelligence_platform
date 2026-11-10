@@ -16,6 +16,7 @@ from ntip.api.models import (
     MessageIn,
     ReviewIn,
 )
+from ntip.ml.contract import ModelOutput
 from ntip.pipeline import Pipeline
 from ntip.schema.advisory import Assessment
 from ntip.schema.review import HumanReview
@@ -96,6 +97,15 @@ def get_events(incident_id: str, request: Request) -> AuditTrail:
     if not events:
         raise UnknownIncident(incident_id)
     return AuditTrail(incident_id=incident_id, events=events)
+
+
+@router.get("/incidents/{incident_id}/model-outputs")
+def get_model_outputs(incident_id: str, request: Request) -> list[ModelOutput]:
+    """Exact model requests and responses recorded for this incident (design 3A.9)."""
+    store = _pipeline(request).store
+    if not store.source_events(incident_id):
+        raise UnknownIncident(incident_id)
+    return store.model_outputs(incident_id)
 
 
 @router.post("/incidents/{incident_id}/reviews", status_code=status.HTTP_201_CREATED)

@@ -96,7 +96,17 @@ export function IncidentDetail({ incidentId, onChanged }: Props) {
           <span style={{ fontSize: '13px' }}>
             Severity: <strong>{SEVERITY_LABELS[assessment.severity_band]}</strong> · Location: <strong>{LOCATION_QUALITY_LABELS[assessment.location_quality.status]}</strong> · {STATE_LABELS[detail.state]}
           </span>
-          <span className="muted mono" style={{ fontSize: '11px' }}>{detail.incident_id} · ruleset {assessment.ruleset_version}</span>
+          <span className="muted mono" style={{ fontSize: '11px' }}>
+            {detail.incident_id} · ruleset {assessment.ruleset_version}
+            {incident?.inference && incident.inference.mode !== 'rules_only' && (
+              <> · model {incident.inference.model_id ?? '?'} ({incident.inference.mode})</>
+            )}
+          </span>
+          {incident?.inference?.status === 'degraded' && (
+            <span role="status" style={{ fontSize: '12px', color: 'var(--p2)' }}>
+              ⚠ Model unavailable — rules-only result ({incident.inference.detail})
+            </span>
+          )}
         </div>
       </header>
 
@@ -179,7 +189,10 @@ export function IncidentDetail({ incidentId, onChanged }: Props) {
                 <tbody>
                   {observations.map((o) => (
                     <tr key={o.observation_id} onMouseEnter={() => setFocus(o.observation_id)} onMouseLeave={() => setFocus(null)} style={{ opacity: isLive(o) ? 1 : 0.6 }}>
-                      <td>{codeLabel(o.code)}</td>
+                      <td>
+                        {codeLabel(o.code)}
+                        {o.extractor.kind === 'model' && <span className="chip" title="Unverified model hypothesis">model</span>}
+                      </td>
                       <td>{describe(o).split(' — ')[1]}</td>
                       <td className="mono">“{o.evidence.text}”</td>
                     </tr>

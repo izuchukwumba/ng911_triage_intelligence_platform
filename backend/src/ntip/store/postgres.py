@@ -6,6 +6,7 @@ from typing import Any
 import psycopg
 from psycopg.types.json import Jsonb
 
+from ntip.ml.contract import ModelOutput
 from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
 from ntip.schema.base import sha256_digest
@@ -64,6 +65,13 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
                 " payload_digest) VALUES (%s, %s, %s, %s, %s)",
                 (record.run_id, record.created_at, record.candidate_ruleset, payload, digest),
             )
+        case ModelOutput():
+            cur.execute(
+                "INSERT INTO model_outputs (output_id, incident_id, recorded_at, mode, payload,"
+                " payload_digest) VALUES (%s, %s, %s, %s, %s, %s)",
+                (record.output_id, record.incident_id, record.recorded_at, record.mode, payload,
+                 digest),
+            )  # fmt: skip
         case IdempotencyClaim():
             cur.execute(
                 "INSERT INTO idempotency_claims (key, request_digest, incident_id, claimed_at,"
@@ -162,6 +170,12 @@ class PostgresEventStore:
             for incident_id, received, payload in rows
         ]
         return (total_row[0] if total_row else 0), page
+
+    def model_outputs(self, incident_id: str) -> list[ModelOutput]:
+        rows = self._payloads(
+            "SELECT payload FROM model_outputs WHERE incident_id = %s ORDER BY seq", (incident_id,)
+        )
+        return [ModelOutput.model_validate(r) for r in rows]
 
     def replay_run(self, run_id: str) -> ReplayRun | None:
         rows = self._payloads("SELECT payload FROM replay_runs WHERE run_id = %s", (run_id,))

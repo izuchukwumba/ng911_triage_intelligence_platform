@@ -26,7 +26,11 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
             "research API over synthetic data."
         ),
     )
-    app.state.pipeline = Pipeline(store=store or settings.build_store())
+    app.state.pipeline = Pipeline(
+        store=store or settings.build_store(),
+        inference_mode=settings.inference_mode,
+        extractor=settings.build_extractor(),
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

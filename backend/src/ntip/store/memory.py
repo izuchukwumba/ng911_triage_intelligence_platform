@@ -3,6 +3,7 @@
 import threading
 from collections.abc import Sequence
 
+from ntip.ml.contract import ModelOutput
 from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
 from ntip.schema.canonical import Incident
@@ -29,6 +30,8 @@ def _identity(record: Record) -> tuple[str, ...]:
             return ("idempotency", record.key)
         case ReplayRun():
             return ("replay", record.run_id)
+        case ModelOutput():
+            return ("model_output", record.output_id)
 
 
 class InMemoryEventStore:
@@ -90,6 +93,9 @@ class InMemoryEventStore:
             for s in ordered[offset : offset + limit]
         ]
         return len(ordered), page
+
+    def model_outputs(self, incident_id: str) -> list[ModelOutput]:
+        return self._of(ModelOutput, incident_id)
 
     def replay_run(self, run_id: str) -> ReplayRun | None:
         return next((r for r in self._of(ReplayRun) if r.run_id == run_id), None)
