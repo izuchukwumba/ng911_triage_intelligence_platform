@@ -74,6 +74,13 @@ release version identifies the platform as a whole.
   raised, lowered, reclassified, escalated), labelled as human judgement rather
   than ground truth.
 
+- **Location level L3** (`NTIP_GIS_REFERENCE`): addresses are matched against a
+  Site/Structure Address Point layer in NENA-STA-006.3 field names. A unique match
+  adds a reference-validated, geocoded candidate (with the point's NGUID and
+  coordinates); ambiguous or unknown addresses still need verifying. Priority is
+  never affected. It ships with a synthetic layer (`data/gis`), and the dashboard
+  now shows each location's origin.
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.

@@ -67,7 +67,8 @@ Last updated: 2026-11-10.
 | Versioned rules with ids, immutable releases (§7.2, §7.5) | Done | `rulesets/*.json` pinned by sha256 |
 | Explainability: rule id, version, evidence per recommendation (§7.4) | Done | `Assessment.reasons`; dashboard "Why this recommendation?" |
 | Location L0–L2 (§8.3) | Done | `ntip.location` |
-| Location L3 (GIS reference) / L4 (standards mapping) | Not done | Needs a licensed GIS dataset |
+| Location L3 (GIS reference) (§8.3) | Done (synthetic reference) | `ntip/location/reference.py`: a unique match in a Site/Structure Address Point layer (NENA-STA-006.3 field names) adds a `reference_validated`, geocoded candidate citing the point's NGUID; ambiguous or unknown addresses still need verifying; never affects priority. Opt-in (`NTIP_GIS_REFERENCE`), on in the compose stack with the synthetic layer in `data/gis`; `tests/location/test_reference.py` |
+| Location L4 (standards validation, e.g. LVF) | Not done | Needs an NG911 Location Validation Function and authoritative data |
 
 ## API, audit, replay (§5, §9, §10)
 
