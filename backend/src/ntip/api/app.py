@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ntip import __version__
 from ntip.api import errors
-from ntip.api.routes import health, incidents
+from ntip.api.routes import health, incidents, replay
 from ntip.api.settings import Settings
 from ntip.pipeline import Pipeline
 from ntip.store import EventStore
@@ -37,4 +37,5 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
     errors.install(app)
     app.include_router(health.router)
     app.include_router(incidents.router)
+    app.include_router(replay.router)
     return app

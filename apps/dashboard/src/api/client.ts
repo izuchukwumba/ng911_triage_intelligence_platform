@@ -86,6 +86,15 @@ export const api = {
   review(id: string, body: ReviewIn) {
     return post<HumanReview>(`/v1/incidents/${encodeURIComponent(id)}/reviews`, body);
   },
+  rulesets() {
+    return request<Schemas['RulesetOut'][]>('/v1/rulesets');
+  },
+  replayRuns() {
+    return request<Schemas['ReplayRun'][]>('/v1/replay-runs?limit=1');
+  },
+  replay(body: Schemas['ReplayIn']) {
+    return post<Schemas['ReplayRun']>('/v1/replay-runs', body);
+  },
   ready() {
     return request<{ status: string }>('/health/ready');
   },

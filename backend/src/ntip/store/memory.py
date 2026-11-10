@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
 from ntip.schema.canonical import Incident
+from ntip.schema.replay import ReplayRun
 from ntip.schema.review import HumanReview
 from ntip.schema.source import SourceEvent
 from ntip.store.base import DuplicateRecord, IdempotencyClaim, IncidentSummary, Record
@@ -26,6 +27,8 @@ def _identity(record: Record) -> tuple[str, ...]:
             return ("audit", record.event_id)
         case IdempotencyClaim():
             return ("idempotency", record.key)
+        case ReplayRun():
+            return ("replay", record.run_id)
 
 
 class InMemoryEventStore:
@@ -87,6 +90,12 @@ class InMemoryEventStore:
             for s in ordered[offset : offset + limit]
         ]
         return len(ordered), page
+
+    def replay_run(self, run_id: str) -> ReplayRun | None:
+        return next((r for r in self._of(ReplayRun) if r.run_id == run_id), None)
+
+    def replay_runs(self, *, limit: int) -> list[ReplayRun]:
+        return list(reversed(self._of(ReplayRun)))[:limit]
 
     def ping(self) -> bool:
         return True

@@ -120,3 +120,25 @@ def test_list_incidents_newest_first_with_latest_assessment(store: EventStore) -
 
 def test_ping(store: EventStore) -> None:
     assert store.ping()
+
+
+def test_replay_runs_round_trip(store: EventStore) -> None:
+    from itertools import count
+
+    from ntip.replay import run_replay
+
+    ingest(store, "inc_1", "He is not breathing at 12 Oak Street.")
+    ids = count(1)
+    run = run_replay(
+        store,
+        incident_ids=["inc_1"],
+        candidate_ruleset="research-1.0.0",
+        requested_by="analyst_1",
+        clock=lambda: T0,
+        new_id=lambda prefix: f"{prefix}_{next(ids)}",
+        correlation_id="req_r",
+    )
+    assert run.summary.reproducible == 1
+    assert store.replay_run(run.run_id) == run
+    assert store.replay_runs(limit=10) == [run]
+    assert store.audit_events("inc_1")[-1].event_type == "incident.replayed"

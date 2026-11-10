@@ -156,6 +156,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/replay-runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Replay Runs */
+        get: operations["list_replay_runs_v1_replay_runs_get"];
+        put?: never;
+        /**
+         * Create Replay Run
+         * @description Re-assess stored incidents. Nothing stored is modified.
+         */
+        post: operations["create_replay_run_v1_replay_runs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/replay-runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Replay Run */
+        get: operations["get_replay_run_v1_replay_runs__run_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/rulesets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Rulesets
+         * @description Released rulesets and their pinned digests.
+         */
+        get: operations["list_rulesets_v1_rulesets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -209,7 +267,7 @@ export interface components {
             ruleset_version: string;
             /**
              * Schema Version
-             * @default 2.0.0
+             * @default 2.1.0
              */
             schema_version: string;
             severity_band: components["schemas"]["SeverityBand"];
@@ -244,7 +302,7 @@ export interface components {
             occurred_at: string;
             /**
              * Schema Version
-             * @default 2.0.0
+             * @default 2.1.0
              */
             schema_version: string;
             /** Subject Digest */
@@ -415,7 +473,7 @@ export interface components {
             reviewer_id: string;
             /**
              * Schema Version
-             * @default 2.0.0
+             * @default 2.1.0
              */
             schema_version: string;
         };
@@ -442,7 +500,7 @@ export interface components {
             observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
-             * @default 2.0.0
+             * @default 2.1.0
              */
             schema_version: string;
             /** Source Event Ids */
@@ -619,6 +677,89 @@ export interface components {
              */
             status: "ready" | "not_ready";
         };
+        /** ReplayCase */
+        ReplayCase: {
+            candidate: components["schemas"]["ReplayOutcome"] | null;
+            /** Candidate Lowers Priority */
+            candidate_lowers_priority: boolean | null;
+            /** Incident Id */
+            incident_id: string;
+            /** Priority Changed */
+            priority_changed: boolean | null;
+            reproduced: components["schemas"]["ReplayOutcome"] | null;
+            /** Reproducible */
+            reproducible: boolean | null;
+            /** Skipped Reason */
+            skipped_reason: string | null;
+            stored: components["schemas"]["ReplayOutcome"];
+            /** Stored Assessment Id */
+            stored_assessment_id: string;
+        };
+        /** ReplayIn */
+        ReplayIn: {
+            /** Candidate Ruleset */
+            candidate_ruleset?: string | null;
+            /** Incident Ids */
+            incident_ids?: string[] | null;
+            /** Requested By */
+            requested_by: string;
+        };
+        /**
+         * ReplayOutcome
+         * @description What one ruleset produced for one incident.
+         */
+        ReplayOutcome: {
+            advisory_priority: components["schemas"]["AdvisoryPriority"] | null;
+            /** Reason Codes */
+            reason_codes: string[];
+            /** Ruleset Version */
+            ruleset_version: string;
+            severity_band: components["schemas"]["SeverityBand"];
+        };
+        /** ReplayRun */
+        ReplayRun: {
+            /** Candidate Ruleset */
+            candidate_ruleset: string | null;
+            /** Cases */
+            cases: components["schemas"]["ReplayCase"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Engine Version */
+            engine_version: string;
+            /**
+             * Note
+             * @default Replay never modifies stored incidents or assessments. Differences are illustrative and are not validated improvements.
+             */
+            note: string;
+            /** Requested By */
+            requested_by: string;
+            /** Run Id */
+            run_id: string;
+            /**
+             * Schema Version
+             * @default 2.1.0
+             */
+            schema_version: string;
+            summary: components["schemas"]["ReplaySummary"];
+        };
+        /** ReplaySummary */
+        ReplaySummary: {
+            /** Candidate Lowers Priority */
+            candidate_lowers_priority: number;
+            /** Incidents */
+            incidents: number;
+            /** Not Reproducible */
+            not_reproducible: number;
+            /** Priority Changed */
+            priority_changed: number;
+            /** Reproducible */
+            reproducible: number;
+            /** Skipped */
+            skipped: number;
+        };
         /**
          * ReviewAction
          * @enum {string}
@@ -657,6 +798,15 @@ export interface components {
             /** Rule Version */
             rule_version: string;
         };
+        /** RulesetOut */
+        RulesetOut: {
+            /** Default */
+            default: boolean;
+            /** Digest */
+            digest: string;
+            /** Name */
+            name: string;
+        };
         /**
          * SeverityBand
          * @enum {string}
@@ -675,7 +825,7 @@ export interface components {
             received_at: string;
             /**
              * Schema Version
-             * @default 2.0.0
+             * @default 2.1.0
              */
             schema_version: string;
             /** Source Event Id */
@@ -998,6 +1148,121 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_replay_runs_v1_replay_runs_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReplayRun"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_replay_run_v1_replay_runs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReplayIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReplayRun"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_replay_run_v1_replay_runs__run_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReplayRun"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_rulesets_v1_rulesets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RulesetOut"][];
                 };
             };
         };

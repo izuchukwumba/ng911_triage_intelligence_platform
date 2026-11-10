@@ -1,0 +1,77 @@
+"""/v1 replay and ruleset endpoints (design v1.2, sections 5.2 and 10)."""
+
+from typing import Annotated
+
+from fastapi import APIRouter, Query, Request, status
+from pydantic import BaseModel, ConfigDict, Field
+
+from ntip.api.errors import correlation_id
+from ntip.pipeline import Pipeline
+from ntip.replay import run_replay
+from ntip.schema.replay import ReplayRun
+from ntip.store import UnknownIncident
+from ntip.triage.ruleset import DEFAULT_RULESET, RELEASED
+
+router = APIRouter(prefix="/v1", tags=["replay"])
+
+
+class ReplayIn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    # Omit to replay every stored incident.
+    incident_ids: list[str] | None = Field(default=None, max_length=1000)
+    # A released ruleset to compare against; omit for a reproducibility check only.
+    candidate_ruleset: str | None = None
+    requested_by: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_.:-]+$")
+
+
+class RulesetOut(BaseModel):
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
+    name: str
+    digest: str
+    default: bool
+
+
+def _pipeline(request: Request) -> Pipeline:
+    pipeline: Pipeline = request.app.state.pipeline
+    return pipeline
+
+
+@router.post("/replay-runs", status_code=status.HTTP_201_CREATED)
+def create_replay_run(body: ReplayIn, request: Request) -> ReplayRun:
+    """Re-assess stored incidents. Nothing stored is modified."""
+    pipeline = _pipeline(request)
+    return run_replay(
+        pipeline.store,
+        incident_ids=body.incident_ids,
+        candidate_ruleset=body.candidate_ruleset,
+        requested_by=body.requested_by,
+        clock=pipeline.clock,
+        new_id=pipeline.new_id,
+        correlation_id=correlation_id(request),
+    )
+
+
+@router.get("/replay-runs")
+def list_replay_runs(
+    request: Request, limit: Annotated[int, Query(ge=1, le=100)] = 20
+) -> list[ReplayRun]:
+    return _pipeline(request).store.replay_runs(limit=limit)
+
+
+@router.get("/replay-runs/{run_id}")
+def get_replay_run(run_id: str, request: Request) -> ReplayRun:
+    run = _pipeline(request).store.replay_run(run_id)
+    if run is None:
+        raise UnknownIncident(run_id)
+    return run
+
+
+@router.get("/rulesets")
+def list_rulesets() -> list[RulesetOut]:
+    """Released rulesets and their pinned digests."""
+    return [
+        RulesetOut(name=name, digest=digest, default=name == DEFAULT_RULESET)
+        for name, digest in RELEASED.items()
+    ]

@@ -610,7 +610,7 @@
       "type": "string"
     }
   },
-  "$id": "https://ntip.local/schemas/v2.0.0/incident.schema.json",
+  "$id": "https://ntip.local/schemas/v2.1.0/incident.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "The canonical interpretation of one or more source events.",
@@ -664,7 +664,7 @@
       "type": "array"
     },
     "schema_version": {
-      "default": "2.0.0",
+      "default": "2.1.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -691,5 +691,5 @@
   ],
   "title": "Incident",
   "type": "object",
-  "x-schema-version": "2.0.0"
+  "x-schema-version": "2.1.0"
 }

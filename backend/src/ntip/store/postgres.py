@@ -10,6 +10,7 @@ from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
 from ntip.schema.base import sha256_digest
 from ntip.schema.canonical import Incident
+from ntip.schema.replay import ReplayRun
 from ntip.schema.review import HumanReview
 from ntip.schema.source import SourceEvent
 from ntip.store.base import DuplicateRecord, IdempotencyClaim, IncidentSummary, Record
@@ -57,6 +58,12 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
                 (record.event_id, record.incident_id, record.occurred_at, record.event_type,
                  record.correlation_id, payload),
             )  # fmt: skip
+        case ReplayRun():
+            cur.execute(
+                "INSERT INTO replay_runs (run_id, created_at, candidate_ruleset, payload,"
+                " payload_digest) VALUES (%s, %s, %s, %s, %s)",
+                (record.run_id, record.created_at, record.candidate_ruleset, payload, digest),
+            )
         case IdempotencyClaim():
             cur.execute(
                 "INSERT INTO idempotency_claims (key, request_digest, incident_id, claimed_at,"
@@ -155,6 +162,16 @@ class PostgresEventStore:
             for incident_id, received, payload in rows
         ]
         return (total_row[0] if total_row else 0), page
+
+    def replay_run(self, run_id: str) -> ReplayRun | None:
+        rows = self._payloads("SELECT payload FROM replay_runs WHERE run_id = %s", (run_id,))
+        return ReplayRun.model_validate(rows[0]) if rows else None
+
+    def replay_runs(self, *, limit: int) -> list[ReplayRun]:
+        rows = self._payloads(
+            "SELECT payload FROM replay_runs ORDER BY seq DESC LIMIT %s", (limit,)
+        )
+        return [ReplayRun.model_validate(r) for r in rows]
 
     def ping(self) -> bool:
         try:
