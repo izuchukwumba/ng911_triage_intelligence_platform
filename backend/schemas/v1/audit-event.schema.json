@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "Actor": {
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Actor Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ActorKind"
+        }
+      },
+      "required": [
+        "kind",
+        "actor_id"
+      ],
+      "title": "Actor",
+      "type": "object"
+    },
+    "ActorKind": {
+      "enum": [
+        "service",
+        "operator"
+      ],
+      "title": "ActorKind",
+      "type": "string"
+    },
+    "AuditEventType": {
+      "enum": [
+        "source.received",
+        "incident.parsed",
+        "location.assessed",
+        "triage.assessed",
+        "processing.failed",
+        "incident.reviewed",
+        "triage.overridden",
+        "incident.replayed",
+        "evaluation.completed"
+      ],
+      "title": "AuditEventType",
+      "type": "string"
+    }
+  },
+  "$id": "https://ntip.local/schemas/v1.0.0/audit-event.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/Actor"
+    },
+    "component_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Component Version"
+    },
+    "correlation_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "event_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "event_type": {
+      "$ref": "#/$defs/AuditEventType"
+    },
+    "incident_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "subject_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Subject Digest",
+      "type": "string"
+    },
+    "subject_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Subject Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "incident_id",
+    "occurred_at",
+    "event_type",
+    "actor",
+    "correlation_id",
+    "subject_id",
+    "subject_digest"
+  ],
+  "title": "AuditEvent",
+  "type": "object",
+  "x-schema-version": "1.0.0"
+}
