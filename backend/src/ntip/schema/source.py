@@ -13,6 +13,8 @@ from pydantic import Field, model_validator
 from ntip.schema.base import (
     DEFAULT_TENANT,
     SCHEMA_VERSION,
+    CivicAddress,
+    Coordinates,
     Identifier,
     SchemaModel,
     Sha256Digest,
@@ -21,6 +23,7 @@ from ntip.schema.base import (
 )
 
 MAX_TRANSCRIPT_CHARS = 20_000
+MAX_SUPPLIED_LOCATIONS = 20
 
 
 class SourceType(StrEnum):
@@ -28,6 +31,27 @@ class SourceType(StrEnum):
     STRUCTURED_TEST_EVENT = "structured_test_event"
     # Narrative imported from an EIDO through the interop gateway.
     EIDO_IMPORT = "eido_import"
+
+
+class SuppliedLocation(SchemaModel):
+    """A location an upstream system supplied in structured form (2.6.0).
+
+    For example a PIDF-LO civic address or point in an EIDO. It is recorded as
+    received: supplied is not the same as validated, and it is never merged
+    with what a caller said.
+    """
+
+    # Where it was in the original payload, e.g. "/locationComponent/0/locationByValue".
+    origin: str = Field(min_length=1, max_length=512)
+    civic_address: CivicAddress | None = None
+    coordinates: Coordinates | None = None
+    description: str | None = Field(default=None, max_length=1000)
+
+    @model_validator(mode="after")
+    def _check(self) -> Self:
+        if self.civic_address is None and self.coordinates is None:
+            raise ValueError("a supplied location needs a civic address or coordinates")
+        return self
 
 
 class SourceEvent(SchemaModel):
@@ -46,6 +70,10 @@ class SourceEvent(SchemaModel):
     # The organisation the incident belongs to (2.5.0). Every message of an
     # incident has the same tenant; only that tenant's users can see it.
     tenant_id: Identifier = DEFAULT_TENANT
+    # Locations received in structured form alongside the text (2.6.0).
+    supplied_locations: list[SuppliedLocation] = Field(
+        default_factory=list, max_length=MAX_SUPPLIED_LOCATIONS
+    )
 
     @model_validator(mode="after")
     def _check(self) -> Self:
@@ -68,6 +96,7 @@ class SourceEvent(SchemaModel):
         source_type: SourceType = SourceType.SYNTHETIC_TRANSCRIPT,
         supersedes: str | None = None,
         tenant_id: str = DEFAULT_TENANT,
+        supplied_locations: list[SuppliedLocation] | None = None,
     ) -> Self:
         """Build a synthetic source event, computing its digest."""
         return cls(
@@ -80,4 +109,5 @@ class SourceEvent(SchemaModel):
             payload_digest=sha256_digest(text),
             supersedes=supersedes,
             tenant_id=tenant_id,
+            supplied_locations=supplied_locations or [],
         )

@@ -12,7 +12,7 @@ from the pinned commit at runtime and verified against the digests below
 
 from dataclasses import dataclass
 
-ADAPTER_VERSION = "eido-adapter-0.1.0"
+ADAPTER_VERSION = "eido-adapter-0.2.0"
 
 
 @dataclass(frozen=True)

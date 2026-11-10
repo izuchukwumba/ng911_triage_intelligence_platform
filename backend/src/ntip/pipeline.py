@@ -24,7 +24,7 @@ from ntip.schema.audit import Actor, ActorKind, AuditEvent, AuditEventType
 from ntip.schema.base import DEFAULT_TENANT, SchemaModel, sha256_digest
 from ntip.schema.canonical import Incident, InferenceMode
 from ntip.schema.review import HumanReview, ReviewDecision
-from ntip.schema.source import SourceEvent, SourceType
+from ntip.schema.source import SourceEvent, SourceType, SuppliedLocation
 from ntip.store import (
     ConcurrentModification,
     EventStore,
@@ -89,6 +89,7 @@ class Pipeline:
         correlation_id: str | None = None,
         new_incident_id: str | None = None,
         tenant_id: str = DEFAULT_TENANT,
+        supplied_locations: list[SuppliedLocation] | None = None,
     ) -> "IngestResult":
         """Accept a new message, either opening an incident or adding to one.
 
@@ -129,6 +130,7 @@ class Pipeline:
                 source_type=source_type,
                 supersedes=previous[-1].source_event_id if previous else None,
                 tenant_id=tenant_id,
+                supplied_locations=supplied_locations,
             )
             records: list[Record] = []
             if idempotency_key is not None:

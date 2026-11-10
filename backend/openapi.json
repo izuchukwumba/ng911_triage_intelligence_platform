@@ -143,7 +143,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.5.0",
+            "default": "2.6.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -238,7 +238,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.5.0",
+            "default": "2.6.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -875,7 +875,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.5.0",
+            "default": "2.6.0",
             "title": "Schema Version",
             "type": "string"
           }
@@ -957,7 +957,7 @@
             "type": "array"
           },
           "schema_version": {
-            "default": "2.5.0",
+            "default": "2.6.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -1549,6 +1549,16 @@
           "role": {
             "$ref": "#/components/schemas/LocationRole"
           },
+          "supplied_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SuppliedReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "validation": {
             "$ref": "#/components/schemas/LocationValidation",
             "default": "unverified"
@@ -1572,6 +1582,7 @@
           "civic_address",
           "coordinates",
           "evidence",
+          "supplied_by",
           "extractor",
           "validation",
           "validation_source",
@@ -2060,7 +2071,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.5.0",
+            "default": "2.6.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2326,7 +2337,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.5.0",
+            "default": "2.6.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2353,6 +2364,14 @@
               }
             ],
             "title": "Supersedes"
+          },
+          "supplied_locations": {
+            "items": {
+              "$ref": "#/components/schemas/SuppliedLocation"
+            },
+            "maxItems": 20,
+            "title": "Supplied Locations",
+            "type": "array"
           },
           "synthetic": {
             "title": "Synthetic",
@@ -2383,7 +2402,8 @@
           "synthetic",
           "payload_digest",
           "supersedes",
-          "tenant_id"
+          "tenant_id",
+          "supplied_locations"
         ],
         "title": "SourceEvent",
         "type": "object"
@@ -2418,6 +2438,83 @@
         ],
         "title": "SourceType",
         "type": "string"
+      },
+      "SuppliedLocation": {
+        "additionalProperties": false,
+        "description": "A location an upstream system supplied in structured form (2.6.0).\n\nFor example a PIDF-LO civic address or point in an EIDO. It is recorded as\nreceived: supplied is not the same as validated, and it is never merged\nwith what a caller said.",
+        "properties": {
+          "civic_address": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CivicAddress"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coordinates": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "description": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "origin": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Origin",
+            "type": "string"
+          }
+        },
+        "required": [
+          "origin",
+          "civic_address",
+          "coordinates",
+          "description"
+        ],
+        "title": "SuppliedLocation",
+        "type": "object"
+      },
+      "SuppliedReference": {
+        "additionalProperties": false,
+        "description": "Where a structured, upstream-supplied location came from (2.6.0).",
+        "properties": {
+          "origin": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Origin",
+            "type": "string"
+          },
+          "source_event_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Source Event Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_event_id",
+          "origin"
+        ],
+        "title": "SuppliedReference",
+        "type": "object"
       },
       "Temporality": {
         "enum": [

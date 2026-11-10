@@ -9,9 +9,9 @@ from ntip.parser.classify import classify, detect_language
 from ntip.parser.context import analyse
 from ntip.parser.counts import victim_count
 from ntip.parser.lexicon import OBSERVATION_CUES
-from ntip.parser.locations import extract_locations
+from ntip.parser.locations import extract_locations, normalise_street
 from ntip.parser.text import find_all, phrase_pattern
-from ntip.schema.base import Evidence, Fact, FactStatus, SourceSpan
+from ntip.schema.base import CivicAddress, Evidence, Fact, FactStatus, SourceSpan
 from ntip.schema.canonical import (
     Conflict,
     ConflictKind,
@@ -22,12 +22,13 @@ from ntip.schema.canonical import (
     LocationRole,
     Observation,
     Polarity,
+    SuppliedReference,
     Temporality,
 )
-from ntip.schema.source import SourceEvent
+from ntip.schema.source import SourceEvent, SuppliedLocation
 
 PARSER_ID = "rules-parser"
-PARSER_VERSION = "1.3.0"
+PARSER_VERSION = "1.4.0"
 EXTRACTOR = Extractor(kind=ExtractorKind.RULE, extractor_id=PARSER_ID, version=PARSER_VERSION)
 
 
@@ -106,13 +107,45 @@ def _observation_conflicts(observations: list[Observation]) -> list[Conflict]:
     return conflicts
 
 
+def _supplied(source: SourceEvent, supplied: SuppliedLocation) -> LocationCandidate:
+    """A location received in structured form (e.g. EIDO PIDF-LO): kept apart from
+    what the caller said, and unverified until a person or reference data confirms it."""
+    address = supplied.civic_address
+    if address is None:
+        missing = ["civic_address"]
+    else:
+        wanted = ("house_number", "street", "locality", "region")
+        missing = [f for f in wanted if getattr(address, f) is None]
+    return LocationCandidate(
+        location_id="pending",
+        role=LocationRole.DEVICE_PROVIDED,
+        raw_text=supplied.description or _describe(address),
+        civic_address=address,
+        coordinates=supplied.coordinates,
+        supplied_by=SuppliedReference(
+            source_event_id=source.source_event_id, origin=supplied.origin
+        ),
+        extractor=EXTRACTOR,
+        missing_fields=missing,
+    )
+
+
+def _describe(address: CivicAddress | None) -> str | None:
+    if address is None:
+        return None
+    first = " ".join(p for p in (address.house_number, address.street) if p)
+    parts = [first, address.locality, address.region, address.postal_code]
+    return ", ".join(p for p in parts if p) or None
+
+
 def _location_conflicts(locations: list[LocationCandidate]) -> list[Conflict]:
-    """Different numbered addresses for the same incident (e.g. a corrected address)."""
+    """Different numbered addresses for the same incident (e.g. a corrected address,
+    or a caller who contradicts the address an upstream system supplied)."""
     numbered: dict[tuple[str, str], list[str]] = {}
     for loc in locations:
         address = loc.civic_address
         if address and address.house_number and address.street:
-            key = (address.house_number.lower(), address.street.lower())
+            key = (address.house_number.lower(), normalise_street(address.street))
             numbered.setdefault(key, []).append(loc.location_id)
     if len(numbered) < 2:
         return []
@@ -156,6 +189,7 @@ def parse(sources: Sequence[SourceEvent], *, derived_at: datetime) -> Incident:
                     missing_fields=extracted.missing_fields,
                 )
             )
+        locations.extend(_supplied(source, s) for s in source.supplied_locations)
         counts.append(victim_count(source.text, source.source_event_id))
 
     count = _merge_counts(counts)

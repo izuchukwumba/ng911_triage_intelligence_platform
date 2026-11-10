@@ -23,6 +23,15 @@ release version identifies the platform as a whole.
   (`token:principal:role:tenant`). Users see only their tenant's incidents,
   idempotency keys are per tenant, and EIDO imports belong to the submitting
   tenant. Another tenant's incident answers 404 (DDL-017).
+- **EIDO locations** (schema 2.6.0, adapter 0.2.0, parser 1.4.0): PIDF-LO civic
+  addresses, points and circles become supplied locations, kept apart from the
+  narrative. Contradictions are flagged as location conflicts, and a revision
+  that only moves the location still updates the incident. Reference URLs are
+  never fetched, and unsafe or unsupported PIDF-LO is preserved with a reason.
+
+### Fixed
+
+- "Main St" and "Main Street" no longer count as a location conflict.
 
 ## [0.1.0] - 2026-11-10
 

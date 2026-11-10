@@ -28,9 +28,10 @@ Additionally, NENA's own published sample validates against the pinned schema
 
 - Tenant isolation extends to `/v1` (DDL-017): an imported incident belongs
   to the submitting tenant and is visible only to `/v1` users of that tenant.
-- Only `notesComponent[].notesActionComments` is mapped. Location, person,
-  vehicle and call components are preserved but not interpreted; in particular
-  PIDF-LO location values are not parsed.
+- Notes and PIDF-LO locations (civic, point, circle) are mapped; see the
+  [profile](eido-profile.md#what-is-mapped). Persons, vehicles and calls are
+  preserved but not interpreted, which is deliberate (data minimisation).
+  Other PIDF-LO shapes are preserved, with a reason, not interpreted.
 - Receipt and incident are written in two steps; a crash between them could
   leave an incident without its receipt. Processing is at-least-once
   (design v1.2, §5.3); no exactly-once guarantee is claimed.
