@@ -133,15 +133,20 @@
           }
         },
         "required": [
+          "schema_version",
           "assessment_id",
           "incident_id",
           "assessed_at",
           "assessor",
           "ruleset_version",
           "status",
+          "failure_reason",
           "severity_band",
           "location_quality",
           "advisory_priority",
+          "priority_scheme",
+          "reasons",
+          "review_actions",
           "requires_human_review"
         ],
         "title": "Assessment",
@@ -229,11 +234,13 @@
           }
         },
         "required": [
+          "schema_version",
           "event_id",
           "incident_id",
           "occurred_at",
           "event_type",
           "actor",
+          "component_version",
           "correlation_id",
           "subject_id",
           "subject_digest"
@@ -369,10 +376,20 @@
             "title": "Unit"
           }
         },
+        "required": [
+          "house_number",
+          "street",
+          "unit",
+          "floor",
+          "locality",
+          "region",
+          "postal_code",
+          "landmark"
+        ],
         "title": "CivicAddress",
         "type": "object"
       },
-      "Classification": {
+      "Classification-Input": {
         "additionalProperties": false,
         "properties": {
           "domain": {
@@ -409,6 +426,50 @@
         },
         "required": [
           "domain"
+        ],
+        "title": "Classification",
+        "type": "object"
+      },
+      "Classification-Output": {
+        "additionalProperties": false,
+        "properties": {
+          "domain": {
+            "$ref": "#/components/schemas/IncidentDomain"
+          },
+          "heuristic_confidence": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heuristic Confidence"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ClassificationStatus",
+            "default": "provisional"
+          },
+          "subtype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtype"
+          }
+        },
+        "required": [
+          "domain",
+          "subtype",
+          "status",
+          "heuristic_confidence"
         ],
         "title": "Classification",
         "type": "object"
@@ -470,7 +531,10 @@
         },
         "required": [
           "conflict_id",
-          "kind"
+          "kind",
+          "code",
+          "observation_ids",
+          "location_ids"
         ],
         "title": "Conflict",
         "type": "object"
@@ -518,7 +582,9 @@
         },
         "required": [
           "lat",
-          "lng"
+          "lng",
+          "crs",
+          "uncertainty_m"
         ],
         "title": "Coordinates",
         "type": "object"
@@ -636,7 +702,10 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "value",
+          "candidates",
+          "evidence"
         ],
         "title": "Fact[int]",
         "type": "object"
@@ -667,7 +736,7 @@
           "corrected_classification": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Classification"
+                "$ref": "#/components/schemas/Classification-Output"
               },
               {
                 "type": "null"
@@ -732,12 +801,16 @@
           }
         },
         "required": [
+          "schema_version",
           "review_id",
           "incident_id",
           "assessment_id",
           "reviewer_id",
           "reviewed_at",
-          "decision"
+          "decision",
+          "override_priority",
+          "corrected_classification",
+          "reason"
         ],
         "title": "HumanReview",
         "type": "object"
@@ -747,7 +820,7 @@
         "description": "The canonical interpretation of one or more source events.",
         "properties": {
           "classification": {
-            "$ref": "#/components/schemas/Classification"
+            "$ref": "#/components/schemas/Classification-Output"
           },
           "conflicts": {
             "items": {
@@ -814,10 +887,16 @@
           }
         },
         "required": [
+          "schema_version",
           "incident_id",
           "source_event_ids",
           "derived_at",
-          "classification"
+          "classification",
+          "observations",
+          "locations",
+          "victim_count",
+          "conflicts",
+          "language"
         ],
         "title": "Incident",
         "type": "object"
@@ -1047,6 +1126,7 @@
           }
         },
         "required": [
+          "status",
           "incident_id",
           "source_event_id",
           "assessment_id",
@@ -1159,7 +1239,14 @@
         "required": [
           "location_id",
           "role",
-          "extractor"
+          "raw_text",
+          "civic_address",
+          "coordinates",
+          "evidence",
+          "extractor",
+          "validation",
+          "validation_source",
+          "missing_fields"
         ],
         "title": "LocationCandidate",
         "type": "object"
@@ -1189,7 +1276,9 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "missing_fields",
+          "conflicting_location_ids"
         ],
         "title": "LocationQuality",
         "type": "object"
@@ -1301,8 +1390,11 @@
           "observation_id",
           "code",
           "polarity",
+          "temporality",
+          "attribution",
           "evidence",
-          "extractor"
+          "extractor",
+          "heuristic_confidence"
         ],
         "title": "Observation",
         "type": "object"
@@ -1373,7 +1465,7 @@
           "corrected_classification": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/Classification"
+                "$ref": "#/components/schemas/Classification-Input"
               },
               {
                 "type": "null"
@@ -1467,7 +1559,9 @@
         "required": [
           "rule_id",
           "rule_version",
-          "reason_code"
+          "reason_code",
+          "observation_ids",
+          "location_ids"
         ],
         "title": "RuleFiring",
         "type": "object"
@@ -1545,13 +1639,15 @@
           }
         },
         "required": [
+          "schema_version",
           "source_event_id",
           "incident_id",
           "received_at",
           "source_type",
           "text",
           "synthetic",
-          "payload_digest"
+          "payload_digest",
+          "supersedes"
         ],
         "title": "SourceEvent",
         "type": "object"
