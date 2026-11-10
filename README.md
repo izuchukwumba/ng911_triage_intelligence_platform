@@ -74,8 +74,8 @@ Details, configuration and the full API table: [backend/README.md](backend/READM
 ### Try it
 
 ```sh
-# with the compose stack, use one of its development tokens
-curl -X POST localhost:8000/v1/incidents -H 'Authorization: Bearer dev-operator' \
+# with the compose stack, use one of its development tokens, e.g. NTIP_TOKEN=dev-operator
+curl -X POST localhost:8000/v1/incidents -H "Authorization: Bearer $NTIP_TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"text": "My wife is not breathing. I do not know where I am.", "synthetic": true}'
 ```
