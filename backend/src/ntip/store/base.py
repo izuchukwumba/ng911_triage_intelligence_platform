@@ -14,6 +14,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Protocol
 
+from ntip.ml.contract import ModelOutput
 from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
 from ntip.schema.base import Identifier, SchemaModel, Sha256Digest, UtcDatetime
@@ -33,7 +34,14 @@ class IdempotencyClaim(SchemaModel):
 
 
 Record = (
-    SourceEvent | Incident | Assessment | HumanReview | AuditEvent | IdempotencyClaim | ReplayRun
+    SourceEvent
+    | Incident
+    | Assessment
+    | HumanReview
+    | AuditEvent
+    | IdempotencyClaim
+    | ReplayRun
+    | ModelOutput
 )
 
 
@@ -81,6 +89,9 @@ class EventStore(Protocol):
 
     def list_incidents(self, *, limit: int, offset: int) -> tuple[int, list[IncidentSummary]]:
         """(total, page) ordered by first receipt, newest first."""
+
+    def model_outputs(self, incident_id: str) -> list[ModelOutput]:
+        """Recorded model calls for an incident, oldest first."""
 
     def replay_run(self, run_id: str) -> ReplayRun | None: ...
 
