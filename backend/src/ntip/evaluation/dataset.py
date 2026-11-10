@@ -90,7 +90,16 @@ def load_dataset(path: Path) -> Dataset:
     leaking = {f: sorted(s) for f, s in splits_by_family.items() if len(s) > 1}
     if leaking:
         raise ValueError(f"families span several splits (leakage): {leaking}")
-    return Dataset(path=path.as_posix(), digest=sha256_digest(raw), cases=cases)
+    return Dataset(path=_display_path(path), digest=sha256_digest(raw), cases=cases)
+
+
+def _display_path(path: Path) -> str:
+    """Repository-relative when possible, so reports never contain local paths."""
+    root = Path(__file__).resolve().parents[4]
+    try:
+        return path.resolve().relative_to(root).as_posix()
+    except ValueError:
+        return path.name
 
 
 def dump_case(case: EvalCase) -> str:

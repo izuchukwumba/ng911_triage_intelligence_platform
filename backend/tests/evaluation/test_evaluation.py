@@ -38,6 +38,11 @@ class TestDataset:
         assert {c.split for c in dataset.cases} == set(Split)
         assert all(c.synthetic for c in dataset.cases)
 
+    def test_paths_are_repository_relative(self, tmp_path: Path) -> None:
+        assert load_dataset(CURATED).path == "data/eval/curated.jsonl"
+        # Outside the repository only the file name is kept.
+        assert load_dataset(write(tmp_path, case("a", "dev", "f"))).path == "cases.jsonl"
+
     def test_family_spanning_splits_is_rejected(self, tmp_path: Path) -> None:
         path = write(tmp_path, case("a", "dev", "fam"), case("b", "test", "fam"))
         with pytest.raises(ValueError, match="leakage"):
