@@ -1,0 +1,695 @@
+{
+  "$defs": {
+    "Attribution": {
+      "enum": [
+        "first_hand",
+        "second_hand",
+        "unspecified"
+      ],
+      "title": "Attribution",
+      "type": "string"
+    },
+    "CivicAddress": {
+      "additionalProperties": false,
+      "properties": {
+        "floor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Floor"
+        },
+        "house_number": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "House Number"
+        },
+        "landmark": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Landmark"
+        },
+        "locality": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locality"
+        },
+        "postal_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Postal Code"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "street": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Street"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "title": "CivicAddress",
+      "type": "object"
+    },
+    "Classification": {
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/IncidentDomain"
+        },
+        "heuristic_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heuristic Confidence"
+        },
+        "status": {
+          "$ref": "#/$defs/ClassificationStatus",
+          "default": "provisional"
+        },
+        "subtype": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subtype"
+        }
+      },
+      "required": [
+        "domain"
+      ],
+      "title": "Classification",
+      "type": "object"
+    },
+    "ClassificationStatus": {
+      "enum": [
+        "provisional",
+        "confirmed"
+      ],
+      "title": "ClassificationStatus",
+      "type": "string"
+    },
+    "Conflict": {
+      "additionalProperties": false,
+      "description": "Incompatible statements, kept side by side instead of resolved silently.",
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Code"
+        },
+        "conflict_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Conflict Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ConflictKind"
+        },
+        "location_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "title": "Location Ids",
+          "type": "array"
+        },
+        "observation_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "title": "Observation Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "conflict_id",
+        "kind"
+      ],
+      "title": "Conflict",
+      "type": "object"
+    },
+    "ConflictKind": {
+      "enum": [
+        "observation_polarity",
+        "location_mismatch"
+      ],
+      "title": "ConflictKind",
+      "type": "string"
+    },
+    "Coordinates": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "default": "EPSG:4326",
+          "title": "Crs",
+          "type": "string"
+        },
+        "lat": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Lng",
+          "type": "number"
+        },
+        "uncertainty_m": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty M"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "Coordinates",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "description": "A quoted stretch of a specific source event.",
+      "properties": {
+        "source_event_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Source Event Id",
+          "type": "string"
+        },
+        "span": {
+          "$ref": "#/$defs/SourceSpan"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_event_id",
+        "span",
+        "text"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Extractor": {
+      "additionalProperties": false,
+      "description": "The component that produced a fact, pinned to a version.",
+      "properties": {
+        "extractor_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Extractor Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ExtractorKind"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "extractor_id",
+        "version"
+      ],
+      "title": "Extractor",
+      "type": "object"
+    },
+    "ExtractorKind": {
+      "enum": [
+        "rule",
+        "model",
+        "operator"
+      ],
+      "title": "ExtractorKind",
+      "type": "string"
+    },
+    "FactStatus": {
+      "description": "How much is known about a fact (design v1.2, sections 3B.4 and 4.3).\n\n``unknown``, ``not_reported``, ``negated`` and ``not_applicable`` are\ndistinct and must never be collapsed into ``false``.",
+      "enum": [
+        "reported",
+        "inferred",
+        "confirmed",
+        "unknown",
+        "not_reported",
+        "negated",
+        "not_applicable",
+        "conflicting"
+      ],
+      "title": "FactStatus",
+      "type": "string"
+    },
+    "Fact_int_": {
+      "additionalProperties": false,
+      "properties": {
+        "candidates": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Candidates",
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/FactStatus"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "Fact[int]",
+      "type": "object"
+    },
+    "IncidentDomain": {
+      "enum": [
+        "police",
+        "fire",
+        "ems",
+        "hazmat",
+        "other",
+        "unknown"
+      ],
+      "title": "IncidentDomain",
+      "type": "string"
+    },
+    "LocationCandidate": {
+      "additionalProperties": false,
+      "properties": {
+        "civic_address": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CivicAddress"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "coordinates": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Coordinates"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Evidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "extractor": {
+          "$ref": "#/$defs/Extractor"
+        },
+        "location_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Location Id",
+          "type": "string"
+        },
+        "missing_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Fields",
+          "type": "array"
+        },
+        "raw_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Text"
+        },
+        "role": {
+          "$ref": "#/$defs/LocationRole"
+        },
+        "validation": {
+          "$ref": "#/$defs/LocationValidation",
+          "default": "unverified"
+        },
+        "validation_source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Validation Source"
+        }
+      },
+      "required": [
+        "location_id",
+        "role",
+        "extractor"
+      ],
+      "title": "LocationCandidate",
+      "type": "object"
+    },
+    "LocationRole": {
+      "description": "Location concepts that must not be conflated (design v1.2, section 8.1).",
+      "enum": [
+        "reported",
+        "device_provided",
+        "geocoded"
+      ],
+      "title": "LocationRole",
+      "type": "string"
+    },
+    "LocationValidation": {
+      "enum": [
+        "unverified",
+        "structurally_complete",
+        "conflicting",
+        "operator_verified",
+        "reference_validated"
+      ],
+      "title": "LocationValidation",
+      "type": "string"
+    },
+    "Observation": {
+      "additionalProperties": false,
+      "properties": {
+        "attribution": {
+          "$ref": "#/$defs/Attribution",
+          "default": "unspecified"
+        },
+        "code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "evidence": {
+          "$ref": "#/$defs/Evidence"
+        },
+        "extractor": {
+          "$ref": "#/$defs/Extractor"
+        },
+        "heuristic_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heuristic Confidence"
+        },
+        "observation_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "polarity": {
+          "$ref": "#/$defs/Polarity"
+        },
+        "temporality": {
+          "$ref": "#/$defs/Temporality",
+          "default": "current"
+        }
+      },
+      "required": [
+        "observation_id",
+        "code",
+        "polarity",
+        "evidence",
+        "extractor"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "Polarity": {
+      "enum": [
+        "affirmed",
+        "negated",
+        "uncertain"
+      ],
+      "title": "Polarity",
+      "type": "string"
+    },
+    "SourceSpan": {
+      "additionalProperties": false,
+      "description": "Half-open character range ``[start, end)`` into a source text.",
+      "properties": {
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "SourceSpan",
+      "type": "object"
+    },
+    "Temporality": {
+      "enum": [
+        "current",
+        "historical",
+        "hypothetical"
+      ],
+      "title": "Temporality",
+      "type": "string"
+    }
+  },
+  "$id": "https://ntip.local/schemas/v2.0.0/incident.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The canonical interpretation of one or more source events.",
+  "properties": {
+    "classification": {
+      "$ref": "#/$defs/Classification"
+    },
+    "conflicts": {
+      "items": {
+        "$ref": "#/$defs/Conflict"
+      },
+      "title": "Conflicts",
+      "type": "array"
+    },
+    "derived_at": {
+      "format": "date-time",
+      "title": "Derived At",
+      "type": "string"
+    },
+    "incident_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "language": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Language"
+    },
+    "locations": {
+      "items": {
+        "$ref": "#/$defs/LocationCandidate"
+      },
+      "title": "Locations",
+      "type": "array"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/Observation"
+      },
+      "title": "Observations",
+      "type": "array"
+    },
+    "schema_version": {
+      "default": "2.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_event_ids": {
+      "items": {
+        "maxLength": 128,
+        "minLength": 1,
+        "pattern": "^[A-Za-z0-9_.:-]+$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Event Ids",
+      "type": "array"
+    },
+    "victim_count": {
+      "$ref": "#/$defs/Fact_int_"
+    }
+  },
+  "required": [
+    "incident_id",
+    "source_event_ids",
+    "derived_at",
+    "classification"
+  ],
+  "title": "Incident",
+  "type": "object",
+  "x-schema-version": "2.0.0"
+}

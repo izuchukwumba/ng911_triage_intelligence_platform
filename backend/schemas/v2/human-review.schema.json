@@ -1,0 +1,182 @@
+{
+  "$defs": {
+    "AdvisoryPriority": {
+      "description": "Project-defined research labels, not PSAP or dispatch-protocol codes.",
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "title": "AdvisoryPriority",
+      "type": "string"
+    },
+    "Classification": {
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/IncidentDomain"
+        },
+        "heuristic_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heuristic Confidence"
+        },
+        "status": {
+          "$ref": "#/$defs/ClassificationStatus",
+          "default": "provisional"
+        },
+        "subtype": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subtype"
+        }
+      },
+      "required": [
+        "domain"
+      ],
+      "title": "Classification",
+      "type": "object"
+    },
+    "ClassificationStatus": {
+      "enum": [
+        "provisional",
+        "confirmed"
+      ],
+      "title": "ClassificationStatus",
+      "type": "string"
+    },
+    "IncidentDomain": {
+      "enum": [
+        "police",
+        "fire",
+        "ems",
+        "hazmat",
+        "other",
+        "unknown"
+      ],
+      "title": "IncidentDomain",
+      "type": "string"
+    },
+    "ReviewDecision": {
+      "enum": [
+        "confirm",
+        "correct_classification",
+        "override_priority",
+        "escalate",
+        "note"
+      ],
+      "title": "ReviewDecision",
+      "type": "string"
+    }
+  },
+  "$id": "https://ntip.local/schemas/v2.0.0/human-review.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assessment_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "corrected_classification": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Classification"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "decision": {
+      "$ref": "#/$defs/ReviewDecision"
+    },
+    "incident_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "override_priority": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AdvisoryPriority"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "review_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Review Id",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "format": "date-time",
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "reviewer_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Reviewer Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "2.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "review_id",
+    "incident_id",
+    "assessment_id",
+    "reviewer_id",
+    "reviewed_at",
+    "decision"
+  ],
+  "title": "HumanReview",
+  "type": "object",
+  "x-schema-version": "2.0.0"
+}

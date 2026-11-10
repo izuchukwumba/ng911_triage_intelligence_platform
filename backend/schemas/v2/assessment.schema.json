@@ -1,0 +1,281 @@
+{
+  "$defs": {
+    "AdvisoryPriority": {
+      "description": "Project-defined research labels, not PSAP or dispatch-protocol codes.",
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "title": "AdvisoryPriority",
+      "type": "string"
+    },
+    "AssessmentStatus": {
+      "enum": [
+        "completed",
+        "processing_failed"
+      ],
+      "title": "AssessmentStatus",
+      "type": "string"
+    },
+    "Extractor": {
+      "additionalProperties": false,
+      "description": "The component that produced a fact, pinned to a version.",
+      "properties": {
+        "extractor_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Extractor Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ExtractorKind"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "extractor_id",
+        "version"
+      ],
+      "title": "Extractor",
+      "type": "object"
+    },
+    "ExtractorKind": {
+      "enum": [
+        "rule",
+        "model",
+        "operator"
+      ],
+      "title": "ExtractorKind",
+      "type": "string"
+    },
+    "LocationQuality": {
+      "additionalProperties": false,
+      "properties": {
+        "conflicting_location_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "title": "Conflicting Location Ids",
+          "type": "array"
+        },
+        "missing_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Fields",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/LocationQualityStatus"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "LocationQuality",
+      "type": "object"
+    },
+    "LocationQualityStatus": {
+      "enum": [
+        "sufficient",
+        "requires_verification",
+        "missing",
+        "conflicting"
+      ],
+      "title": "LocationQualityStatus",
+      "type": "string"
+    },
+    "ReviewAction": {
+      "enum": [
+        "URGENT_HUMAN_REVIEW",
+        "CONFIRM_CRITICAL_REPORT",
+        "VERIFY_LOCATION",
+        "CONFIRM_CLASSIFICATION",
+        "RESOLVE_CONFLICT"
+      ],
+      "title": "ReviewAction",
+      "type": "string"
+    },
+    "RuleFiring": {
+      "additionalProperties": false,
+      "description": "One rule that contributed to the assessment, with the facts it used.",
+      "properties": {
+        "location_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "title": "Location Ids",
+          "type": "array"
+        },
+        "observation_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "title": "Observation Ids",
+          "type": "array"
+        },
+        "reason_code": {
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "title": "Reason Code",
+          "type": "string"
+        },
+        "rule_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Rule Id",
+          "type": "string"
+        },
+        "rule_version": {
+          "minLength": 1,
+          "title": "Rule Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule_id",
+        "rule_version",
+        "reason_code"
+      ],
+      "title": "RuleFiring",
+      "type": "object"
+    },
+    "SeverityBand": {
+      "enum": [
+        "critical",
+        "high",
+        "elevated",
+        "standard",
+        "low",
+        "undetermined"
+      ],
+      "title": "SeverityBand",
+      "type": "string"
+    }
+  },
+  "$id": "https://ntip.local/schemas/v2.0.0/assessment.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "advisory_priority": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AdvisoryPriority"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "assessed_at": {
+      "format": "date-time",
+      "title": "Assessed At",
+      "type": "string"
+    },
+    "assessment_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "assessor": {
+      "$ref": "#/$defs/Extractor"
+    },
+    "failure_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Failure Reason"
+    },
+    "incident_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "location_quality": {
+      "$ref": "#/$defs/LocationQuality"
+    },
+    "priority_scheme": {
+      "const": "research-v1",
+      "default": "research-v1",
+      "title": "Priority Scheme",
+      "type": "string"
+    },
+    "reasons": {
+      "items": {
+        "$ref": "#/$defs/RuleFiring"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "requires_human_review": {
+      "title": "Requires Human Review",
+      "type": "boolean"
+    },
+    "review_actions": {
+      "items": {
+        "$ref": "#/$defs/ReviewAction"
+      },
+      "title": "Review Actions",
+      "type": "array"
+    },
+    "ruleset_version": {
+      "minLength": 1,
+      "title": "Ruleset Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "2.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "severity_band": {
+      "$ref": "#/$defs/SeverityBand"
+    },
+    "status": {
+      "$ref": "#/$defs/AssessmentStatus"
+    }
+  },
+  "required": [
+    "assessment_id",
+    "incident_id",
+    "assessed_at",
+    "assessor",
+    "ruleset_version",
+    "status",
+    "severity_band",
+    "location_quality",
+    "advisory_priority",
+    "requires_human_review"
+  ],
+  "title": "Assessment",
+  "type": "object",
+  "x-schema-version": "2.0.0"
+}
