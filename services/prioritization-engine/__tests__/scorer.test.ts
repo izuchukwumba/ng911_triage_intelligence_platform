@@ -142,6 +142,49 @@ describe('scoreIncident', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // Safety invariant: uncertainty never lowers priority
+  // ---------------------------------------------------------------------------
+
+  describe('uncertainty does not lower priority', () => {
+    const { record } = triageTranscript(
+      'My father is not breathing and has no pulse. We are at 123 Oak Street.',
+    );
+    const baseline = scoreIncident(record);
+
+    it('scores identically when the location is unusable', () => {
+      const result = scoreIncident({
+        ...record,
+        location: { ...record.location, dispatchable_location_score: 0 },
+      });
+      expect(result.priority_score).toBe(baseline.priority_score);
+      expect(result.priority_tier).toBe(baseline.priority_tier);
+      expect(result.reason_codes).toContain('LOW_LOCATION_CONFIDENCE');
+    });
+
+    it('scores identically when parser confidence is low', () => {
+      const result = scoreIncident({
+        ...record,
+        incident: { ...record.incident, confidence: 0 },
+      });
+      expect(result.priority_score).toBe(baseline.priority_score);
+      expect(result.priority_tier).toBe(baseline.priority_tier);
+      expect(result.reason_codes).toContain('LOW_PARSE_CONFIDENCE');
+    });
+
+    it('records verification flags with zero weight in the breakdown', () => {
+      const result = scoreIncident({
+        ...record,
+        location: { ...record.location, dispatchable_location_score: 0 },
+        incident: { ...record.incident, confidence: 0 },
+      });
+      const flagWeights = result.score_breakdown
+        .filter((b) => ['LOW_LOCATION_CONFIDENCE', 'LOW_PARSE_CONFIDENCE'].includes(b.reason_code))
+        .map((b) => b.weight);
+      expect(flagWeights).toEqual([0, 0]);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Edge-case scoring behaviour
   // ---------------------------------------------------------------------------
 
@@ -204,7 +247,7 @@ describe('scoreIncident', () => {
       expect(result.score_breakdown[0]?.reason_code).toBe('DOMAIN_BASE');
     });
 
-    it('score_breakdown for a low-severity incident contains only DOMAIN_BASE and possibly location penalty', () => {
+    it('score_breakdown for a low-severity incident contains only DOMAIN_BASE and possibly verification flags', () => {
       const { result } = triageTranscript(
         'I need an ambulance at 99 Cedar Lane. My elderly neighbour fell and her hip hurts.',
       );
