@@ -80,8 +80,17 @@ _WORD = re.compile(r"[\w'’]+")
 
 
 def last_words(text: str, count: int) -> str:
-    """The final ``count`` words of ``text``, joined by single spaces."""
-    return " ".join(w.lower() for w in _WORD.findall(text)[-count:])
+    """The tail of ``text`` starting at its ``count``-th last word.
+
+    Punctuation inside the tail is kept ("no, he's bleeding" must stay
+    distinguishable from "no bleeding"); the result is lower-cased and
+    typographic apostrophes are normalised.
+    """
+    found = list(_WORD.finditer(text))
+    if not found:
+        return ""
+    start = found[-count].start() if len(found) >= count else found[0].start()
+    return text[start:].lower().replace("’", "'")
 
 
 def words(text: str) -> Iterator[str]:
