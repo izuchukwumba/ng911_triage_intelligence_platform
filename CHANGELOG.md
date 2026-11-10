@@ -36,6 +36,12 @@ release version identifies the platform as a whole.
   renews before expiry, and reconnects with backoff. Every message is validated
   against NENA's pinned message schema v1.1 (DDL-018).
 
+- **Evaluation report screen** (dashboard *Evaluation* tab, `GET /v1/evaluation/report`):
+  evaluates the deployed rules baseline live on the dev and regression splits of a
+  committed dataset. It shows metrics with confidence intervals, the priority
+  confusion matrix, failed cases (critical first) and version pins, with
+  Markdown and JSON export. The held-out test split is never served.
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.
