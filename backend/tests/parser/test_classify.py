@@ -46,6 +46,24 @@ class TestDomain:
         assert result.heuristic_confidence is not None
         assert 0 < result.heuristic_confidence <= 0.9
 
+    def test_prank_only_call_is_other(self) -> None:
+        text = "Ha ha it's just a prank, we were filming. Nobody is actually hurt."
+        assert classify_text(text).domain == "other"
+
+    def test_prank_word_does_not_override_a_real_domain(self) -> None:
+        assert classify_text("This is not a prank, there is a fire.").domain == "fire"
+
+    @pytest.mark.parametrize(
+        ("text", "domain"),
+        [
+            ("Two cars crashed on Route 66.", "ems"),
+            ("Someone broke into my car on Elm Street.", "police"),
+            ("Can you do a welfare check? My neighbor lives alone.", "ems"),
+        ],
+    )
+    def test_extended_domain_keywords(self, text: str, domain: str) -> None:
+        assert classify_text(text).domain == domain
+
     def test_unknown_has_low_confidence(self) -> None:
         assert classify_text("hello there").heuristic_confidence == 0.1
 
