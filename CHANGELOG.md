@@ -42,9 +42,17 @@ release version identifies the platform as a whole.
   confusion matrix, failed cases (critical first) and version pins, with
   Markdown and JSON export. The held-out test split is never served.
 
+- **Automated accessibility tests** (`npm run test:a11y`, CI job): axe-core checks
+  WCAG 2.0/2.1 A and AA on every dashboard screen against a real backend, and
+  keyboard-only tests cover switching views, submitting a message and opening an
+  incident.
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.
+- Small priority badges failed WCAG contrast (faded label text). Screen readers
+  also heard "P0Immediate", because the priority and its label had no space and
+  an `aria-label` was misused on a generic element.
 
 ## [0.1.0] - 2026-11-10
 
