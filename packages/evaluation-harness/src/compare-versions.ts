@@ -41,7 +41,14 @@ interface ScoringConfig {
   domain_base_scores: Record<string, number>;
   indicator_rules: Array<{ indicator: string; weight: number; reason_code: string; description: string }>;
   victim_count_multiplier: { enabled: boolean; per_additional_victim: number; max_contribution: number; reason_code: string; description: string };
-  penalty_rules: {
+  // >= 0.3.0: uncertainty is flagged but never changes the score.
+  verification_flags?: {
+    low_location_confidence: { threshold: number; reason_code: string; description: string };
+    low_parse_confidence:    { threshold: number; reason_code: string; description: string };
+  };
+  // <= 0.2.0: uncertainty was deducted from the score. Kept so older configs
+  // can still be replayed exactly as they behaved.
+  penalty_rules?: {
     low_location_confidence: { threshold: number; penalty: number; reason_code: string; description: string };
     low_parse_confidence:    { threshold: number; penalty: number; reason_code: string; description: string };
   };
@@ -80,16 +87,19 @@ function scoreWithConfig(record: IncidentRecord, cfg: ScoringConfig): ScoreResul
     breakdown.push({ reason_code: vc.reason_code, weight: w, description: vc.description });
   }
 
-  const p = cfg.penalty_rules;
-  if (record.location.dispatchable_location_score < p.low_location_confidence.threshold) {
-    score += p.low_location_confidence.penalty;
-    reason_codes.push(p.low_location_confidence.reason_code);
-    breakdown.push({ reason_code: p.low_location_confidence.reason_code, weight: p.low_location_confidence.penalty, description: p.low_location_confidence.description });
-  }
-  if (record.incident.confidence < p.low_parse_confidence.threshold) {
-    score += p.low_parse_confidence.penalty;
-    reason_codes.push(p.low_parse_confidence.reason_code);
-    breakdown.push({ reason_code: p.low_parse_confidence.reason_code, weight: p.low_parse_confidence.penalty, description: p.low_parse_confidence.description });
+  const rules = cfg.verification_flags ?? cfg.penalty_rules;
+  if (rules) {
+    const checks = [
+      { rule: rules.low_location_confidence, fires: record.location.dispatchable_location_score < rules.low_location_confidence.threshold },
+      { rule: rules.low_parse_confidence,    fires: record.incident.confidence < rules.low_parse_confidence.threshold },
+    ];
+    for (const { rule, fires } of checks) {
+      if (!fires) continue;
+      const weight = (rule as { penalty?: number }).penalty ?? 0;
+      score += weight;
+      reason_codes.push(rule.reason_code);
+      breakdown.push({ reason_code: rule.reason_code, weight, description: rule.description });
+    }
   }
 
   const finalScore = Math.max(0, Math.min(1, score));
