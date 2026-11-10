@@ -117,3 +117,20 @@ Other findings:
 These are synthetic-benchmark results with author- or generator-intended
 labels; they are not evidence of real-world performance.
 
+## Processing latency baseline
+
+[latency.json](latency.json), from `python -m ntip.evaluation.latency --repeat 5`:
+end-to-end ingest through the pipeline (parse, optional in-process model,
+assess, store) with an in-memory store, one request at a time, over the 50
+curated cases, on `Windows-11-10.0.26300-SP0`, Python 3.12.10.
+
+| Mode | Model | Requests | p50 ms | p95 ms | p99 ms |
+|---|---|---|---|---|---|
+| rules_only | - | 250 | 0.57 | 0.95 | 1.51 |
+| hybrid_review | b1-tfidf-logreg | 250 | 3.16 | 3.82 | 4.19 |
+
+These are measurements, not targets (design v1.2, §13.3). They exclude HTTP,
+PostgreSQL and a networked inference service, whose time is bounded separately
+by the 2 s inference timeout; the model is optional and can never block
+ingestion (§3B.1, RQ-INT4).
+
