@@ -93,6 +93,23 @@ uses the same database and model settings as the API.
 | GET | `/v1/assessments/{id}` | One assessment |
 | GET | `/health/live`, `/health/ready` | Liveness; readiness (checks the event store) |
 
+### Retention and erasure
+
+The application can only append. To erase data (a retention period or an
+erasure request), an operator runs the erasure procedure with the **table
+owner's** credentials. It reports what it would do unless given `--execute`:
+
+```sh
+python -m ntip.store.retention "$OWNER_URL" --reason "retention: 30 days" \
+    --requested-by dpo_1 --older-than-days 30 [--tenant psap-a] [--execute]
+python -m ntip.store.retention "$OWNER_URL" --reason "erasure request 17" \
+    --requested-by dpo_1 --incident inc_123 --execute
+```
+
+Each erased incident, with everything derived from it and its EIDO payloads,
+leaves a content-free tombstone in the `erasures` table. Replay runs are kept;
+they hold no transcript text.
+
 Every response carries `X-Correlation-ID`. Errors look like
 `{"error": {"code", "message", "correlation_id"}}` and never echo submitted
 text. Interactive docs: <http://localhost:8000/docs>.

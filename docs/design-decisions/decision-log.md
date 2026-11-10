@@ -304,3 +304,17 @@ The threat model listed the unauthenticated research API as the main gap before 
 
 **Limits:** Only the message schema has been reviewed, not the standard's normative text, so no conveyance compliance is claimed (§3B.2). Validation dispatches on the message's top-level key because the published `oneOf` unions are ambiguous.
 
+---
+
+## DDL-019: Lawful erasure through an owner-only, audited procedure
+
+**Decision:** The store stays append-only for the application, but there is one sanctioned way to delete. `python -m ntip.store.retention`, run with the table owner's credentials, erases selected incidents (by id or by retention period, optionally per tenant): every row derived from each incident, and the EIDO receipts carrying its raw payload. It works in one transaction per incident, under the same advisory lock ingest uses, and writes a content-free tombstone to an append-only `erasures` table. The append-only trigger allows `DELETE` only inside a transaction that has set the transaction-local `ntip.erasure_id`; UPDATE and TRUNCATE stay refused, and the application role has no DELETE privilege. The procedure is a dry run unless `--execute` is given.
+
+**Rationale:** Design v1.2 section 9.3 requires explicit retention and deletion rules, and says audit retention must not override lawful deletion. An append-only store with no deletion path cannot hold any real personal data lawfully. Tombstones keep accountability (that something was erased, when, by whom and why) without keeping the content.
+
+**Alternatives considered:**
+- *Crypto-shredding (per-incident encryption keys, deleted on erasure):* keeps rows physically immutable, but needs key management and makes every read decrypt; disproportionate for a research platform.
+- *Disabling the triggers during erasure:* takes table-wide exclusive locks and briefly removes the protection for every writer; the flagged-transaction check is narrower.
+
+**Kept on purpose:** Replay runs, which hold identifiers, priorities and reason codes but no transcript text or payloads.
+
