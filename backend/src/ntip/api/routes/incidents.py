@@ -18,7 +18,7 @@ from ntip.api.models import (
     ReviewIn,
 )
 from ntip.ml.contract import ModelOutput
-from ntip.pipeline import Pipeline
+from ntip.pipeline import IngestResult, Pipeline
 from ntip.schema.advisory import Assessment
 from ntip.schema.review import HumanReview
 from ntip.store import UnknownIncident
@@ -40,6 +40,18 @@ def _own(request: Request, incident_id: str, principal: Principal) -> Pipeline:
     pipeline = _pipeline(request)
     pipeline.check_tenant(incident_id, principal.tenant_id)
     return pipeline
+
+
+def _observe(request: Request, result: IngestResult) -> None:
+    """Count processing outcomes: failures and model degradation must be visible."""
+    if result.idempotent_replay:
+        return
+    inference = result.incident.inference if result.incident else None
+    request.app.state.metrics.inc(
+        "ntip_assessments_total",
+        status=str(result.assessment.status),
+        inference=str(inference.status) if inference else "none",
+    )
 
 
 def _accepted(response: Response, result: IngestOut) -> IngestOut:
@@ -67,6 +79,7 @@ def create_incident(
         idempotency_key=idempotency_key,
         correlation_id=correlation_id(request),
     )
+    _observe(request, result)
     return _accepted(response, IngestOut.of(result))
 
 
@@ -91,6 +104,7 @@ def add_message(
         idempotency_key=idempotency_key,
         correlation_id=correlation_id(request),
     )
+    _observe(request, result)
     return _accepted(response, IngestOut.of(result))
 
 

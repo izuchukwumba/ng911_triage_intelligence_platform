@@ -15,8 +15,18 @@ from ntip.store import EventStore, InMemoryEventStore
 IDENTIFIER = re.compile(r"[A-Za-z0-9_.:-]{1,128}")
 
 
+#: The only deployment mode there is (design v1.2, section 13.2): advisory
+#: output over synthetic data, never connected to live dispatch or telephony.
+SIMULATION = "simulation"
+
+
 @dataclass(frozen=True)
 class Settings:
+    # Stated explicitly by every deployment; anything else refuses to start.
+    deployment_mode: str = SIMULATION
+    # Logs: one JSON object per line ("json") or plain text ("text").
+    log_format: str = "json"
+    log_level: str = "INFO"
     # PostgreSQL URL for the event store. Unset -> in-memory store (demo only).
     database_url: str | None = None
     # Maximum PostgreSQL connections held by the event store's pool.
@@ -46,12 +56,24 @@ class Settings:
         origins = os.environ.get("NTIP_CORS_ORIGINS")
         api_tokens = _parse_api_tokens(os.environ.get("NTIP_API_TOKENS", ""))
         auth_disabled = os.environ.get("NTIP_AUTH_DISABLED") == "1"
+        mode = os.environ.get("NTIP_DEPLOYMENT_MODE", SIMULATION)
+        if mode != SIMULATION:
+            raise ConfigurationError(
+                f"NTIP_DEPLOYMENT_MODE={mode!r}: this platform only runs as a simulation "
+                "(synthetic data, advisory output, no live dispatch or telephony)."
+            )
+        log_format = os.environ.get("NTIP_LOG_FORMAT", "json")
+        if log_format not in {"json", "text"}:
+            raise ConfigurationError("NTIP_LOG_FORMAT must be 'json' or 'text'")
         if serves_api and not api_tokens and not auth_disabled:
             raise ConfigurationError(
                 "Set NTIP_API_TOKENS (token:principal:role,...) or, for an isolated local "
                 "demo only, NTIP_AUTH_DISABLED=1."
             )
         return cls(
+            deployment_mode=mode,
+            log_format=log_format,
+            log_level=os.environ.get("NTIP_LOG_LEVEL", "INFO"),
             api_tokens=api_tokens,
             rate_limit_per_minute=int(os.environ.get("NTIP_RATE_LIMIT_PER_MINUTE", "600")),
             auth_disabled=auth_disabled and not api_tokens,

@@ -116,6 +116,10 @@ async def ingest_eido(
             request, 409, "revision_conflict",
             "This EIDO revision was already received with different content.",
         )  # fmt: skip
+    if not result.replayed:
+        request.app.state.metrics.inc(
+            "ntip_interop_receipts_total", status=str(result.receipt.status)
+        )
     out = ReceiptOut.of(result.receipt)
     if result.receipt.status in _REJECTED:
         return JSONResponse(status_code=422, content=out.model_dump(mode="json"))
