@@ -68,12 +68,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Incidents */
+        /**
+         * List Incidents
+         * @description The caller's tenant's incidents, newest first.
+         */
         get: operations["list_incidents_v1_incidents_get"];
         put?: never;
         /**
          * Create Incident
-         * @description Open an incident from a first synthetic message.
+         * @description Open an incident from a first synthetic message, in the caller's tenant.
          */
         post: operations["create_incident_v1_incidents_post"];
         delete?: never;
@@ -237,7 +240,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Replay Runs */
+        /**
+         * List Replay Runs
+         * @description The caller's tenant's replay runs, newest first.
+         */
         get: operations["list_replay_runs_v1_replay_runs_get"];
         put?: never;
         /**
@@ -351,7 +357,7 @@ export interface components {
             ruleset_version: string;
             /**
              * Schema Version
-             * @default 2.4.0
+             * @default 2.5.0
              */
             schema_version: string;
             severity_band: components["schemas"]["SeverityBand"];
@@ -386,7 +392,7 @@ export interface components {
             occurred_at: string;
             /**
              * Schema Version
-             * @default 2.4.0
+             * @default 2.5.0
              */
             schema_version: string;
             /** Subject Digest */
@@ -578,7 +584,7 @@ export interface components {
             reviewer_id: string;
             /**
              * Schema Version
-             * @default 2.4.0
+             * @default 2.5.0
              */
             schema_version: string;
         };
@@ -606,7 +612,7 @@ export interface components {
             observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
-             * @default 2.4.0
+             * @default 2.5.0
              */
             schema_version: string;
             /** Source Event Ids */
@@ -957,10 +963,15 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @default 2.4.0
+             * @default 2.5.0
              */
             schema_version: string;
             summary: components["schemas"]["ReplaySummary"];
+            /**
+             * Tenant Id
+             * @default default
+             */
+            tenant_id: string;
         };
         /** ReplaySummary */
         ReplaySummary: {
@@ -1042,7 +1053,7 @@ export interface components {
             received_at: string;
             /**
              * Schema Version
-             * @default 2.4.0
+             * @default 2.5.0
              */
             schema_version: string;
             /** Source Event Id */
@@ -1052,6 +1063,11 @@ export interface components {
             supersedes: string | null;
             /** Synthetic */
             synthetic: boolean;
+            /**
+             * Tenant Id
+             * @default default
+             */
+            tenant_id: string;
             /** Text */
             text: string;
         };

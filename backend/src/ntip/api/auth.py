@@ -7,7 +7,8 @@ tokens nor that flag refuses to start (see ``Settings.from_env``).
 
 The authenticated principal, not the request body, identifies who reviewed
 an incident or requested a replay, so audit entries cannot be attributed to
-someone else.
+someone else. Each principal belongs to one tenant and sees only that
+tenant's incidents and replay runs.
 """
 
 import hmac
@@ -18,6 +19,8 @@ from typing import Annotated
 
 from fastapi import Header, Request
 from fastapi.exceptions import RequestValidationError
+
+from ntip.schema.base import DEFAULT_TENANT
 
 
 class Role(StrEnum):
@@ -47,6 +50,7 @@ class Principal:
     principal_id: str
     role: Role
     authenticated: bool = True
+    tenant_id: str = DEFAULT_TENANT
 
     def can(self, permission: Permission) -> bool:
         return permission in ROLE_PERMISSIONS[self.role]

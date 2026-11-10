@@ -58,20 +58,28 @@ def create_replay_run(
         clock=pipeline.clock,
         new_id=pipeline.new_id,
         correlation_id=correlation_id(request),
+        tenant_id=principal.tenant_id,
     )
 
 
-@router.get("/replay-runs", dependencies=[Depends(require(Permission.READ))])
+@router.get("/replay-runs")
 def list_replay_runs(
-    request: Request, limit: Annotated[int, Query(ge=1, le=100)] = 20
+    request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.READ))],
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
 ) -> list[ReplayRun]:
-    return _pipeline(request).store.replay_runs(limit=limit)
+    """The caller's tenant's replay runs, newest first."""
+    return _pipeline(request).store.replay_runs(limit=limit, tenant_id=principal.tenant_id)
 
 
-@router.get("/replay-runs/{run_id}", dependencies=[Depends(require(Permission.READ))])
-def get_replay_run(run_id: str, request: Request) -> ReplayRun:
+@router.get("/replay-runs/{run_id}")
+def get_replay_run(
+    run_id: str,
+    request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.READ))],
+) -> ReplayRun:
     run = _pipeline(request).store.replay_run(run_id)
-    if run is None:
+    if run is None or run.tenant_id != principal.tenant_id:
         raise UnknownIncident(run_id)
     return run
 

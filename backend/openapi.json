@@ -143,7 +143,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.4.0",
+            "default": "2.5.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -238,7 +238,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.4.0",
+            "default": "2.5.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -875,7 +875,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.4.0",
+            "default": "2.5.0",
             "title": "Schema Version",
             "type": "string"
           }
@@ -957,7 +957,7 @@
             "type": "array"
           },
           "schema_version": {
-            "default": "2.4.0",
+            "default": "2.5.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2060,12 +2060,20 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.4.0",
+            "default": "2.5.0",
             "title": "Schema Version",
             "type": "string"
           },
           "summary": {
             "$ref": "#/components/schemas/ReplaySummary"
+          },
+          "tenant_id": {
+            "default": "default",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Tenant Id",
+            "type": "string"
           }
         },
         "required": [
@@ -2075,6 +2083,7 @@
           "requested_by",
           "candidate_ruleset",
           "engine_version",
+          "tenant_id",
           "cases",
           "summary",
           "note"
@@ -2317,7 +2326,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.4.0",
+            "default": "2.5.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2349,6 +2358,14 @@
             "title": "Synthetic",
             "type": "boolean"
           },
+          "tenant_id": {
+            "default": "default",
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Tenant Id",
+            "type": "string"
+          },
           "text": {
             "maxLength": 20000,
             "minLength": 1,
@@ -2365,7 +2382,8 @@
           "text",
           "synthetic",
           "payload_digest",
-          "supersedes"
+          "supersedes",
+          "tenant_id"
         ],
         "title": "SourceEvent",
         "type": "object"
@@ -2563,6 +2581,7 @@
     },
     "/v1/incidents": {
       "get": {
+        "description": "The caller's tenant's incidents, newest first.",
         "operationId": "list_incidents_v1_incidents_get",
         "parameters": [
           {
@@ -2633,7 +2652,7 @@
         ]
       },
       "post": {
-        "description": "Open an incident from a first synthetic message.",
+        "description": "Open an incident from a first synthetic message, in the caller's tenant.",
         "operationId": "create_incident_v1_incidents_post",
         "parameters": [
           {
@@ -3238,6 +3257,7 @@
     },
     "/v1/replay-runs": {
       "get": {
+        "description": "The caller's tenant's replay runs, newest first.",
         "operationId": "list_replay_runs_v1_replay_runs_get",
         "parameters": [
           {
