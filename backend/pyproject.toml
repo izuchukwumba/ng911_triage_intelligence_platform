@@ -6,8 +6,10 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.115",
+  "jsonschema>=4.23",
   "psycopg[binary]>=3.2",
   "pydantic>=2.9",
+  "pyyaml>=6.0",
   "uvicorn[standard]>=0.32",
 ]
 
@@ -26,6 +28,8 @@ dev = [
   "mypy>=1.13",
   "pytest>=8.3",
   "ruff>=0.8",
+  "types-jsonschema",
+  "types-PyYAML",
 ]
 
 [build-system]
@@ -48,6 +52,10 @@ src = ["src", "tests"]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
 # Transcripts contain typographic apostrophes; matching them is intentional.
 allowed-confusables = ["’"]
+
+[tool.ruff.lint.per-file-ignores]
+# A table of pinned sha256 digests; wrapping the hashes would not help.
+"src/ntip/interop/eido/profile.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"
