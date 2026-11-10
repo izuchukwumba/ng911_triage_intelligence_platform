@@ -59,3 +59,7 @@ npm run gen:api && git diff --exit-code -- src/api/schema.ts && npm run build
 One concern per branch; commits small enough that each message explains one
 change. A PR description says what changed, why, how it was tested, and what
 it deliberately does not do. CI must be green before merging.
+
+Add user-visible changes to the `Unreleased` section of
+[CHANGELOG.md](CHANGELOG.md). Releasing is described in
+[docs/releases](docs/releases/README.md).
