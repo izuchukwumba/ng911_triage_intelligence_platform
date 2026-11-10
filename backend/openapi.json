@@ -1,6 +1,28 @@
 {
   "components": {
     "schemas": {
+      "Abstention": {
+        "additionalProperties": false,
+        "description": "The model declines to decide about a code (design v1.2, section 3A.1).",
+        "properties": {
+          "code": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "title": "Code",
+            "type": "string"
+          },
+          "reason": {
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "reason"
+        ],
+        "title": "Abstention",
+        "type": "object"
+      },
       "Actor": {
         "additionalProperties": false,
         "properties": {
@@ -282,6 +304,62 @@
           "events"
         ],
         "title": "AuditTrail",
+        "type": "object"
+      },
+      "Candidate": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "title": "Code",
+            "type": "string"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "evidence_text": {
+            "minLength": 1,
+            "title": "Evidence Text",
+            "type": "string"
+          },
+          "polarity": {
+            "$ref": "#/components/schemas/Polarity"
+          },
+          "source_event_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Source Event Id",
+            "type": "string"
+          },
+          "span": {
+            "$ref": "#/components/schemas/SourceSpan"
+          },
+          "status": {
+            "const": "unverified_model_hypothesis",
+            "default": "unverified_model_hypothesis",
+            "title": "Status",
+            "type": "string"
+          },
+          "temporality": {
+            "$ref": "#/components/schemas/Temporality",
+            "default": "current"
+          }
+        },
+        "required": [
+          "code",
+          "polarity",
+          "temporality",
+          "source_event_id",
+          "span",
+          "evidence_text",
+          "confidence",
+          "status"
+        ],
+        "title": "Candidate",
         "type": "object"
       },
       "CivicAddress": {
@@ -1175,6 +1253,28 @@
         "title": "InferenceInfo",
         "type": "object"
       },
+      "InferenceMessage": {
+        "additionalProperties": false,
+        "properties": {
+          "source_event_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Source Event Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_event_id",
+          "text"
+        ],
+        "title": "InferenceMessage",
+        "type": "object"
+      },
       "InferenceMode": {
         "description": "How model output is used (design v1.2, section 3A.3).",
         "enum": [
@@ -1184,6 +1284,125 @@
         ],
         "title": "InferenceMode",
         "type": "string"
+      },
+      "InferenceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "contract_version": {
+            "const": "1.0.0",
+            "default": "1.0.0",
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "incident_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "language_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Hint"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/InferenceMessage"
+            },
+            "minItems": 1,
+            "title": "Messages",
+            "type": "array"
+          },
+          "request_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Request Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "contract_version",
+          "request_id",
+          "incident_id",
+          "messages",
+          "language_hint"
+        ],
+        "title": "InferenceRequest",
+        "type": "object"
+      },
+      "InferenceResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "abstentions": {
+            "items": {
+              "$ref": "#/components/schemas/Abstention"
+            },
+            "title": "Abstentions",
+            "type": "array"
+          },
+          "calibrated": {
+            "default": false,
+            "title": "Calibrated",
+            "type": "boolean"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "contract_version": {
+            "const": "1.0.0",
+            "default": "1.0.0",
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "model_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Model Id",
+            "type": "string"
+          },
+          "model_version": {
+            "minLength": 1,
+            "title": "Model Version",
+            "type": "string"
+          },
+          "request_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "runtime_ms": {
+            "minimum": 0.0,
+            "title": "Runtime Ms",
+            "type": "number"
+          }
+        },
+        "required": [
+          "contract_version",
+          "request_id",
+          "model_id",
+          "model_version",
+          "candidates",
+          "abstentions",
+          "calibrated",
+          "runtime_ms"
+        ],
+        "title": "InferenceResponse",
+        "type": "object"
       },
       "InferenceStatus": {
         "enum": [
@@ -1446,6 +1665,69 @@
           "synthetic"
         ],
         "title": "MessageIn",
+        "type": "object"
+      },
+      "ModelOutput": {
+        "additionalProperties": false,
+        "description": "The exact request and response of one model call, kept for audit.\n\nGenerative or retrained models are not guaranteed to reproduce their\noutput, so replay of a model-assisted incident uses this recorded output\nrather than calling the model again (design v1.2, section 3A.9).",
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "incident_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/InferenceMode"
+          },
+          "output_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "title": "Output Id",
+            "type": "string"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "request": {
+            "$ref": "#/components/schemas/InferenceRequest"
+          },
+          "response": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InferenceResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "output_id",
+          "incident_id",
+          "recorded_at",
+          "mode",
+          "request",
+          "response",
+          "error"
+        ],
+        "title": "ModelOutput",
         "type": "object"
       },
       "Observation": {
@@ -2515,6 +2797,53 @@
           }
         },
         "summary": "Add Message",
+        "tags": [
+          "incidents"
+        ]
+      }
+    },
+    "/v1/incidents/{incident_id}/model-outputs": {
+      "get": {
+        "description": "Exact model requests and responses recorded for this incident (design 3A.9).",
+        "operationId": "get_model_outputs_v1_incidents__incident_id__model_outputs_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_id",
+            "required": true,
+            "schema": {
+              "title": "Incident Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelOutput"
+                  },
+                  "title": "Response Get Model Outputs V1 Incidents  Incident Id  Model Outputs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Model Outputs",
         "tags": [
           "incidents"
         ]
