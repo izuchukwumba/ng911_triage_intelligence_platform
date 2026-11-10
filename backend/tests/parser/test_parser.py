@@ -53,6 +53,7 @@ class TestObservations:
             ("I don't know where I am, my wife is not breathing.", "CALLER_LOCATION_UNKNOWN"),
             ("He's lying on the floor and won't answer me.", "UNCONSCIOUS"),
             ("My foot hurts badly.", "INJURY_REPORTED"),
+            ("She fell and she can't get up.", "UNABLE_TO_GET_UP"),
             (
                 "HELP HELP PLEASE MY SON IS NOT BREATHING HELP. PLEASE HURRY.",
                 "CALLER_HIGH_DISTRESS",
