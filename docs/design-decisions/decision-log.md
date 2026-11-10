@@ -208,3 +208,33 @@ Until step 6, the TypeScript backend remains the running system and receives onl
 
 **Trade-off:** The existing TypeScript tests and Express API are rewritten rather than reused, and backend/frontend types are no longer shared directly — they are generated from OpenAPI instead.
 
+---
+
+## DDL-013: Triage severity comes only from reported conditions
+
+**Decision:** The Python triage engine (`ntip.triage`, ruleset `research-1.0.0`) sets severity only from current, non-negated observation codes through versioned ruleset rules. Every other signal becomes a review action for a human. Resolves the `POSSIBLE_PRANK` issue left open in DDL-011.
+
+**Rationale:**
+DDL-011 stopped location and parser confidence from lowering priority in the TypeScript scorer, but left one more way for a weak signal to bury a strong one: `POSSIBLE_PRANK` subtracted 0.40, so "this is not a prank, he's not breathing" could be pushed down the queue. The design forbids this (v1.2, section 7.1: "an apparent prank indicator must not silently suppress credible emergency evidence").
+
+The engine therefore separates two kinds of input:
+
+| Input | Effect |
+|---|---|
+| Current affirmed or uncertain cue | Fires severity rules (floor or escalate) |
+| Negated, historical, hypothetical cue | Ignored for severity; kept in the record |
+| Uncertain high/critical cue | Full weight + `CONFIRM_CRITICAL_REPORT` |
+| Location quality below sufficient | `VERIFY_LOCATION` |
+| Contradiction / conflicting count | `RESOLVE_CONFLICT`; the affirmed side still counts |
+| Possible prank | `CONFIRM_CLASSIFICATION`; sets `low` only if nothing else was reported |
+| Weak or unknown classification | `CONFIRM_CLASSIFICATION` |
+| Nothing reported, unknown domain | `undetermined` severity, P2 — never the bottom of the queue |
+
+**Versioning:** severity rules live in released JSON rulesets pinned by sha256 (a test fails if a released file changes). Review policies live in code and are versioned with the engine (`P-REVIEW-00x`, engine 1.0.0). Both appear in `Assessment.reasons`.
+
+**Alternatives considered:**
+- Port the weighted score: keeps the coupling that caused DDL-011.
+- Down-weight uncertain cues: "I think he's not breathing" is exactly the call that must not wait; uncertainty is resolved by a human, not by arithmetic.
+
+**Limitations:** the bands and the research-v1 priority labels are project-defined and have not been reviewed by public-safety practitioners (design v1.2, open question 6).
+
