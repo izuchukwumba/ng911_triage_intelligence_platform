@@ -185,6 +185,9 @@ class ConflictKind(StrEnum):
     OBSERVATION_POLARITY = "observation_polarity"
     # Two reported locations disagree, e.g. the caller corrects the address.
     LOCATION_MISMATCH = "location_mismatch"
+    # The rules parser and a model disagree about a cue: one found it, the
+    # other did not. Both findings are kept and a human resolves it.
+    MODEL_RULE_DISAGREEMENT = "model_rule_disagreement"
 
 
 class Conflict(SchemaModel):
@@ -198,6 +201,11 @@ class Conflict(SchemaModel):
 
     @model_validator(mode="after")
     def _check(self) -> Self:
+        if self.kind is ConflictKind.MODEL_RULE_DISAGREEMENT:
+            # Only one side may have produced an observation.
+            if not self.observation_ids or self.code is None:
+                raise ValueError("a model/rule disagreement needs a code and an observation")
+            return self
         refs = (
             self.observation_ids
             if self.kind is ConflictKind.OBSERVATION_POLARITY
@@ -206,6 +214,37 @@ class Conflict(SchemaModel):
         if len(set(refs)) < 2:
             raise ValueError(f"a {self.kind} conflict must reference at least two items")
         return self
+
+
+class InferenceMode(StrEnum):
+    """How model output is used (design v1.2, section 3A.3)."""
+
+    RULES_ONLY = "rules_only"  # no model involved
+    ML_SHADOW = "ml_shadow"  # model runs and is recorded, but is not shown or used
+    HYBRID_REVIEW = "hybrid_review"  # verified model hypotheses join the record
+
+
+class InferenceStatus(StrEnum):
+    DISABLED = "disabled"
+    OK = "ok"
+    # The model failed, timed out or returned nothing usable; the record is
+    # the rules baseline only, and says so (design v1.2, section 3A.6).
+    DEGRADED = "degraded"
+
+
+class InferenceInfo(SchemaModel):
+    """Which model contributed to an incident version, and how it went."""
+
+    mode: InferenceMode
+    status: InferenceStatus
+    model_id: str | None = None
+    model_version: str | None = None
+    accepted_candidates: int = Field(default=0, ge=0)
+    # Candidates whose quote did not match the source, or that were otherwise
+    # unsupported. They never enter the record.
+    rejected_candidates: int = Field(default=0, ge=0)
+    abstained_codes: list[ReasonCode] = Field(default_factory=list)
+    detail: str | None = None
 
 
 def _not_reported() -> Fact[int]:
@@ -225,6 +264,8 @@ class Incident(SchemaModel):
     victim_count: Fact[int] = Field(default_factory=_not_reported)
     conflicts: list[Conflict] = Field(default_factory=list)
     language: str | None = None
+    # Absent for incidents processed before model support existed.
+    inference: InferenceInfo | None = None
 
     @model_validator(mode="after")
     def _check(self) -> Self:

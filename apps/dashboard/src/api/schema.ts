@@ -267,7 +267,7 @@ export interface components {
             ruleset_version: string;
             /**
              * Schema Version
-             * @default 2.1.0
+             * @default 2.2.0
              */
             schema_version: string;
             severity_band: components["schemas"]["SeverityBand"];
@@ -302,7 +302,7 @@ export interface components {
             occurred_at: string;
             /**
              * Schema Version
-             * @default 2.1.0
+             * @default 2.2.0
              */
             schema_version: string;
             /** Subject Digest */
@@ -385,7 +385,7 @@ export interface components {
          * ConflictKind
          * @enum {string}
          */
-        ConflictKind: "observation_polarity" | "location_mismatch";
+        ConflictKind: "observation_polarity" | "location_mismatch" | "model_rule_disagreement";
         /** Coordinates */
         Coordinates: {
             /**
@@ -473,7 +473,7 @@ export interface components {
             reviewer_id: string;
             /**
              * Schema Version
-             * @default 2.1.0
+             * @default 2.2.0
              */
             schema_version: string;
         };
@@ -492,6 +492,7 @@ export interface components {
             derived_at: string;
             /** Incident Id */
             incident_id: string;
+            inference: components["schemas"]["InferenceInfo"] | null;
             /** Language */
             language: string | null;
             /** Locations */
@@ -500,7 +501,7 @@ export interface components {
             observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
-             * @default 2.1.0
+             * @default 2.2.0
              */
             schema_version: string;
             /** Source Event Ids */
@@ -560,6 +561,43 @@ export interface components {
             review_actions: components["schemas"]["ReviewAction"][];
             severity_band: components["schemas"]["SeverityBand"] | null;
         };
+        /**
+         * InferenceInfo
+         * @description Which model contributed to an incident version, and how it went.
+         */
+        InferenceInfo: {
+            /** Abstained Codes */
+            abstained_codes: string[];
+            /**
+             * Accepted Candidates
+             * @default 0
+             */
+            accepted_candidates: number;
+            /** Detail */
+            detail: string | null;
+            mode: components["schemas"]["InferenceMode"];
+            /** Model Id */
+            model_id: string | null;
+            /** Model Version */
+            model_version: string | null;
+            /**
+             * Rejected Candidates
+             * @default 0
+             */
+            rejected_candidates: number;
+            status: components["schemas"]["InferenceStatus"];
+        };
+        /**
+         * InferenceMode
+         * @description How model output is used (design v1.2, section 3A.3).
+         * @enum {string}
+         */
+        InferenceMode: "rules_only" | "ml_shadow" | "hybrid_review";
+        /**
+         * InferenceStatus
+         * @enum {string}
+         */
+        InferenceStatus: "disabled" | "ok" | "degraded";
         /** IngestOut */
         IngestOut: {
             advisory_priority: components["schemas"]["AdvisoryPriority"] | null;
@@ -740,7 +778,7 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @default 2.1.0
+             * @default 2.2.0
              */
             schema_version: string;
             summary: components["schemas"]["ReplaySummary"];
@@ -825,7 +863,7 @@ export interface components {
             received_at: string;
             /**
              * Schema Version
-             * @default 2.1.0
+             * @default 2.2.0
              */
             schema_version: string;
             /** Source Event Id */
