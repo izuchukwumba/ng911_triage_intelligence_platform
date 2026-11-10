@@ -13,7 +13,14 @@ from typing import Self
 from pydantic import Field, model_validator
 
 from ntip.schema.advisory import AdvisoryPriority, SeverityBand
-from ntip.schema.base import SCHEMA_VERSION, Identifier, ReasonCode, SchemaModel, UtcDatetime
+from ntip.schema.base import (
+    DEFAULT_TENANT,
+    SCHEMA_VERSION,
+    Identifier,
+    ReasonCode,
+    SchemaModel,
+    UtcDatetime,
+)
 
 
 class ReplayOutcome(SchemaModel):
@@ -57,6 +64,8 @@ class ReplayRun(SchemaModel):
     requested_by: Identifier
     candidate_ruleset: str | None
     engine_version: str
+    # A run covers one tenant's incidents and is visible to that tenant only (2.5.0).
+    tenant_id: Identifier = DEFAULT_TENANT
     cases: list[ReplayCase]
     summary: ReplaySummary
     note: str = Field(
