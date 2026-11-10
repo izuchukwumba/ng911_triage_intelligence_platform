@@ -20,6 +20,9 @@ export type IngestOut = Schemas['IngestOut'];
 export type ReviewIn = Schemas['ReviewIn'];
 export type Priority = Schemas['AdvisoryPriority'];
 export type ReviewAction = Schemas['ReviewAction'];
+export type EvaluationReport = Schemas['EvaluationReport'];
+export type DatasetName = Schemas['DatasetName'];
+export type ReportSplit = Schemas['ReportSplit'];
 
 // Same-origin in development (Vite proxies /v1 and /health to the backend).
 const BASE = import.meta.env.VITE_API_BASE ?? '';
@@ -56,7 +59,7 @@ export function setToken(token: string): void {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function send(path: string, init?: RequestInit): Promise<Response> {
   const token = getToken();
   const res = await fetch(`${BASE}${path}`, {
     ...init,
@@ -77,7 +80,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       res.headers.get('X-Correlation-ID'),
     );
   }
-  return (await res.json()) as T;
+  return res;
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  return (await (await send(path, init)).json()) as T;
 }
 
 function post<T>(path: string, body: unknown, headers?: Record<string, string>) {
@@ -121,7 +128,19 @@ export const api = {
   replay(body: Schemas['ReplayIn']) {
     return post<Schemas['ReplayRun']>('/v1/replay-runs', body);
   },
+  evaluationReport(dataset: DatasetName, splits: ReportSplit[]) {
+    return request<EvaluationReport>(`/v1/evaluation/report?${evaluationQuery(dataset, splits)}`);
+  },
+  async evaluationMarkdown(dataset: DatasetName, splits: ReportSplit[]) {
+    return (await send(`/v1/evaluation/report.md?${evaluationQuery(dataset, splits)}`)).text();
+  },
   ready() {
     return request<{ status: string }>('/health/ready');
   },
 };
+
+function evaluationQuery(dataset: DatasetName, splits: ReportSplit[]): string {
+  const query = new URLSearchParams({ dataset });
+  for (const split of splits) query.append('split', split);
+  return query.toString();
+}

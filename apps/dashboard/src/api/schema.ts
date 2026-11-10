@@ -61,6 +61,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/evaluation/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Report
+         * @description Evaluate B0 now, on the dev and/or regression split of a committed dataset.
+         */
+        get: operations["get_report_v1_evaluation_report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/evaluation/report.md": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Report Markdown
+         * @description The same evaluation as a Markdown report, for export.
+         */
+        get: operations["get_report_markdown_v1_evaluation_report_md_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/incidents": {
         parameters: {
             query?: never;
@@ -511,6 +551,34 @@ export interface components {
             /** Uncertainty M */
             uncertainty_m: number | null;
         };
+        /** CueExtraction */
+        CueExtraction: {
+            /** Denied Or Past Cues Treated As Live */
+            denied_or_past_cues_treated_as_live: number;
+            /** F1 */
+            f1: number | null;
+            /** F1 Ci95 */
+            f1_ci95: (number | null)[];
+            /** Precision */
+            precision: number | null;
+            /** Recall */
+            recall: number | null;
+        };
+        /**
+         * DatasetName
+         * @enum {string}
+         */
+        DatasetName: "curated" | "generated";
+        /** EvaluationReport */
+        EvaluationReport: {
+            dataset: components["schemas"]["DatasetName"];
+            /** Failed Cases */
+            failed_cases: components["schemas"]["FailedCase"][];
+            metrics: components["schemas"]["Metrics"];
+            /** Note */
+            note: string;
+            pins: components["schemas"]["Pins"];
+        };
         /**
          * Evidence
          * @description A quoted stretch of a specific source event.
@@ -556,6 +624,21 @@ export interface components {
             status: components["schemas"]["FactStatus"];
             /** Value */
             value: number | null;
+        };
+        /** FailedCase */
+        FailedCase: {
+            /** Case Id */
+            case_id: string;
+            /** Critical */
+            critical: boolean;
+            /** Errors */
+            errors: string[];
+            /** Expected Priority */
+            expected_priority: string | null;
+            /** Messages */
+            messages: string[];
+            /** Split */
+            split: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -844,6 +927,27 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** Metrics */
+        Metrics: {
+            /** Cases */
+            cases: number;
+            critical_cue_sensitivity: components["schemas"]["Rate"];
+            critical_undertriage: components["schemas"]["Rate"];
+            cue_extraction: components["schemas"]["CueExtraction"];
+            domain_accuracy: components["schemas"]["Rate"];
+            location_accuracy: components["schemas"]["Rate"];
+            overtriage: components["schemas"]["Rate"];
+            /** Priority Confusion */
+            priority_confusion: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            priority_exact: components["schemas"]["Rate"];
+            severity_exact: components["schemas"]["Rate"];
+            undertriage: components["schemas"]["Rate"];
+            victim_count_accuracy: components["schemas"]["Rate"];
+        };
         /**
          * ModelOutput
          * @description The exact request and response of one model call, kept for audit.
@@ -884,11 +988,53 @@ export interface components {
             /** @default current */
             temporality: components["schemas"]["Temporality"];
         };
+        /** Pins */
+        Pins: {
+            /** Bootstrap */
+            bootstrap: string;
+            /** Dataset Digest */
+            dataset_digest: string;
+            /** Dataset Path */
+            dataset_path: string;
+            /** Engine */
+            engine: string;
+            /** Git Commit */
+            git_commit: string;
+            /** Lockfile Digest */
+            lockfile_digest: string | null;
+            /** Parser */
+            parser: string;
+            /** Python */
+            python: string;
+            /** Ruleset */
+            ruleset: string;
+            /** Ruleset Digest */
+            ruleset_digest: string;
+            /** Schema Version */
+            schema_version: string;
+            /** Seed */
+            seed: number;
+            /** Splits */
+            splits: string[];
+            /** System */
+            system: string;
+        };
         /**
          * Polarity
          * @enum {string}
          */
         Polarity: "affirmed" | "negated" | "uncertain";
+        /** Rate */
+        Rate: {
+            /** Ci95 */
+            ci95: number[] | null;
+            /** Denominator */
+            denominator: number;
+            /** Numerator */
+            numerator: number;
+            /** Value */
+            value: number | null;
+        };
         /** ReadyResponse */
         ReadyResponse: {
             /** Checks */
@@ -989,6 +1135,12 @@ export interface components {
             /** Skipped */
             skipped: number;
         };
+        /**
+         * ReportSplit
+         * @description The splits that may be browsed. ``test`` is deliberately absent.
+         * @enum {string}
+         */
+        ReportSplit: "dev" | "regression";
         /**
          * ReviewAction
          * @enum {string}
@@ -1202,6 +1354,77 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Assessment"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_report_v1_evaluation_report_get: {
+        parameters: {
+            query?: {
+                dataset?: components["schemas"]["DatasetName"];
+                /** @description default: dev and regression */
+                split?: components["schemas"]["ReportSplit"][] | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvaluationReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_report_markdown_v1_evaluation_report_md_get: {
+        parameters: {
+            query?: {
+                dataset?: components["schemas"]["DatasetName"];
+                /** @description default: dev and regression */
+                split?: components["schemas"]["ReportSplit"][] | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/markdown": unknown;
+                    "text/plain": string;
                 };
             };
             /** @description Validation Error */
