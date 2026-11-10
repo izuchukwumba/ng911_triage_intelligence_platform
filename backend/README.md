@@ -39,10 +39,26 @@ Without a database URL the API uses an in-memory event store (lost on restart).
 To persist to PostgreSQL:
 
 ```sh
-export NTIP_DATABASE_URL=postgresql://user:pass@localhost:5432/ntip
-python -m ntip.store.migrate "$NTIP_DATABASE_URL"        # apply migrations
-python -m ntip.store.migrate "$NTIP_DATABASE_URL" --down 0000   # roll back (dev only)
+OWNER_URL=postgresql://owner:pass@localhost:5432/ntip
+python -m ntip.store.migrate "$OWNER_URL"               # apply migrations
+python -m ntip.store.migrate "$OWNER_URL" --down 0000   # roll back (dev only)
 ```
+
+Migrations run as the owner of the tables. The API should **not**: it should
+connect as a login role in `ntip_app`, which migration 0006 creates (if a DBA
+has not already) and grants read and append access only. Such a role cannot
+update, delete or truncate records, nor disable the append-only triggers.
+
+```sql
+CREATE ROLE ntip_api LOGIN PASSWORD '...' IN ROLE ntip_app;  -- after migrating
+```
+
+```sh
+export NTIP_DATABASE_URL=postgresql://ntip_api:...@localhost:5432/ntip
+```
+
+The compose stack does this; if you reuse a PostgreSQL volume created before
+the role existed, recreate it (`docker compose ... down --volumes`).
 
 | Variable | Default | Purpose |
 |---|---|---|
