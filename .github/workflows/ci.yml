@@ -62,6 +62,11 @@ jobs:
       - name: Test
         run: uv run pytest
 
+      - name: Published contracts are current
+        run: |
+          uv run python -m ntip.schema.export --check
+          uv run python -m ntip.api.openapi --check
+
   dashboard:
     name: Dashboard (TypeScript)
     runs-on: ubuntu-latest
@@ -79,6 +84,11 @@ jobs:
 
       - name: Install (from lockfile)
         run: npm ci
+
+      - name: Generated API types are current
+        run: |
+          npm run gen:api
+          git diff --exit-code -- src/api/schema.ts
 
       - name: Type check and build
         run: npm run build
