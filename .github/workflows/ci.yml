@@ -44,7 +44,7 @@ jobs:
           cache-dependency-glob: backend/uv.lock
 
       - name: Install (from lockfile)
-        run: uv sync --locked --extra dev
+        run: uv sync --locked --extra dev --extra ml
 
       - name: Lint
         run: uv run ruff check .
@@ -101,14 +101,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build and start PostgreSQL, migrations, backend and dashboard
+      - name: Build and start the stack (B1 model, hybrid_review mode)
+        env:
+          NTIP_MODEL: b1-tfidf-logreg
+          NTIP_INFERENCE_MODE: hybrid_review
         run: docker compose -f infra/docker/docker-compose.yml up --build --detach --wait
 
       - name: Ingest through the dashboard's API proxy and read it back
         run: |
           set -euo pipefail
           id=$(curl -fsS -X POST localhost:8080/v1/incidents                  -H 'Content-Type: application/json'                  -d '{"text":"My wife is not breathing. I do not know where I am.","synthetic":true}'                | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["advisory_priority"]=="P0", d; print(d["incident_id"])')
-          curl -fsS "localhost:8000/v1/incidents/$id" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["state"]=="awaiting_review", d'
+          curl -fsS "localhost:8000/v1/incidents/$id" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["state"]=="awaiting_review", d; i=d["incident"]["inference"]; assert i["status"]=="ok" and i["model_id"]=="b1-tfidf-logreg", i'
+          curl -fsS "localhost:8000/v1/incidents/$id/model-outputs" | python3 -c 'import json,sys; [o]=json.load(sys.stdin); assert o["response"]["candidates"], o'
           curl -fsS localhost:8000/health/ready | grep -q '"event_store":true'
 
       - name: Logs on failure

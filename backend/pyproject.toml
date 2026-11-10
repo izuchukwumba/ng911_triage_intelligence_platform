@@ -12,6 +12,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Learned baselines (B1). Not needed for the rules-only platform.
+ml = [
+  "scikit-learn>=1.5",
+]
 dev = [
   "httpx2>=1.0",
   "mypy>=1.13",
@@ -45,3 +49,8 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 packages = ["ntip"]
+
+[[tool.mypy.overrides]]
+# scikit-learn ships no type information.
+module = ["sklearn", "sklearn.*"]
+ignore_missing_imports = true

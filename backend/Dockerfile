@@ -1,4 +1,5 @@
-# Research backend image: FastAPI app over the append-only event store.
+# Research backend image: the FastAPI app over the append-only event store,
+# also used for the inference service. Build context: repository root.
 FROM python:3.12-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.13 /uv /bin/uv
@@ -7,14 +8,19 @@ WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"
+    PATH="/app/.venv/bin:$PATH" \
+    NTIP_B1_TRAINING_DATA=/app/data/eval/generated-1.0.0-seed42.jsonl
 
-# Dependencies first (cached layer), exactly as pinned in uv.lock.
-COPY pyproject.toml uv.lock README.md ./
-RUN uv sync --locked --no-install-project
+# Dependencies first (cached layer), exactly as pinned in uv.lock, including
+# the "ml" extra so the inference service can serve B1.
+COPY backend/pyproject.toml backend/uv.lock backend/README.md ./
+RUN uv sync --locked --extra ml --no-install-project
 
-COPY src ./src
-RUN uv sync --locked
+COPY backend/src ./src
+RUN uv sync --locked --extra ml
+
+# B1 trains from this committed synthetic dataset when it is selected.
+COPY data/eval/generated-1.0.0-seed42.jsonl ./data/eval/
 
 RUN useradd --system --uid 10001 ntip
 USER ntip
