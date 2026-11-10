@@ -327,7 +327,7 @@ ng911-triage-intelligence/
   docs/
     architecture/             System overview and data flow
     design/                   Technical design specification (target architecture)
-    design-decisions/         Decision log (DDL-001 through DDL-012)
+    design-decisions/         Decision log (DDL-001 through DDL-013)
     evaluation/               Evaluation plan, benchmark reports, replay workflow
     scoring/                  Reason code taxonomy
     standards-alignment/      NG911 alignment narrative
