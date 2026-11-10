@@ -113,8 +113,12 @@ def main() -> int:
     parser.add_argument("--follow-ups", type=int, default=3)
     parser.add_argument("--database-url")
     args = parser.parse_args()
-    result = run(_store(args.database_url), workers=args.workers, incidents=args.incidents,
-                 follow_ups=args.follow_ups)  # fmt: skip
+    store = _store(args.database_url)
+    try:
+        result = run(store, workers=args.workers, incidents=args.incidents,
+                     follow_ups=args.follow_ups)  # fmt: skip
+    finally:
+        store.close()
     result["store"] = "postgresql" if args.database_url else "memory"
     print(json.dumps(result, indent=2))
     return 0 if not result["errors"] and not result["consistency_problems"] else 1

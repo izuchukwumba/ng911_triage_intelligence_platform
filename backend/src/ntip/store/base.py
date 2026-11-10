@@ -128,3 +128,6 @@ class EventStore(Protocol):
 
     def ping(self) -> bool:
         """True when the store can serve requests (used by readiness checks)."""
+
+    def close(self) -> None:
+        """Release held resources such as database connections. Idempotent."""
