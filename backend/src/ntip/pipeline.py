@@ -14,11 +14,15 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 
+from ntip.ml.contract import InferenceMessage, InferenceRequest, ModelOutput
+from ntip.ml.extractors import ModelExtractor
+from ntip.ml.fusion import fuse
+from ntip.ml.verify import verify
 from ntip.parser.parser import PARSER_ID, PARSER_VERSION, parse
 from ntip.schema.advisory import Assessment, AssessmentStatus
 from ntip.schema.audit import Actor, ActorKind, AuditEvent, AuditEventType
 from ntip.schema.base import SchemaModel, sha256_digest
-from ntip.schema.canonical import Incident
+from ntip.schema.canonical import Incident, InferenceMode
 from ntip.schema.review import HumanReview, ReviewDecision
 from ntip.schema.source import SourceEvent, SourceType
 from ntip.store import EventStore, IdempotencyClaim, Record, UnknownIncident
@@ -58,6 +62,10 @@ class Pipeline:
     new_id: Callable[[str], str] = _new_id
     # Test hook: replaces the parser, e.g. to simulate a crash.
     parser: Callable[..., Incident] = field(default=parse)
+    # How model output is used (design v1.2, section 3A.3). The rules baseline
+    # always runs; a model can only add to it, and never blocks it.
+    inference_mode: InferenceMode = InferenceMode.RULES_ONLY
+    extractor: ModelExtractor | None = None
 
     # ------------------------------------------------------------------ ingest
 
@@ -120,7 +128,9 @@ class Pipeline:
         now = self.clock()
         assessment_id = self.new_id("assess")
         try:
-            incident = self.parser(sources, derived_at=now)
+            incident, model_records = self._with_model(
+                self.parser(sources, derived_at=now), sources
+            )
             assessment = assess(
                 incident,
                 assessment_id=assessment_id,
@@ -151,10 +161,57 @@ class Pipeline:
             [
                 incident,
                 self._audit(AuditEventType.INCIDENT_PARSED, incident, correlation_id),
+                *model_records,
                 assessment,
                 self._audit(AuditEventType.TRIAGE_ASSESSED, assessment, correlation_id),
             ],
         )
+
+    def _with_model(
+        self, rules: Incident, sources: list[SourceEvent]
+    ) -> tuple[Incident, list[Record]]:
+        """Apply the inference mode. A model problem never fails processing."""
+        mode = self.inference_mode
+        if mode is InferenceMode.RULES_ONLY:
+            return fuse(rules, mode), []
+        if self.extractor is None:
+            return fuse(rules, mode, failure="no model configured"), []
+
+        request = InferenceRequest(
+            request_id=self.new_id("infer"),
+            incident_id=rules.incident_id,
+            messages=[
+                InferenceMessage(source_event_id=s.source_event_id, text=s.text) for s in sources
+            ],
+            language_hint=rules.language,
+        )
+        model_id, model_version = self.extractor.model_id, self.extractor.model_version
+        try:
+            response = self.extractor.infer(request)
+            verified = verify(response, {s.source_event_id: s.text for s in sources})
+            fused = fuse(
+                rules,
+                mode,
+                verified=verified,
+                abstained_codes=[a.code for a in response.abstentions],
+                model_id=model_id,
+                model_version=model_version,
+            )
+            error = None
+        except Exception as err:  # the model is optional; fall back to the rules
+            log.warning("inference failed for %s: %s", rules.incident_id, err)
+            response, error = None, f"{type(err).__name__}: {err}"[:500]
+            fused = fuse(rules, mode, failure=error, model_id=model_id, model_version=model_version)
+        output = ModelOutput(
+            output_id=self.new_id("mo"),
+            incident_id=rules.incident_id,
+            recorded_at=self.clock(),
+            mode=mode,
+            request=request,
+            response=response,
+            error=error,
+        )
+        return fused, [output]
 
     def _replayed(self, incident_id: str) -> "IngestResult":
         sources = self.store.source_events(incident_id)
