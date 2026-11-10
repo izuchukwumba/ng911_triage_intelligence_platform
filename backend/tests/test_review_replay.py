@@ -35,9 +35,10 @@ def test_each_decision_is_shown_next_to_the_machine_output() -> None:
     by_incident = {c.incident_id: c for c in comparison.cases}
     assert set(by_incident) == {confirmed, lowered, raised, noted}
     assert by_incident[confirmed].agreement == "confirmed"
-    assert (by_incident[lowered].machine_priority, by_incident[lowered].human_priority) == ("P0", "P2")
-    assert by_incident[lowered].agreement == "lowered"
-    assert by_incident[lowered].reason.startswith("Patient breathing")  # type: ignore[union-attr]
+    lowered_case = by_incident[lowered]
+    assert (lowered_case.machine_priority, lowered_case.human_priority) == ("P0", "P2")
+    assert lowered_case.agreement == "lowered"
+    assert (lowered_case.reason or "").startswith("Patient breathing")
     assert by_incident[raised].agreement == "raised"
     assert by_incident[noted].agreement == "noted"
     assert by_incident[confirmed].machine_reasons  # the rules that fired are shown
