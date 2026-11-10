@@ -56,7 +56,7 @@ When scoring logic changes, historical incidents should be re-scorable with the 
 
 **Rationale:**
 Emergency response is fundamentally limited by location quality. An incident may be high severity but unserviceable if there is no actionable location. Treating this as a numeric signal:
-- allows it to influence priority scoring (low dispatchability applies a penalty)
+- allows it to influence priority scoring (low dispatchability applies a penalty) — *superseded by DDL-011: location quality is now a zero-weight verification flag*
 - makes location uncertainty visible to operators in the UI
 - distinguishes between semantic confidence (do we understand the location?) and operational dispatchability (can we route a response?)
 
@@ -146,3 +146,26 @@ Sentence boundary characters (`.`, `!`, `?`, `;`) are treated as hard stops for 
 - Negation blocklist per indicator: maintainable but requires curating negative phrases for every indicator keyword
 
 **Impact:** The negation filter is called from `extractSeverityIndicators()` in the transcript parser. False negatives (indicators that should fire but don't) remain possible with unusual phrasing; the conservative default is to allow ambiguous indicators through for operator review.
+
+---
+
+## DDL-011: Uncertainty never lowers priority
+
+**Decision:** Low location dispatchability and low parser confidence are reported as zero-weight *verification flags* rather than score penalties. Supersedes the penalty described in DDL-004. Introduced in scoring 0.3.0.
+
+**Rationale:**
+Through scoring 0.2.0, `LOW_LOCATION_CONFIDENCE` (−0.08) and `LOW_PARSE_CONFIDENCE` (−0.06) were subtracted from the same score that selects the priority tier. That couples two independent questions — *how urgent is this?* and *how sure are we about where it is / what it is?* — and the coupling fails in exactly the wrong direction: a caller who cannot give an address, or whose speech is hard to parse, is not less urgent and is often more vulnerable. On the 23 fixtures, removing the deduction moved fixture-020 (domestic violence, caller does not know where they are) from P4 to P3 with no regressions elsewhere.
+
+Uncertainty should change the *workflow* (verify the location, confirm the classification), not the *priority*. This matches the safety invariants in the v1.2 design document (sections 3A.6 and 7.5) and ADR-004 there.
+
+**Implementation:**
+- `penalty_rules` in `scoring-rules.json` is replaced by `verification_flags`, which has no weight field, so the invariant cannot be reintroduced by a config edit alone
+- Flags still appear in `reason_codes` and in `score_breakdown` with `weight: 0`; the dashboard shows them in their own section
+- Invariant tests score the same record with and without degraded location/confidence and require identical scores and tiers
+
+**Alternatives considered:**
+- Setting the penalties to 0 in config: leaves a knob that silently reintroduces the problem
+- Clamping so penalties cannot cross a tier boundary: still lowers scores, and tier boundaries move
+
+**Not addressed here:** `POSSIBLE_PRANK` (−0.40) can still suppress credible emergency evidence, which the v1.2 design also prohibits. It is a separate behaviour change and needs its own decision.
+

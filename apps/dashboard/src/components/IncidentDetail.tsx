@@ -154,7 +154,7 @@ function ConfidenceMeters({ inc }: { inc: IncidentRecord }) {
         <ConfidenceMeter
           label="Location (Dispatchable)"
           value={inc.location.dispatchable_location_score}
-          tooltip="Confidence that emergency services can navigate to this location. Low values trigger the LOW_LOCATION_CONFIDENCE penalty."
+          tooltip="Confidence that emergency services can navigate to this location. Low values raise the LOW_LOCATION_CONFIDENCE verification flag; priority is unaffected."
         />
       </div>
     </div>
@@ -381,13 +381,13 @@ export function IncidentDetail({ incident: inc, initialBreakdown }: Props) {
               <ConfidenceMeter
                 label="Dispatchable Location Score"
                 value={inc.location.dispatchable_location_score}
-                tooltip="Confidence that emergency services can navigate to this location. Below 0.30 triggers the LOW_LOCATION_CONFIDENCE penalty."
+                tooltip="Confidence that emergency services can navigate to this location. Below 0.30 raises the LOW_LOCATION_CONFIDENCE verification flag; priority is unaffected."
               />
             </div>
 
             {inc.location.dispatchable_location_score < 0.30 && (
               <div style={{ marginTop: '10px', padding: '8px 10px', borderRadius: '4px', background: 'rgba(255,77,79,0.08)', border: '1px solid rgba(255,77,79,0.3)', fontSize: '12px', color: 'var(--p0)' }}>
-                LOW_LOCATION_CONFIDENCE penalty applied (−0.08). This location may not be navigable by emergency services.
+                LOW_LOCATION_CONFIDENCE — verify location with the caller. This location may not be navigable by emergency services. Priority is not reduced.
               </div>
             )}
 

@@ -87,13 +87,20 @@ Applied when victim count is extractable from the transcript and exceeds one.
 
 ## Penalty Codes
 
-Penalty codes reduce the score when data quality is low. They are always negative contributions.
+Penalty codes reduce the score. They are always negative contributions.
 
 | Code | Trigger | Weight | Description |
 |------|---------|--------|-------------|
-| `LOW_LOCATION_CONFIDENCE` | `dispatchable_location_score` < 0.30 | −0.08 | The reported location cannot be reliably used for dispatch routing. Vague descriptions ("somewhere downtown", "near a gas station") or no location at all trigger this penalty. Does not suppress life-threat indicators from reaching P0. |
-| `LOW_PARSE_CONFIDENCE` | `incident.confidence` < 0.50 | −0.06 | The transcript parser could not confidently classify the incident. May occur with very short transcripts, ambiguous language, or unsupported input formats. |
 | `POSSIBLE_PRANK` | Keywords: "prank", "joke", "fake", "filming", "YouTube", "just kidding" | −0.40 | Strong signal that the call is not genuine. This is the largest single penalty and is designed to suppress prank calls below P4 in most circumstances. Still requires human review. |
+
+### Verification flags
+
+Verification flags mark uncertainty that an operator should resolve. Since scoring 0.3.0 they carry **zero weight**: missing location or low parser confidence never lowers priority (see DDL-011). They still appear in `reason_codes` and in `score_breakdown` with `weight: 0`.
+
+| Code | Trigger | Weight | Description |
+|------|---------|--------|-------------|
+| `LOW_LOCATION_CONFIDENCE` | `dispatchable_location_score` < 0.30 | 0 | The reported location cannot be reliably used for dispatch routing — verify with the caller. Vague descriptions ("somewhere downtown", "near a gas station") or no location at all raise this flag. Was −0.08 up to scoring 0.2.0. |
+| `LOW_PARSE_CONFIDENCE` | `incident.confidence` < 0.40 | 0 | The transcript parser could not confidently classify the incident — confirm the classification. May occur with very short transcripts, ambiguous language, or unsupported input formats. Was −0.06 up to scoring 0.2.0. |
 
 ---
 

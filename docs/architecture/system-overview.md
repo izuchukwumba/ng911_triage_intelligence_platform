@@ -135,7 +135,7 @@ See [decision-log.md](../design-decisions/decision-log.md) for full rationale.
 - **Zod for schema validation** — runtime type safety at API boundaries, types inferred from schema
 - **Versioned scoring config** — `config/scoring-rules.json` is keyed with `scoring_version`; config upgrades do not break historical records
 - **Replay as a first-class endpoint** — `POST /replay/:id` re-processes any stored incident against the current parser and scorer
-- **Location as a quality signal** — low `dispatchable_location_score` applies a scoring penalty so operators see that uncertainty
+- **Location as a quality signal** — low `dispatchable_location_score` raises a zero-weight `LOW_LOCATION_CONFIDENCE` flag so operators see the uncertainty without the incident's priority being lowered
 - **Reason codes always preserved** — every scoring decision is traceable in the audit trail
 - **Negation filter with sentence boundary detection** — 8-token lookback window; indicators only suppressed if all keyword occurrences are negated
 

@@ -298,7 +298,7 @@ Every incident carries a `score_breakdown` array — each rule that fired, its n
   { "reason_code": "DOMAIN_BASE",            "weight":  0.22, "description": "EMS domain base score" },
   { "reason_code": "NOT_BREATHING",          "weight":  0.32, "description": "Caller reports victim is not breathing" },
   { "reason_code": "CARDIAC_EVENT",          "weight":  0.30, "description": "Cardiac arrest or heart attack reported" },
-  { "reason_code": "LOW_LOCATION_CONFIDENCE","weight": -0.08, "description": "Dispatchable location score is low" }
+  { "reason_code": "LOW_LOCATION_CONFIDENCE","weight":  0.00, "description": "Dispatchable location score is low — verify location with caller (does not lower priority)" }
 ]
 ```
 
@@ -326,7 +326,7 @@ ng911-triage-intelligence/
   docs/
     architecture/             System overview and data flow
     design/                   Technical design specification (target architecture)
-    design-decisions/         Decision log (DDL-001 through DDL-010)
+    design-decisions/         Decision log (DDL-001 through DDL-011)
     evaluation/               Evaluation plan, benchmark reports, replay workflow
     scoring/                  Reason code taxonomy
     standards-alignment/      NG911 alignment narrative
@@ -438,7 +438,8 @@ Driven by `services/prioritization-engine/config/scoring-rules.json`. Config is 
 | Child involved | +0.12 | `CHILD_INVOLVED` |
 | Caller high distress | +0.08 | `CALLER_HIGH_DISTRESS` |
 | Possible prank | −0.40 | `POSSIBLE_PRANK` |
-| Low location confidence | −0.08 | `LOW_LOCATION_CONFIDENCE` |
+| Low location confidence | 0 (verification flag) | `LOW_LOCATION_CONFIDENCE` |
+| Low parse confidence | 0 (verification flag) | `LOW_PARSE_CONFIDENCE` |
 
 **Victim count multiplier:** each additional victim beyond one adds 0.04, capped at 0.20.
 
@@ -452,7 +453,7 @@ Full taxonomy: [docs/scoring/reason-code-taxonomy.md](docs/scoring/reason-code-t
 - **Explainability before accuracy** — every score has a breakdown; a wrong but explainable score is more useful than a right but opaque one
 - **Deterministic before probabilistic** — rule-based scoring is fully testable and auditable without model introspection
 - **Replayability is first-class** — every incident can be re-processed against any scoring version; the audit trail is the feature
-- **Location quality as a priority signal** — low dispatchability is a penalty, not a footnote
+- **Location quality as a verification signal** — low dispatchability is flagged for the operator, but never lowers the priority of an urgent call
 
 Full rationale: [docs/design-decisions/decision-log.md](docs/design-decisions/decision-log.md)
 
