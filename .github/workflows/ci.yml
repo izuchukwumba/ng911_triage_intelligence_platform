@@ -65,6 +65,9 @@ jobs:
       - name: Evaluate B0 on dev + regression
         run: uv run python -m ntip.evaluation --split dev --split regression
 
+      - name: Safety gate (no critical under-triage on the regression split)
+        run: uv run python -m ntip.evaluation --split regression --gate
+
       - name: Published contracts are current
         run: |
           uv run python -m ntip.schema.export --check
