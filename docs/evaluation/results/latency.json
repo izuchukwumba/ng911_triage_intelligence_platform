@@ -1,0 +1,33 @@
+{
+  "git_commit": "0f8e587cb49a81e71ac689aadbc93e3a5d93ab18",
+  "machine": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+    "python": "3.12.10"
+  },
+  "setup": "Pipeline with in-memory store, in-process model, one request at a time",
+  "runs": [
+    {
+      "mode": "rules_only",
+      "model": null,
+      "requests": 250,
+      "latency_ms": {
+        "p50": 0.57,
+        "p95": 0.95,
+        "p99": 1.51,
+        "mean": 0.62
+      }
+    },
+    {
+      "mode": "hybrid_review",
+      "model": "b1-tfidf-logreg",
+      "requests": 250,
+      "latency_ms": {
+        "p50": 3.16,
+        "p95": 3.82,
+        "p99": 4.19,
+        "mean": 3.19
+      }
+    }
+  ]
+}
