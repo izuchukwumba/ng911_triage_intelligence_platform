@@ -43,8 +43,13 @@ _HISTORICAL = re.compile(
     r"(?<![\w'])(?:earlier|yesterday|last (?:night|week|month|year|time)|ago|used to"
     r"|previously|the other day|before but|ayer|antes)(?![\w'])"
 )
+# "if" after sure/know/tell/... asks a question ("not sure if he's breathing")
+# rather than stating a condition, so it does not make the clause hypothetical.
+_QUESTION_IF = "".join(
+    f"(?<!{w} )" for w in ("sure", "know", "tell", "check", "see", "wonder", "ask")
+)
 _HYPOTHETICAL = re.compile(
-    r"(?<![\w'])(?:if|in case|what if|unless|worried (?:that|he|she|it|they)"
+    rf"(?<![\w'])(?:{_QUESTION_IF}if|in case|what if|unless|worried (?:that|he|she|it|they)"
     r"|afraid (?:that|he|she|it|they)|could start|might start|si)(?![\w'])"
 )
 

@@ -81,6 +81,10 @@ class TestTemporality:
         result = context("He might be having a heart attack.", "heart attack")
         assert (result.temporality, result.polarity) == (Temporality.CURRENT, Polarity.UNCERTAIN)
 
+    def test_embedded_question_if_is_not_a_condition(self) -> None:
+        text = "I'm not sure if he's breathing, he's on the floor and won't answer me."
+        assert context(text, "won't answer").temporality is Temporality.CURRENT
+
     def test_current_by_default(self) -> None:
         assert context("There is a fire.", "fire").temporality is Temporality.CURRENT
 
