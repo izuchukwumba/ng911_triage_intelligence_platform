@@ -33,6 +33,7 @@ mutation, and CI gates changes.
 | S17 | No critical call is silently under-triaged by a change (§14.2) | CI gate: zero critical under-triage on the curated regression split | `python -m ntip.evaluation --split regression --gate` (CI step) |
 | S18 | Concurrent messages for one incident are never lost or half-processed | Optimistic concurrency: writes carry an expected message count, checked atomically (PostgreSQL advisory lock); the pipeline re-reads and retries | `test_concurrent_follow_ups_are_all_kept_and_assessed_together`, `test_expectation_rejects_a_stale_write`, `test_postgres_load_run_is_consistent` |
 | S19 | One tenant never sees or changes another tenant's incidents | Tenant on every source event and replay run; every incident route checks it; lists and replays are filtered; idempotency keys are scoped | `tests/api/test_tenants.py`, `test_incidents_and_replay_runs_are_filtered_by_tenant` |
+| S20 | Data is erased only by the sanctioned, audited procedure, and completely | Owner-only erasure inside a flagged transaction under the incident lock; tombstones in an append-only table; the application role cannot delete or write tombstones | `tests/store/test_retention.py` |
 
 ## Residual risks (accepted for a research prototype)
 

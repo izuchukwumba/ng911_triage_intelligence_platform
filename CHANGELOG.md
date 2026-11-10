@@ -59,6 +59,11 @@ release version identifies the platform as a whole.
 - **Explicit simulation mode**: `NTIP_DEPLOYMENT_MODE` accepts only `simulation`,
   and every API response says so (`X-NTIP-Mode`).
 
+- **Retention and lawful erasure** (migration 0008, DDL-019): an owner-only,
+  audited procedure (`python -m ntip.store.retention`) erases incidents by id or
+  by retention period, with everything derived from them, and leaves content-free
+  tombstones. The application still cannot delete anything.
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.
