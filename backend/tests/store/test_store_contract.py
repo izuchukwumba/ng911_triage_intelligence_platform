@@ -163,3 +163,25 @@ def test_model_outputs_round_trip(store: EventStore) -> None:
     )
     store.append([output])
     assert store.model_outputs("inc_1") == [output]
+
+
+def test_interop_receipts_round_trip_scoped_by_tenant(store: EventStore) -> None:
+    from ntip.interop.receipts import InteropReceipt, ReceiptStatus
+
+    def receipt(receipt_id: str, tenant: str) -> InteropReceipt:
+        return InteropReceipt(
+            receipt_id=receipt_id,
+            received_at=T0,
+            tenant_id=tenant,
+            profile_id="p",
+            adapter_version="a",
+            schema_artifact_digest=sha256_digest("schema"),
+            status=ReceiptStatus.QUARANTINED,
+            payload="{}",
+            payload_digest=sha256_digest("{}"),
+            source_event_id="urn:x",
+        )
+
+    store.append([receipt("r1", "tenant-a"), receipt("r2", "tenant-b")])
+    assert store.interop_receipt("r1") == receipt("r1", "tenant-a")
+    assert [r.receipt_id for r in store.interop_receipts("tenant-a", "urn:x")] == ["r1"]

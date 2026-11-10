@@ -14,6 +14,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Protocol
 
+from ntip.interop.receipts import InteropReceipt
 from ntip.ml.contract import ModelOutput
 from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
@@ -42,6 +43,7 @@ Record = (
     | IdempotencyClaim
     | ReplayRun
     | ModelOutput
+    | InteropReceipt
 )
 
 
@@ -92,6 +94,11 @@ class EventStore(Protocol):
 
     def model_outputs(self, incident_id: str) -> list[ModelOutput]:
         """Recorded model calls for an incident, oldest first."""
+
+    def interop_receipt(self, receipt_id: str) -> InteropReceipt | None: ...
+
+    def interop_receipts(self, tenant_id: str, source_event_id: str) -> list[InteropReceipt]:
+        """Receipts for one external incident from one tenant, oldest first."""
 
     def replay_run(self, run_id: str) -> ReplayRun | None: ...
 
