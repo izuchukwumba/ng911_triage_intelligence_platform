@@ -10,7 +10,7 @@ import re
 
 from ntip.parser.context import analyse
 from ntip.parser.text import Match
-from ntip.schema.base import Fact, FactStatus, SourceSpan
+from ntip.schema.base import Evidence, Fact, FactStatus, SourceSpan
 from ntip.schema.canonical import Polarity
 
 _NUMBERS = {
@@ -48,24 +48,34 @@ def _value(token: str) -> int:
     return int(token) if token.isdigit() else _NUMBERS[token.lower()]
 
 
-def victim_count(text: str) -> Fact[int]:
-    stated: list[tuple[int, SourceSpan]] = []
+def _quote(text: str, source_event_id: str, start: int, end: int) -> Evidence:
+    return Evidence(
+        source_event_id=source_event_id,
+        span=SourceSpan(start=start, end=end),
+        text=text[start:end],
+    )
+
+
+def victim_count(text: str, source_event_id: str) -> Fact[int]:
+    stated: list[tuple[int, Evidence]] = []
     for m in _COUNT.finditer(text):
         if analyse(text, Match(m.start(), m.end(), m.group(0))).polarity is Polarity.NEGATED:
             continue
         low = _value(m.group("low"))
         high = _value(m.group("high")) if m.group("high") else low
         # A range is planned for at its upper bound.
-        stated.append((max(low, high), SourceSpan(start=m.start(), end=m.end())))
+        stated.append((max(low, high), _quote(text, source_event_id, m.start(), m.end())))
 
     values = sorted({value for value, _ in stated})
-    spans = [span for _, span in stated]
+    quotes = [quote for _, quote in stated]
     if len(values) == 1:
-        return Fact[int](status=FactStatus.REPORTED, value=values[0], source_spans=spans)
+        return Fact[int](status=FactStatus.REPORTED, value=values[0], evidence=quotes)
     if len(values) > 1:
-        return Fact[int](status=FactStatus.CONFLICTING, candidates=values, source_spans=spans)
+        return Fact[int](status=FactStatus.CONFLICTING, candidates=values, evidence=quotes)
 
-    indefinite = [SourceSpan(start=m.start(), end=m.end()) for m in _INDEFINITE.finditer(text)]
+    indefinite = [
+        _quote(text, source_event_id, m.start(), m.end()) for m in _INDEFINITE.finditer(text)
+    ]
     if indefinite:
-        return Fact[int](status=FactStatus.UNKNOWN, source_spans=indefinite)
+        return Fact[int](status=FactStatus.UNKNOWN, evidence=indefinite)
     return Fact[int](status=FactStatus.NOT_REPORTED)
