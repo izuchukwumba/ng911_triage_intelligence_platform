@@ -1,10 +1,9 @@
 # ntip — research backend
 
-Python backend for the NG911 Triage Intelligence Platform. It replaces the
-TypeScript services under `services/` and `packages/` incrementally — see
-[DDL-012](../docs/design-decisions/decision-log.md) for the decision and the
-migration plan. Until the migration completes, the TypeScript backend remains
-the running system.
+Python backend for the NG911 Triage Intelligence Platform: rules parser,
+triage engine, append-only event store, HTTP API, replay, evaluation harness
+and synthetic data generator. It replaced the original TypeScript services
+(see [DDL-012](../docs/design-decisions/decision-log.md)).
 
 > Simulation and research use only. Not certified for emergency operations and
 > not a substitute for trained telecommunicators or approved dispatch protocols.
