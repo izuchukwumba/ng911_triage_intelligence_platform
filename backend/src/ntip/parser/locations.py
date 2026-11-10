@@ -10,12 +10,19 @@ location until something authoritative confirms it (design v1.2, section 8).
 import re
 from dataclasses import dataclass, field
 
-from ntip.schema.canonical import CivicAddress
+from ntip.schema.base import CivicAddress
 
 _SUFFIX = (
     r"(?:street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln|way|court|ct"
     r"|place|pl|circle|cir|highway|hwy|parkway|pkwy|terrace|ter|trail|trl|loop|alley)"
 )
+# Abbreviated street suffixes and their full form, so "Main St" and "Main Street"
+# are recognised as the same street.
+STREET_SUFFIXES = {
+    "st": "street", "ave": "avenue", "av": "avenue", "rd": "road", "blvd": "boulevard",
+    "dr": "drive", "ln": "lane", "ct": "court", "pl": "place", "cir": "circle",
+    "hwy": "highway", "pkwy": "parkway", "ter": "terrace", "trl": "trail",
+}  # fmt: skip
 _NAME = r"[A-Za-z][\w'’]*"
 _ORDINAL = r"\d+(?:st|nd|rd|th)"
 _DIRECTION = r"(?:[NSEW]\.?|north|south|east|west)"
@@ -191,3 +198,11 @@ def extract_locations(text: str) -> list[ExtractedLocation]:
                 landmark=m.group("landmark"))  # fmt: skip
 
     return sorted(found, key=lambda loc: loc.start)
+
+
+def normalise_street(street: str) -> str:
+    """Lower-case, single-spaced, with a final abbreviated suffix spelled out."""
+    words = street.lower().replace(".", "").split()
+    if words and words[-1] in STREET_SUFFIXES:
+        words[-1] = STREET_SUFFIXES[words[-1]]
+    return " ".join(words)
