@@ -35,6 +35,7 @@ from ntip.evaluation.runner import (
 )
 from ntip.ml.b1 import ABSTAIN_FROM, B1Model
 from ntip.ml.contract import InferenceMessage, InferenceRequest
+from ntip.ml.extractors import ModelExtractor
 from ntip.ml.fusion import fuse
 from ntip.ml.verify import verify
 from ntip.parser.parser import parse
@@ -50,7 +51,7 @@ def _messages(messages: list[str]) -> list[InferenceMessage]:
     return [InferenceMessage(source_event_id=f"evt_{i}", text=m) for i, m in enumerate(messages, 1)]
 
 
-def model_system(model: B1Model, *, model_only: bool) -> System:
+def model_system(model: ModelExtractor, *, model_only: bool) -> System:
     def run(messages: list[str]) -> tuple[Incident, Assessment]:
         sources = [
             SourceEvent.from_text(
@@ -107,7 +108,13 @@ def _slices(results: Sequence[Any], seed: int) -> dict[str, Any]:
     }
 
 
-def compare(dataset: Dataset, splits: Sequence[Split], *, seed: int = 20261109) -> dict[str, Any]:
+def compare(
+    dataset: Dataset,
+    splits: Sequence[Split],
+    *,
+    seed: int = 20261109,
+    extra_models: dict[str, ModelExtractor] | None = None,
+) -> dict[str, Any]:
     cases = dataset.split(*splits)
     relevant = rule_codes()
     b1 = B1Model()
@@ -118,6 +125,9 @@ def compare(dataset: Dataset, splits: Sequence[Split], *, seed: int = 20261109) 
         "Hybrid B0+B1": model_system(b1, model_only=False),
         "Hybrid without abstention": model_system(b1_no_abstain, model_only=False),
     }
+    for name, model in (extra_models or {}).items():
+        systems[f"{name} only"] = model_system(model, model_only=True)
+        systems[f"Hybrid B0+{name}"] = model_system(model, model_only=False)
     results: dict[str, Any] = {}
     for name, system in systems.items():
         case_results = [evaluate_case(case, system, relevant) for case in cases]
@@ -214,9 +224,19 @@ def main() -> int:
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--split", action="append", choices=[s.value for s in Split])
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "docs" / "evaluation" / "results")
+    parser.add_argument(
+        "--with-b2",
+        action="store_true",
+        help="also run B2 (calls the Anthropic API: costs money, needs NTIP_B2_ALLOW_EXTERNAL=1)",
+    )
     args = parser.parse_args()
     splits = [Split(s) for s in (args.split or ["test"])]
-    result = compare(load_dataset(args.dataset), splits)
+    extra: dict[str, ModelExtractor] = {}
+    if args.with_b2:
+        from ntip.ml.b2 import B2Model
+
+        extra["B2"] = B2Model()
+    result = compare(load_dataset(args.dataset), splits, extra_models=extra)
     stem = f"compare-{args.dataset.stem.split('-')[0]}-{'-'.join(splits)}"
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / f"{stem}.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

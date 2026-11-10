@@ -44,7 +44,7 @@ jobs:
           cache-dependency-glob: backend/uv.lock
 
       - name: Install (from lockfile)
-        run: uv sync --locked --extra dev --extra ml
+        run: uv sync --locked --extra dev --extra ml --extra llm
 
       - name: Lint
         run: uv run ruff check .
