@@ -47,6 +47,11 @@ release version identifies the platform as a whole.
   keyboard-only tests cover switching views, submitting a message and opening an
   incident.
 
+- **Schema samples and compatibility tests**: sample documents for every contract
+  are published per schema version (`backend/schemas/v2/examples`), and CI checks
+  that every published sample, including those reconstructed without the fields
+  added since 2.0.0, is still accepted unchanged.
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.
