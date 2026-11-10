@@ -12,6 +12,12 @@ release version identifies the platform as a whole.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-10
+
+Implements the remaining engineering items of design v1.2, and the gaps a
+second full review of the design found. See the
+[release notes](docs/releases/0.2.0.md).
+
 ### Added
 
 - **Stream replay** (`python -m ntip.stream`): replays timed message
@@ -81,8 +87,16 @@ release version identifies the platform as a whole.
   never affected. It ships with a synthetic layer (`data/gis`), and the dashboard
   now shows each location's origin.
 
+### Changed
+
+- Schema 2.6.0 (additive since 2.4.0: tenants, supplied locations, mapping notes),
+  rules parser 1.4.0, EIDO adapter 0.2.0, database migrations up to 0008.
+
 ### Fixed
 
+- The Release and Benchmarks workflows used the runner context at job level,
+  which GitHub rejects; caught when dispatching Benchmarks, before any release
+  was tagged. CI now lints every workflow with actionlint (#56).
 - "Main St" and "Main Street" no longer count as a location conflict.
 - Small priority badges failed WCAG contrast (faded label text). Screen readers
   also heard "P0Immediate", because the priority and its label had no space and
@@ -90,7 +104,9 @@ release version identifies the platform as a whole.
 
 ## [0.1.0] - 2026-11-10
 
-First tagged release: a research prototype that implements the technical
+Not tagged: the Release workflow at that commit had the defect fixed in 0.2.0.
+
+First release: a research prototype that implements the technical
 design v1.2 end to end on synthetic data. **Simulation only, not for live
 dispatch.** See the [release notes](docs/releases/0.1.0.md).
 
@@ -155,5 +171,6 @@ dispatch.** See the [release notes](docs/releases/0.1.0.md).
 
 - Vite upgraded to 6.4.6 for a published advisory (#35).
 
-[Unreleased]: https://github.com/izuchukwumba/ng911_triage_intelligence_platform/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/izuchukwumba/ng911_triage_intelligence_platform/releases/tag/v0.1.0
+[Unreleased]: https://github.com/izuchukwumba/ng911_triage_intelligence_platform/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/izuchukwumba/ng911_triage_intelligence_platform/releases/tag/v0.2.0
+[0.1.0]: https://github.com/izuchukwumba/ng911_triage_intelligence_platform/tree/d7a1b00

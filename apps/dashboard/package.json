@@ -1,6 +1,6 @@
 {
   "name": "@ng911/dashboard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Operator dashboard \u2014 ranked incident queue, detail panel, and score breakdown",
   "private": true,
   "scripts": {
