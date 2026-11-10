@@ -23,10 +23,17 @@ def _b1() -> ModelExtractor:
     return B1Model()
 
 
+def _b2() -> ModelExtractor:
+    from ntip.ml.b2 import B2Model  # needs the "llm" extra and NTIP_B2_ALLOW_EXTERNAL=1
+
+    return B2Model()
+
+
 # Factories, so heavy model dependencies are only imported when selected.
 MODELS: dict[str, Callable[[], ModelExtractor]] = {
     "b0-rules-as-model": RulesAsModel,
     "b1-tfidf-logreg": _b1,
+    "b2-claude-structured": _b2,
 }
 
 
