@@ -1,0 +1,82 @@
+name: Release
+
+# Pushing a tag v<version> re-verifies the tagged commit and publishes a GitHub
+# release with its notes and freshly generated test and evaluation reports
+# (design v1.2, section 14.3). Nothing is published if any step fails.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Verify and publish
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      NTIP_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      OUT: ${{ runner.temp }}/release
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Install (from lockfile)
+        run: uv sync --locked --extra dev --extra ml --extra llm
+
+      - name: The tag matches the package version
+        run: |
+          version=$(uv run python -c "import ntip; print(ntip.__version__)")
+          test "$GITHUB_REF_NAME" = "v$version"
+          test -f "../docs/releases/$version.md"
+
+      - name: Cache the pinned EIDO schema
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ntip/eido
+          key: eido-${{ hashFiles('backend/src/ntip/interop/eido/profile.py') }}
+
+      - name: Fetch and verify the pinned EIDO schema
+        run: uv run python -m ntip.interop.eido.fetch
+
+      - name: Test
+        run: |
+          set -o pipefail
+          mkdir -p "$OUT"
+          uv run pytest -q --junitxml="$OUT/tests-junit.xml" | tee "$OUT/tests.txt"
+
+      - name: Evaluate B0 on dev + regression
+        run: uv run python -m ntip.evaluation --split dev --split regression --out "$OUT/evaluation"
+
+      - name: Safety gate (no critical under-triage on the regression split)
+        run: uv run python -m ntip.evaluation --split regression --gate
+
+      - name: Publish the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" --verify-tag \
+            --title "NTIP $version" \
+            --notes-file "../docs/releases/$version.md" \
+            "$OUT/tests.txt" "$OUT/tests-junit.xml" "$OUT"/evaluation/*
