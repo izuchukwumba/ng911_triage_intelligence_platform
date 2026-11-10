@@ -334,6 +334,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/review-comparison": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Review Comparison
+         * @description Machine output next to the operator's decision, for every reviewed assessment
+         *     of the caller's tenant (design v1.2, 10.2 mode 4). Not ground truth.
+         */
+        get: operations["get_review_comparison_v1_review_comparison_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/rulesets": {
         parameters: {
             query?: never;
@@ -385,6 +406,11 @@ export interface components {
          * @enum {string}
          */
         AdvisoryPriority: "P0" | "P1" | "P2" | "P3" | "P4";
+        /**
+         * Agreement
+         * @enum {string}
+         */
+        Agreement: "confirmed" | "raised" | "lowered" | "override_same" | "reclassified" | "escalated" | "closed" | "noted";
         /** Assessment */
         Assessment: {
             advisory_priority: components["schemas"]["AdvisoryPriority"] | null;
@@ -1171,6 +1197,19 @@ export interface components {
          * @enum {string}
          */
         ReviewAction: "URGENT_HUMAN_REVIEW" | "CONFIRM_CRITICAL_REPORT" | "VERIFY_LOCATION" | "CONFIRM_CLASSIFICATION" | "RESOLVE_CONFLICT";
+        /** ReviewComparison */
+        ReviewComparison: {
+            /** By Agreement */
+            by_agreement: {
+                [key: string]: number;
+            };
+            /** Cases */
+            cases: components["schemas"]["ReviewedCase"][];
+            /** Note */
+            note: string;
+            /** Reviewed Assessments */
+            reviewed_assessments: number;
+        };
         /**
          * ReviewDecision
          * @enum {string}
@@ -1187,6 +1226,32 @@ export interface components {
             reason?: string | null;
             /** Reviewer Id */
             reviewer_id?: string | null;
+        };
+        /** ReviewedCase */
+        ReviewedCase: {
+            agreement: components["schemas"]["Agreement"];
+            /** Assessment Id */
+            assessment_id: string;
+            /** Corrected Domain */
+            corrected_domain: string | null;
+            /** Decision */
+            decision: string;
+            /** Human Priority */
+            human_priority: string | null;
+            /** Incident Id */
+            incident_id: string;
+            /** Machine Priority */
+            machine_priority: string | null;
+            /** Machine Reasons */
+            machine_reasons: string[];
+            /** Machine Severity */
+            machine_severity: string;
+            /** Reason */
+            reason: string | null;
+            /** Reviewer Id */
+            reviewer_id: string;
+            /** Ruleset Version */
+            ruleset_version: string;
         };
         /**
          * RuleFiring
@@ -1925,6 +1990,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ReplayRun"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_review_comparison_v1_review_comparison_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewComparison"];
                 };
             };
             /** @description Validation Error */

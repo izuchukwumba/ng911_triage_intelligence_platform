@@ -128,6 +128,9 @@ export const api = {
   replay(body: Schemas['ReplayIn']) {
     return post<Schemas['ReplayRun']>('/v1/replay-runs', body);
   },
+  reviewComparison() {
+    return request<Schemas['ReviewComparison']>('/v1/review-comparison');
+  },
   evaluationReport(dataset: DatasetName, splits: ReportSplit[]) {
     return request<EvaluationReport>(`/v1/evaluation/report?${evaluationQuery(dataset, splits)}`);
   },

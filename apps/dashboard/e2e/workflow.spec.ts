@@ -44,6 +44,13 @@ test('an operator triages, overrides with a reason, and the decision is replayab
   await expect(page.getByText(/reproducible/).first()).toBeVisible();
   await expect(page.getByText(/NOT reproducible/)).toHaveCount(0);
 
+  // Human-review replay: the override is shown next to the machine output,
+  // as a human judgement, not ground truth.
+  const comparison = page.getByRole('region', { name: /machine output vs human review/i });
+  await expect(comparison).toContainText('Lowered by operator');
+  await expect(comparison).toContainText('Crews already on scene (synthetic test).');
+  await expect(comparison).toContainText('not ground truth');
+
   // And the evaluation report is one click away.
   await page.getByRole('button', { name: 'Evaluation', exact: true }).click();
   await expect(page.getByText('Version pins')).toBeVisible();
