@@ -7,6 +7,8 @@ from pydantic import ValidationError
 from ntip.schema.base import FactStatus, SourceSpan
 from ntip.schema.canonical import (
     Classification,
+    Conflict,
+    ConflictKind,
     Coordinates,
     Evidence,
     Extractor,
@@ -161,3 +163,34 @@ class TestLocationCandidate:
             extractor=RULES,
         )
         assert candidate.validation is LocationValidation.UNVERIFIED
+
+
+class TestConflicts:
+    def test_keeps_contradicting_observations_side_by_side(self, source_event: SourceEvent) -> None:
+        affirmed = observation(source_event)
+        negated = observation(source_event, observation_id="obs_2", polarity=Polarity.NEGATED)
+        conflict = Conflict(
+            conflict_id="conf_1",
+            kind=ConflictKind.OBSERVATION_POLARITY,
+            code="NOT_BREATHING_REPORTED",
+            observation_ids=["obs_1", "obs_2"],
+        )
+        record = incident(source_event, observations=[affirmed, negated], conflicts=[conflict])
+        assert record.conflicts == [conflict]
+
+    def test_conflict_needs_two_distinct_items(self) -> None:
+        with pytest.raises(ValidationError, match="at least two items"):
+            Conflict(
+                conflict_id="conf_1",
+                kind=ConflictKind.LOCATION_MISMATCH,
+                location_ids=["loc_1", "loc_1"],
+            )
+
+    def test_conflict_must_cite_existing_facts(self, source_event: SourceEvent) -> None:
+        conflict = Conflict(
+            conflict_id="conf_1",
+            kind=ConflictKind.LOCATION_MISMATCH,
+            location_ids=["loc_1", "loc_missing"],
+        )
+        with pytest.raises(ValidationError, match="unknown location"):
+            incident(source_event, conflicts=[conflict])

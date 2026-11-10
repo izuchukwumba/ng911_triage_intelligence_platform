@@ -18,6 +18,20 @@
         "domain": {
           "$ref": "#/$defs/IncidentDomain"
         },
+        "heuristic_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heuristic Confidence"
+        },
         "status": {
           "$ref": "#/$defs/ClassificationStatus",
           "default": "provisional"
@@ -73,7 +87,7 @@
       "type": "string"
     }
   },
-  "$id": "https://ntip.local/schemas/v1.0.0/human-review.schema.json",
+  "$id": "https://ntip.local/schemas/v1.1.0/human-review.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -149,7 +163,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "1.0.0",
+      "default": "1.1.0",
       "title": "Schema Version",
       "type": "string"
     }
@@ -164,5 +178,5 @@
   ],
   "title": "HumanReview",
   "type": "object",
-  "x-schema-version": "1.0.0"
+  "x-schema-version": "1.1.0"
 }
