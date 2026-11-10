@@ -44,6 +44,7 @@ class IncidentState(StrEnum):
     AWAITING_REVIEW = "awaiting_review"
     REVIEWED = "reviewed"
     PROCESSING_FAILED = "processing_failed"
+    CLOSED = "closed"
 
 
 def _now() -> datetime:
@@ -260,11 +261,10 @@ class Pipeline:
                 "corrected_classification": corrected_classification,
             }
         )
-        event = (
-            AuditEventType.TRIAGE_OVERRIDDEN
-            if decision is ReviewDecision.OVERRIDE_PRIORITY
-            else AuditEventType.INCIDENT_REVIEWED
-        )
+        event = {
+            ReviewDecision.OVERRIDE_PRIORITY: AuditEventType.TRIAGE_OVERRIDDEN,
+            ReviewDecision.CLOSE: AuditEventType.INCIDENT_CLOSED,
+        }.get(decision, AuditEventType.INCIDENT_REVIEWED)
         actor = Actor(kind=ActorKind.OPERATOR, actor_id=reviewer_id)
         self.store.append(
             [review, self._audit(event, review, correlation_id or self.new_id("req"), actor)]
@@ -351,7 +351,9 @@ class IncidentView:
     ) -> "IncidentView":
         latest = assessments[-1]
         on_latest = [r for r in reviews if r.assessment_id == latest.assessment_id]
-        if latest.status is AssessmentStatus.PROCESSING_FAILED:
+        if on_latest and on_latest[-1].decision is ReviewDecision.CLOSE:
+            state = IncidentState.CLOSED
+        elif latest.status is AssessmentStatus.PROCESSING_FAILED:
             state = IncidentState.PROCESSING_FAILED
         elif on_latest:
             state = IncidentState.REVIEWED
