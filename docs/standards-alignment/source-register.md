@@ -14,7 +14,7 @@ Last verified: 2026-11-10.
 | EIDO dereference / retrieval API | NENA, NENA-STA-024 series | Not pinned (reviewed at tag `NENA-STA-024.1.1-2025`) | [NENA911/EIDO-Conveyance-Incident-Data-API](https://github.com/NENA911/EIDO-Conveyance-Incident-Data-API) | No licence file published | Not used: the platform never fetches EIDOs by reference (DDL-018) | — | — |
 | NG9-1-1 (i3) solution | NENA, NENA-STA-010 series | Not pinned | [NENA standards catalogue](https://www.nena.org/page/Standards) | NENA terms | Architectural context only: which NG911 functions the platform does **not** implement (ESInet, NGCS, ECRF, LVF, call routing) | `docs/standards-alignment/ng911-alignment.md` | No i3 compliance claim |
 | NG9-1-1 GIS Data Model | NENA, NENA-STA-006.3-2026 | Schema v3.0, commit `30a42bfdf0eb316bb1266087f5f1a39e1c77e22d` | [NENA911/NG911GISDataModel](https://github.com/NENA911/NG911GISDataModel) | Apache-2.0 | Field names of the `SiteStructureAddressPoint` layer, used by the synthetic reference layer and the L3 matcher | `data/gis/`, `backend/src/ntip/location/reference.py` | L3 is an exact match against a reference layer, not LVF validation and not NG911 GIS conformance |
-| NG911 interoperability test development | Texas A&M | Not pinned | [tamu-edu/ng911-dev](https://github.com/tamu-edu/ng911-dev) | Not reviewed | Not used; coverage of EIDO not yet checked | — | No claim of passing its tests |
+| NG911 conformance and interoperability tests | Texas A&M CACN | Reviewed at commit `73ba4f279378d3083a566e228f32ddc28345be67` | [tamu-edu/ng911-dev](https://github.com/tamu-edu/ng911-dev) | MIT | Reviewed for applicability: it tests i3 functional elements; EIDO appears only as logging-service event types, so none of its tests applies to this import-only consumer | [review](tamu-ng911-dev-review.md) | No claim of passing or having run its tests |
 | National 911 Program | NHTSA / 911.gov | — | [911.gov NG911](https://www.911.gov/issues/ng911/) | Public | Problem framing and ecosystem context | README | Program guidance is not an integration API |
 
 ## Open items
@@ -25,5 +25,4 @@ Last verified: 2026-11-10.
   WebSocket subprotocol and the `requestAccepts` MIME type) before claiming
   anything beyond message-schema validation.
 - Ask NENA for the licence terms of NENA911/WebSocket-Subscribe-Notify.
-- Check which NENA requirements Texas A&M's `ng911-dev` covers before using it
   (design v1.2, §3B.9 Phase IV).
