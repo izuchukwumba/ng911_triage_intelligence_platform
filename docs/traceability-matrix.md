@@ -75,7 +75,7 @@ Last updated: 2026-11-10.
 | `/v1` endpoints, 202 ingest, idempotency, structured errors, correlation ids (§5.2–5.3) | Done | `ntip/api/*` |
 | Live and ready health checks (§5.2) | Done | `/health/live`, `/health/ready` |
 | Append-only events enforced by the database (§9.2) | Done | Triggers on every table; safety case S12 |
-| Restricted database role (§9.2) | Not done | Recommended in the threat model for shared deployments |
+| Restricted database role (§9.2) | Done | Migration 0006 (`ntip_app`); contract tests run as the role; `tests/store/test_postgres_app_role.py`; compose backend connects as `ntip_api` |
 | Replay: reproducibility and version comparison (§10.1–10.4) | Done | `POST /v1/replay-runs`; dashboard Replay tab |
 | Stream replay with relative timing (§10.2) | Not done | — |
 | Latency baseline (§10.5, §13.3) | Done | `ntip.evaluation.latency`; results README |

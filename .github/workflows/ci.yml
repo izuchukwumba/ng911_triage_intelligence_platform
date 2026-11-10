@@ -132,6 +132,20 @@ jobs:
           curl -fsS -H "$AUTH" "localhost:8000/v1/incidents/$id/model-outputs" | python3 -c 'import json,sys; [o]=json.load(sys.stdin); assert o["response"]["candidates"], o'
           curl -fsS localhost:8000/health/ready | grep -q '"event_store":true'
 
+      - name: The backend connects as the restricted database role
+        run: |
+          set -euo pipefail
+          q() { docker compose -f infra/docker/docker-compose.yml exec -T postgres psql -d ntip -tA "$@"; }
+          others="datname = 'ntip' AND pid <> pg_backend_pid()"
+          q -U ntip -c "SELECT usename, count(*) FROM pg_stat_activity WHERE $others GROUP BY 1"
+          test "$(q -U ntip -c "SELECT count(*) FROM pg_stat_activity WHERE $others AND usename = 'ntip_api'")" -gt 0
+          test "$(q -U ntip -c "SELECT count(*) FROM pg_stat_activity WHERE $others AND usename <> 'ntip_api'")" = 0
+          # Refused by privileges, not only by the append-only triggers.
+          out=$(q -U ntip_api -c "DELETE FROM audit_events" 2>&1 || true); echo "$out"
+          grep -q "permission denied for table audit_events" <<<"$out"
+          out=$(q -U ntip_api -c "ALTER TABLE audit_events DISABLE TRIGGER ALL" 2>&1 || true); echo "$out"
+          grep -q "must be owner" <<<"$out"
+
       - name: Logs on failure
         if: failure()
         run: docker compose -f infra/docker/docker-compose.yml logs

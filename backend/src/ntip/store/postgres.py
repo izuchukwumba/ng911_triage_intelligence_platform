@@ -103,6 +103,21 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
             )
 
 
+#: The restricted role the application should act as (migration 0006): it may
+#: read and append to these tables, and nothing else.
+APP_ROLE = "ntip_app"
+EVENT_TABLES = (
+    "source_events",
+    "incident_versions",
+    "assessments",
+    "human_reviews",
+    "audit_events",
+    "idempotency_claims",
+    "replay_runs",
+    "model_outputs",
+    "interop_receipts",
+)
+
 #: How long a readiness check waits for a connection before reporting not ready.
 PING_TIMEOUT_S = 2.0
 

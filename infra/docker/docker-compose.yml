@@ -12,8 +12,11 @@ services:
       POSTGRES_USER: ntip
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ntip-dev-only}
       POSTGRES_DB: ntip
+      # Password of ntip_api, the restricted role the backend connects as.
+      NTIP_API_DB_PASSWORD: ${NTIP_API_DB_PASSWORD:-ntip-api-dev-only}
     volumes:
       - pg_data:/var/lib/postgresql/data
+      - ./postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ntip"]
       interval: 5s
@@ -49,7 +52,9 @@ services:
       context: ../..
       dockerfile: backend/Dockerfile
     environment:
-      NTIP_DATABASE_URL: postgresql://ntip:${POSTGRES_PASSWORD:-ntip-dev-only}@postgres:5432/ntip
+      # Restricted role: read and append only (migration 0006). The table owner,
+      # ntip, is used by the migrate service alone.
+      NTIP_DATABASE_URL: postgresql://ntip_api:${NTIP_API_DB_PASSWORD:-ntip-api-dev-only}@postgres:5432/ntip
       NTIP_CORS_ORIGINS: http://localhost:8080
       # token:principal:role (viewer | operator | analyst | admin). Development
       # tokens only; override NTIP_API_TOKENS for anything shared.
