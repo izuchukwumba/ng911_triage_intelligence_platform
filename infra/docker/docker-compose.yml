@@ -2,7 +2,20 @@
 # SIMULATION ONLY: synthetic data, no connection to any real emergency system.
 #
 #   docker compose -f infra/docker/docker-compose.yml up --build
-#   dashboard: http://localhost:8080   API docs: http://localhost:8000/docs
+#   # Stateless model service. The backend falls back to rules-only (and marks
+  # results "degraded") whenever it is slow or unavailable.
+  inference:
+    build: ../../backend
+    command: ["uvicorn", "ntip.ml.service:create_inference_app", "--factory",
+              "--host", "0.0.0.0", "--port", "8100"]
+    environment:
+      NTIP_MODEL: ${NTIP_MODEL:-b0-rules-as-model}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
+      interval: 5s
+      retries: 20
+
+  dashboard: http://localhost:8080   API docs: http://localhost:8000/docs
 
 services:
   postgres:
@@ -31,6 +44,10 @@ services:
     environment:
       NTIP_DATABASE_URL: postgresql://ntip:${POSTGRES_PASSWORD:-ntip-dev-only}@postgres:5432/ntip
       NTIP_CORS_ORIGINS: http://localhost:8080
+      # rules_only (default) | ml_shadow | hybrid_review  (design v1.2, 3A.3)
+      NTIP_INFERENCE_MODE: ${NTIP_INFERENCE_MODE:-rules_only}
+      NTIP_INFERENCE_URL: http://inference:8100
+      NTIP_INFERENCE_TIMEOUT_S: "2"
     ports:
       - "8000:8000"
     depends_on:
