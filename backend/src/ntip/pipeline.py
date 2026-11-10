@@ -25,13 +25,22 @@ from ntip.schema.base import SchemaModel, sha256_digest
 from ntip.schema.canonical import Incident, InferenceMode
 from ntip.schema.review import HumanReview, ReviewDecision
 from ntip.schema.source import SourceEvent, SourceType
-from ntip.store import EventStore, IdempotencyClaim, Record, UnknownIncident
+from ntip.store import (
+    ConcurrentModification,
+    EventStore,
+    Expectation,
+    IdempotencyClaim,
+    Record,
+    UnknownIncident,
+)
 from ntip.triage.engine import ENGINE_ID, ENGINE_VERSION, assess, failed_assessment
 from ntip.triage.ruleset import DEFAULT_RULESET, load_ruleset
 
 log = logging.getLogger(__name__)
 
 PIPELINE_ACTOR = Actor(kind=ActorKind.SERVICE, actor_id="pipeline")
+# Retries when another message for the same incident was written concurrently.
+MAX_ATTEMPTS = 20
 
 
 class IdempotencyConflict(Exception):
@@ -95,36 +104,42 @@ class Pipeline:
                     raise IdempotencyConflict(idempotency_key)
                 return self._replayed(claim.incident_id)
 
-        previous: list[SourceEvent] = []
-        if incident_id is not None:
-            previous = self.store.source_events(incident_id)
-            if not previous:
-                raise UnknownIncident(incident_id)
+        if incident_id is not None and not self.store.source_events(incident_id):
+            raise UnknownIncident(incident_id)
         incident_id = incident_id or new_incident_id or self.new_id("inc")
 
-        now = self.clock()
-        source = SourceEvent.from_text(
-            source_event_id=self.new_id("evt"),
-            incident_id=incident_id,
-            received_at=now,
-            text=text,
-            source_type=source_type,
-            supersedes=previous[-1].source_event_id if previous else None,
-        )
-        records: list[Record] = []
-        if idempotency_key is not None:
-            records.append(
-                IdempotencyClaim(
-                    key=idempotency_key,
-                    request_digest=request_digest,
-                    incident_id=incident_id,
-                    claimed_at=now,
-                )
+        # Optimistic concurrency: derive from the conversation as read, and
+        # write only if no other message arrived meanwhile; otherwise re-read
+        # and derive again, so the stored result always covers every message.
+        for _ in range(MAX_ATTEMPTS):
+            previous = self.store.source_events(incident_id)
+            now = self.clock()
+            source = SourceEvent.from_text(
+                source_event_id=self.new_id("evt"),
+                incident_id=incident_id,
+                received_at=now,
+                text=text,
+                source_type=source_type,
+                supersedes=previous[-1].source_event_id if previous else None,
             )
-        records += [source, self._audit(AuditEventType.SOURCE_RECEIVED, source, correlation_id)]
-        incident, assessment, derived = self._process([*previous, source], correlation_id)
-        self.store.append(records + derived)
-        return IngestResult(incident_id, source.source_event_id, incident, assessment, False)
+            records: list[Record] = []
+            if idempotency_key is not None:
+                records.append(
+                    IdempotencyClaim(
+                        key=idempotency_key,
+                        request_digest=request_digest,
+                        incident_id=incident_id,
+                        claimed_at=now,
+                    )
+                )
+            records += [source, self._audit(AuditEventType.SOURCE_RECEIVED, source, correlation_id)]
+            incident, assessment, derived = self._process([*previous, source], correlation_id)
+            try:
+                self.store.append(records + derived, expect=Expectation(incident_id, len(previous)))
+            except ConcurrentModification:
+                continue
+            return IngestResult(incident_id, source.source_event_id, incident, assessment, False)
+        raise ConcurrentModification(f"{incident_id}: gave up after {MAX_ATTEMPTS} attempts")
 
     def _process(
         self, sources: list[SourceEvent], correlation_id: str
