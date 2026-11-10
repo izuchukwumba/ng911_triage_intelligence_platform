@@ -52,8 +52,8 @@ def _insert_dummy(conn: psycopg.Connection, table: str) -> None:
     statements = {
         "source_events": "INSERT INTO source_events (source_event_id, incident_id, received_at,"
         " synthetic, payload, payload_digest) VALUES ('s', 'i', now(), true, '{}', 'd')",
-        "incident_versions": "INSERT INTO incident_versions (incident_id, derived_at,"
-        " schema_version, payload, payload_digest) VALUES ('i', now(), '2', '{}', 'd')",
+        "incident_versions": "INSERT INTO incident_versions (incident_id, version, derived_at,"
+        " schema_version, payload, payload_digest) VALUES ('i', 1, now(), '2', '{}', 'd')",
         "assessments": "INSERT INTO assessments (assessment_id, incident_id, assessed_at,"
         " ruleset_version, status, payload, payload_digest)"
         " VALUES ('a', 'i', now(), 'r', 'completed', '{}', 'd')",
