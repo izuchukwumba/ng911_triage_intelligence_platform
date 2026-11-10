@@ -6,10 +6,10 @@ versions and seed needed to reproduce it.
 
 | Report | Parser / ruleset | Data | Notes |
 |---|---|---|---|
-| [1.0.0 dev+regression](b0-1.0.0-research-1.0.0-dev-regression.md) | 1.0.0 / research-1.0.0 | curated dev + regression (30) | First development view |
-| [1.0.0 test](b0-1.0.0-research-1.0.0-test.md) | 1.0.0 / research-1.0.0 | curated test (20) | **Held-out baseline.** Recorded once; its failures are not used to change the parser |
-| [1.1.0 dev+regression](b0-1.1.0-research-1.0.0-dev-regression.md) | 1.1.0 / research-1.0.0 | curated dev + regression (30) | After closing the regression miss; CI gate enabled |
-| [1.2.0 dev+regression](b0-1.2.0-research-1.1.0-dev-regression.md) | 1.2.0 / research-1.1.0 | curated dev + regression (30), labelling guide v1.1 | Rubric gaps closed; no under-triage |
+| [1.0.0 dev+regression](b0-curated-1.0.0-research-1.0.0-dev-regression.md) | 1.0.0 / research-1.0.0 | curated dev + regression (30) | First development view |
+| [1.0.0 test](b0-curated-1.0.0-research-1.0.0-test.md) | 1.0.0 / research-1.0.0 | curated test (20) | **Held-out baseline.** Recorded once; its failures are not used to change the parser |
+| [1.1.0 dev+regression](b0-curated-1.1.0-research-1.0.0-dev-regression.md) | 1.1.0 / research-1.0.0 | curated dev + regression (30) | After closing the regression miss; CI gate enabled |
+| [1.2.0 dev+regression](b0-curated-1.2.0-research-1.1.0-dev-regression.md) | 1.2.0 / research-1.1.0 | curated dev + regression (30), labelling guide v1.1 | Rubric gaps closed; no under-triage |
 
 ## First baseline (B0, curated v1)
 
@@ -49,4 +49,22 @@ are kept deliberately:
   "takes back") is a judgement left to the human reviewer; the engine adds
   review actions instead.
 - `cu-119`: a hypothetical cardiac event is assessed "undetermined" (P2), not low.
+
+## Generated stress set (generator 1.0.0, seed 42; dev + regression, 300 cases)
+
+[Report](b0-generated-1.2.0-research-1.1.0-dev-regression.md). Cue micro F1
+0.963, critical-cue sensitivity 0.926 (63/68), critical under-triage 9/109,
+priority agreement 0.870. Failures group into:
+
+- **Rules gaps worth fixing:** "convulsing a minute ago and is *still*
+  convulsing" read as past; "overdosed" not voting for EMS; Spanish
+  "atrapadas" missing.
+- **Misspellings and disfluency** splitting a cue ("chest perssure",
+  "not um, breathing"): out of reach for exact phrase matching, and the main
+  case for the ML baselines.
+- **Denial-only calls** assessed "undetermined" (P2) rather than low: over-triage,
+  kept deliberately.
+
+Labels here are generator-intended, so these numbers are a stress test, not
+accuracy.
 

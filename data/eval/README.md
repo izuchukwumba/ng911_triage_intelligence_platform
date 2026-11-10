@@ -36,6 +36,20 @@ paraphrases cannot leak from development data into the test set (§3A.7).
 - 50 cases are far too few for narrow confidence intervals; every reported rate
   includes its counts and a bootstrap interval for that reason.
 
+## `generated-1.0.0-seed42.jsonl`
+
+510 cases from `python -m ntip.generator --n 510 --seed 42` (generator 1.0.0):
+17 scenario families with perturbations for location form, children and
+multiple victims, uncertainty, hearsay, denial, past tense, disfluency,
+misspellings, address corrections and Spanish. A test fails if the file no
+longer matches the generator.
+
+- `label_source: "generator"`: labels are **generator-intended**, computed from
+  the labelling rubric and the template, not checked by a person (design v1.2,
+  §12.3). Treat results on this set as a stress test, not as accuracy.
+- Template families are not shared with `curated.jsonl`, so the curated set
+  stays outside the generator's families.
+
 ## Running
 
 ```sh
