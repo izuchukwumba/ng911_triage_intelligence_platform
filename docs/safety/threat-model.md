@@ -22,10 +22,10 @@ the B2 API credential when B2 is enabled.
 | Unauthorised access | Interop endpoints: bearer tokens per tenant, fail closed, tenant-scoped receipts | **The `/v1` research API has no authentication.** Acceptable only on an isolated machine; add authentication and role-based access before any shared deployment (§13.2) |
 | Audit tampering | Append-only store; PostgreSQL triggers reject UPDATE/DELETE/TRUNCATE; digests on records and audit events | A database superuser can still drop triggers; use a restricted application role in any shared deployment |
 | Evaluation tampering | Datasets, rulesets and the EIDO schema are pinned by sha256; reports record commit and digests | — |
-| Supply chain | Locked dependencies (`uv.lock`, `package-lock.json`); third-party schema fetched only from a pinned commit and verified | No automated dependency or secret scanning in CI yet (§13.2) |
+| Supply chain | Locked dependencies (`uv.lock`, `package-lock.json`); third-party schema fetched only from a pinned commit and verified; CI runs pip-audit and npm audit on every change | Scans cover known advisories only |
 | Data sent to a third party | B2 is off unless `NTIP_B2_ALLOW_EXTERNAL=1`; only synthetic data exists | Real data would need authorisation, privacy review and contracts (§3B.6) |
 | Inadvertent connection to real systems | No telephony, routing or dispatch code exists; interop is import-only with no writeback; simulation banner in the UI | — |
-| Secrets in the repository | Defaults are local-development values; `.env` is git-ignored | Secret scanning not automated |
+| Secrets in the repository | Defaults are local-development values; `.env` is git-ignored; CI runs gitleaks over the full history | — |
 
 ## Privacy and retention (§9.3)
 

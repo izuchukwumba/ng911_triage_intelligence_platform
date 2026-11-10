@@ -134,3 +134,32 @@ jobs:
         if: always()
         run: docker compose -f infra/docker/docker-compose.yml down --volumes
 
+
+  security:
+    name: Dependency and secret scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # scan the whole history for secrets
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Python dependencies (pip-audit, locked versions)
+        working-directory: backend
+        run: |
+          uv export --locked --format requirements-txt --extra ml --extra llm --no-hashes --no-emit-project > "$RUNNER_TEMP/requirements.txt"
+          uvx pip-audit --requirement "$RUNNER_TEMP/requirements.txt" --progress-spinner off
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Dashboard dependencies (npm audit)
+        working-directory: apps/dashboard
+        run: npm audit --audit-level=moderate
+
+      - name: Secrets in the repository history (gitleaks)
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest git /repo --config /repo/.gitleaks.toml --redact --verbose
