@@ -13,6 +13,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from ntip.api.auth import Forbidden, Unauthenticated
 from ntip.pipeline import IdempotencyConflict
 from ntip.replay import UnknownRuleset
 from ntip.store import UnknownIncident
@@ -62,6 +63,16 @@ def install(app: FastAPI) -> None:
     @app.exception_handler(UnknownIncident)
     async def _unknown(request: Request, exc: UnknownIncident) -> JSONResponse:
         return _error(request, 404, "not_found", "Incident, assessment or replay run not found.")
+
+    @app.exception_handler(Unauthenticated)
+    async def _unauthenticated(request: Request, exc: Unauthenticated) -> JSONResponse:
+        response = _error(request, 401, "unauthorized", "Missing or invalid credentials.")
+        response.headers["WWW-Authenticate"] = "Bearer"
+        return response
+
+    @app.exception_handler(Forbidden)
+    async def _forbidden(request: Request, exc: Forbidden) -> JSONResponse:
+        return _error(request, 403, "forbidden", f"This role may not {exc.permission}.")
 
     @app.exception_handler(UnknownRuleset)
     async def _ruleset(request: Request, exc: UnknownRuleset) -> JSONResponse:

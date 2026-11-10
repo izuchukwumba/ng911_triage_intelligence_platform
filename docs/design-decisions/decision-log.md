@@ -251,3 +251,18 @@ The first comparison (docs/evaluation/results, "ML comparison") shows hybrid B0+
 
 **Revisit when:** independent annotation, practitioner review of the over-triage cost, or a calibrated model with negation handling changes the trade-off.
 
+---
+
+## DDL-015: Token authentication with roles, failing closed
+
+**Decision:** Every `/v1` route except the health checks requires a bearer token mapped to a principal and a role (`viewer`, `operator`, `analyst`, `admin`). The server refuses to start with neither `NTIP_API_TOKENS` nor an explicit `NTIP_AUTH_DISABLED=1`. With authentication on, the reviewer of an incident and the requester of a replay are the token's principal; any name in the request body is ignored.
+
+**Rationale:**
+The threat model listed the unauthenticated research API as the main gap before any shared deployment, and design v1.2 §2.3 already distinguishes operators, researchers and viewers. Attributing reviews from the body would let anyone record a decision in someone else's name, undermining the audit trail that the platform's accountability rests on.
+
+**Alternatives considered:**
+- *Open by default with a warning:* easy to deploy by accident; rejected in favour of an explicit opt-out.
+- *OAuth/OIDC:* the right choice for a real deployment, but needs an identity provider; static tokens keep the research setup self-contained and the route-level permission model carries over unchanged.
+
+**Limits:** tokens are static (no expiry or rotation), and incidents are not partitioned by tenant.
+

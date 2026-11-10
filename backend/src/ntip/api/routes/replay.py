@@ -2,9 +2,10 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from pydantic import BaseModel, ConfigDict, Field
 
+from ntip.api.auth import Permission, Principal, acting_as, require
 from ntip.api.errors import correlation_id
 from ntip.pipeline import Pipeline
 from ntip.replay import run_replay
@@ -22,7 +23,10 @@ class ReplayIn(BaseModel):
     incident_ids: list[str] | None = Field(default=None, max_length=1000)
     # A released ruleset to compare against; omit for a reproducibility check only.
     candidate_ruleset: str | None = None
-    requested_by: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_.:-]+$")
+    # Ignored when authentication is on: the requester is the token's principal.
+    requested_by: str | None = Field(
+        default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_.:-]+$"
+    )
 
 
 class RulesetOut(BaseModel):
@@ -39,28 +43,32 @@ def _pipeline(request: Request) -> Pipeline:
 
 
 @router.post("/replay-runs", status_code=status.HTTP_201_CREATED)
-def create_replay_run(body: ReplayIn, request: Request) -> ReplayRun:
+def create_replay_run(
+    body: ReplayIn,
+    request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.REPLAY))],
+) -> ReplayRun:
     """Re-assess stored incidents. Nothing stored is modified."""
     pipeline = _pipeline(request)
     return run_replay(
         pipeline.store,
         incident_ids=body.incident_ids,
         candidate_ruleset=body.candidate_ruleset,
-        requested_by=body.requested_by,
+        requested_by=acting_as(principal, body.requested_by, "requested_by"),
         clock=pipeline.clock,
         new_id=pipeline.new_id,
         correlation_id=correlation_id(request),
     )
 
 
-@router.get("/replay-runs")
+@router.get("/replay-runs", dependencies=[Depends(require(Permission.READ))])
 def list_replay_runs(
     request: Request, limit: Annotated[int, Query(ge=1, le=100)] = 20
 ) -> list[ReplayRun]:
     return _pipeline(request).store.replay_runs(limit=limit)
 
 
-@router.get("/replay-runs/{run_id}")
+@router.get("/replay-runs/{run_id}", dependencies=[Depends(require(Permission.READ))])
 def get_replay_run(run_id: str, request: Request) -> ReplayRun:
     run = _pipeline(request).store.replay_run(run_id)
     if run is None:
@@ -68,7 +76,7 @@ def get_replay_run(run_id: str, request: Request) -> ReplayRun:
     return run
 
 
-@router.get("/rulesets")
+@router.get("/rulesets", dependencies=[Depends(require(Permission.READ))])
 def list_rulesets() -> list[RulesetOut]:
     """Released rulesets and their pinned digests."""
     return [

@@ -114,7 +114,10 @@ class AuditTrail(_Out):
 
 class ReviewIn(_Body):
     assessment_id: str
-    reviewer_id: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_.:-]+$")
+    # Ignored when authentication is on: the reviewer is the token's principal.
+    reviewer_id: str | None = Field(
+        default=None, min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_.:-]+$"
+    )
     decision: ReviewDecision
     reason: str | None = Field(default=None, min_length=1, max_length=2000)
     override_priority: AdvisoryPriority | None = None

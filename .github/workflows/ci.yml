@@ -121,9 +121,15 @@ jobs:
       - name: Ingest through the dashboard's API proxy and read it back
         run: |
           set -euo pipefail
-          id=$(curl -fsS -X POST localhost:8080/v1/incidents                  -H 'Content-Type: application/json'                  -d '{"text":"My wife is not breathing. I do not know where I am.","synthetic":true}'                | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["advisory_priority"]=="P0", d; print(d["incident_id"])')
-          curl -fsS "localhost:8000/v1/incidents/$id" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["state"]=="awaiting_review", d; i=d["incident"]["inference"]; assert i["status"]=="ok" and i["model_id"]=="b1-tfidf-logreg", i'
-          curl -fsS "localhost:8000/v1/incidents/$id/model-outputs" | python3 -c 'import json,sys; [o]=json.load(sys.stdin); assert o["response"]["candidates"], o'
+          # Unauthenticated requests are refused.
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:8080/v1/incidents)" = 401
+          AUTH='Authorization: Bearer dev-operator'
+          id=$(curl -fsS -X POST localhost:8080/v1/incidents -H "$AUTH" \
+                 -H 'Content-Type: application/json' \
+                 -d '{"text":"My wife is not breathing. I do not know where I am.","synthetic":true}' \
+               | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["advisory_priority"]=="P0", d; print(d["incident_id"])')
+          curl -fsS -H "$AUTH" "localhost:8000/v1/incidents/$id" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["state"]=="awaiting_review", d; i=d["incident"]["inference"]; assert i["status"]=="ok" and i["model_id"]=="b1-tfidf-logreg", i'
+          curl -fsS -H "$AUTH" "localhost:8000/v1/incidents/$id/model-outputs" | python3 -c 'import json,sys; [o]=json.load(sys.stdin); assert o["response"]["candidates"], o'
           curl -fsS localhost:8000/health/ready | grep -q '"event_store":true'
 
       - name: Logs on failure

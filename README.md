@@ -44,7 +44,8 @@ status against the design: [traceability matrix](docs/traceability-matrix.md)
 docker compose -f infra/docker/docker-compose.yml up --build
 ```
 
-- Dashboard: <http://localhost:8080>
+- Dashboard: <http://localhost:8080> (enter a development token such as
+  `dev-operator`; see `NTIP_API_TOKENS` in the compose file)
 - API docs: <http://localhost:8000/docs>
 
 This starts PostgreSQL, runs migrations, and starts the backend, the optional
@@ -61,7 +62,7 @@ NTIP_MODEL=b1-tfidf-logreg NTIP_INFERENCE_MODE=hybrid_review \
 # backend (Python 3.12)
 cd backend
 uv sync --extra dev --extra ml          # or: pip install -e ".[dev,ml]"
-uvicorn ntip.api:create_app --factory --reload     # in-memory store
+NTIP_AUTH_DISABLED=1 uvicorn ntip.api:create_app --factory --reload   # in-memory store, no auth
 
 # dashboard
 cd apps/dashboard
@@ -73,7 +74,9 @@ Details, configuration and the full API table: [backend/README.md](backend/READM
 ### Try it
 
 ```sh
-curl -X POST localhost:8000/v1/incidents -H 'Content-Type: application/json' \
+# with the compose stack, use one of its development tokens, e.g. NTIP_TOKEN=dev-operator
+curl -X POST localhost:8000/v1/incidents -H "Authorization: Bearer $NTIP_TOKEN" \
+  -H 'Content-Type: application/json' \
   -d '{"text": "My wife is not breathing. I do not know where I am.", "synthetic": true}'
 ```
 

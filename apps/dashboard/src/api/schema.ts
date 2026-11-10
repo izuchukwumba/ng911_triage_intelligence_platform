@@ -919,7 +919,7 @@ export interface components {
             /** Incident Ids */
             incident_ids?: string[] | null;
             /** Requested By */
-            requested_by: string;
+            requested_by?: string | null;
         };
         /**
          * ReplayOutcome
@@ -997,7 +997,7 @@ export interface components {
             /** Reason */
             reason?: string | null;
             /** Reviewer Id */
-            reviewer_id: string;
+            reviewer_id?: string | null;
         };
         /**
          * RuleFiring
@@ -1140,7 +1140,9 @@ export interface operations {
     get_assessment_v1_assessments__assessment_id__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 assessment_id: string;
             };
@@ -1174,7 +1176,9 @@ export interface operations {
                 limit?: number;
                 offset?: number;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1205,6 +1209,7 @@ export interface operations {
             query?: never;
             header?: {
                 "Idempotency-Key"?: string | null;
+                authorization?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -1238,7 +1243,9 @@ export interface operations {
     get_incident_v1_incidents__incident_id__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 incident_id: string;
             };
@@ -1269,7 +1276,9 @@ export interface operations {
     get_events_v1_incidents__incident_id__events_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 incident_id: string;
             };
@@ -1302,6 +1311,7 @@ export interface operations {
             query?: never;
             header?: {
                 "Idempotency-Key"?: string | null;
+                authorization?: string | null;
             };
             path: {
                 incident_id: string;
@@ -1337,7 +1347,9 @@ export interface operations {
     get_model_outputs_v1_incidents__incident_id__model_outputs_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 incident_id: string;
             };
@@ -1368,7 +1380,9 @@ export interface operations {
     create_review_v1_incidents__incident_id__reviews_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 incident_id: string;
             };
@@ -1504,7 +1518,9 @@ export interface operations {
             query?: {
                 limit?: number;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1533,7 +1549,9 @@ export interface operations {
     create_replay_run_v1_replay_runs_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1566,7 +1584,9 @@ export interface operations {
     get_replay_run_v1_replay_runs__run_id__get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 run_id: string;
             };
@@ -1597,7 +1617,9 @@ export interface operations {
     list_rulesets_v1_rulesets_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1610,6 +1632,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RulesetOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

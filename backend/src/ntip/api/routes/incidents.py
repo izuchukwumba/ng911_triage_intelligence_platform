@@ -2,10 +2,11 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Header, Query, Request, Response, status
+from fastapi import APIRouter, Depends, Header, Query, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
 
+from ntip.api.auth import Permission, Principal, acting_as, require
 from ntip.api.errors import correlation_id
 from ntip.api.models import (
     AuditTrail,
@@ -40,7 +41,11 @@ def _accepted(response: Response, result: IngestOut) -> IngestOut:
     return result
 
 
-@router.post("/incidents", status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/incidents",
+    status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(require(Permission.INGEST))],
+)
 def create_incident(
     body: MessageIn, request: Request, response: Response, idempotency_key: IdempotencyKey = None
 ) -> IngestOut:
@@ -54,7 +59,11 @@ def create_incident(
     return _accepted(response, IngestOut.of(result))
 
 
-@router.post("/incidents/{incident_id}/messages", status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/incidents/{incident_id}/messages",
+    status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(require(Permission.INGEST))],
+)
 def add_message(
     incident_id: str,
     body: MessageIn,
@@ -73,7 +82,7 @@ def add_message(
     return _accepted(response, IngestOut.of(result))
 
 
-@router.get("/incidents")
+@router.get("/incidents", dependencies=[Depends(require(Permission.READ))])
 def list_incidents(
     request: Request,
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
@@ -85,12 +94,12 @@ def list_incidents(
     )
 
 
-@router.get("/incidents/{incident_id}")
+@router.get("/incidents/{incident_id}", dependencies=[Depends(require(Permission.READ))])
 def get_incident(incident_id: str, request: Request) -> IncidentDetail:
     return IncidentDetail.of(_pipeline(request).view(incident_id))
 
 
-@router.get("/incidents/{incident_id}/events")
+@router.get("/incidents/{incident_id}/events", dependencies=[Depends(require(Permission.READ))])
 def get_events(incident_id: str, request: Request) -> AuditTrail:
     store = _pipeline(request).store
     events = store.audit_events(incident_id)
@@ -99,7 +108,9 @@ def get_events(incident_id: str, request: Request) -> AuditTrail:
     return AuditTrail(incident_id=incident_id, events=events)
 
 
-@router.get("/incidents/{incident_id}/model-outputs")
+@router.get(
+    "/incidents/{incident_id}/model-outputs", dependencies=[Depends(require(Permission.READ))]
+)
 def get_model_outputs(incident_id: str, request: Request) -> list[ModelOutput]:
     """Exact model requests and responses recorded for this incident (design 3A.9)."""
     store = _pipeline(request).store
@@ -109,13 +120,19 @@ def get_model_outputs(incident_id: str, request: Request) -> list[ModelOutput]:
 
 
 @router.post("/incidents/{incident_id}/reviews", status_code=status.HTTP_201_CREATED)
-def create_review(incident_id: str, body: ReviewIn, request: Request) -> HumanReview:
+def create_review(
+    incident_id: str,
+    body: ReviewIn,
+    request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.REVIEW))],
+) -> HumanReview:
     """Record a confirmation, correction, override, escalation or note."""
     try:
         return _pipeline(request).review(
             incident_id,
             assessment_id=body.assessment_id,
-            reviewer_id=body.reviewer_id,
+            # With authentication on, the reviewer is whoever the token belongs to.
+            reviewer_id=acting_as(principal, body.reviewer_id, "reviewer_id"),
             decision=body.decision,
             reason=body.reason,
             override_priority=body.override_priority,
@@ -131,7 +148,7 @@ def create_review(incident_id: str, body: ReviewIn, request: Request) -> HumanRe
         raise RequestValidationError(err.errors()) from None
 
 
-@router.get("/assessments/{assessment_id}")
+@router.get("/assessments/{assessment_id}", dependencies=[Depends(require(Permission.READ))])
 def get_assessment(assessment_id: str, request: Request) -> Assessment:
     assessment = _pipeline(request).store.assessment(assessment_id)
     if assessment is None:

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { IncidentSummary, IngestOut } from './api/client';
-import { api } from './api/client';
+import { api, getToken, setToken } from './api/client';
 import { IncidentDetail } from './components/IncidentDetail';
 import { IncidentQueue } from './components/IncidentQueue';
 import { IngestPanel } from './components/IngestPanel';
@@ -13,10 +13,11 @@ export default function App() {
   const [incidents, setIncidents] = useState<IncidentSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [apiStatus, setApiStatus] = useState<'ok' | 'error' | 'unknown'>('unknown');
+  const [apiStatus, setApiStatus] = useState<'ok' | 'error' | 'unauthorized' | 'unknown'>('unknown');
   // Bumped to make the detail view reload after the queue changes.
   const [revision, setRevision] = useState(0);
   const [view, setView] = useState<'queue' | 'replay'>('queue');
+  const [token, setTokenState] = useState(getToken());
 
   const fetchIncidents = useCallback(async () => {
     setLoading(true);
@@ -24,8 +25,8 @@ export default function App() {
       const page = await api.listIncidents(100);
       setIncidents(page.items);
       setApiStatus('ok');
-    } catch {
-      setApiStatus('error');
+    } catch (err) {
+      setApiStatus((err as { status?: number }).status === 401 ? 'unauthorized' : 'error');
     } finally {
       setLoading(false);
     }
@@ -53,8 +54,19 @@ export default function App() {
           <button type="button" className={`tab ${view === 'queue' ? 'tab-active' : ''}`} aria-pressed={view === 'queue'} onClick={() => setView('queue')}>Queue</button>
           <button type="button" className={`tab ${view === 'replay' ? 'tab-active' : ''}`} aria-pressed={view === 'replay'} onClick={() => setView('replay')}>Replay</button>
         </nav>
-        <span role="status" style={{ marginLeft: 'auto', fontSize: '11px' }} className="muted">
-          {apiStatus === 'ok' ? '● API connected' : apiStatus === 'error' ? '○ API unavailable' : 'connecting…'}
+        <form
+          style={{ marginLeft: 'auto', display: 'flex', gap: '6px', alignItems: 'center' }}
+          onSubmit={(e) => { e.preventDefault(); setToken(token.trim()); void fetchIncidents(); }}
+        >
+          <label htmlFor="api-token" className="muted" style={{ fontSize: '11px' }}>Access token</label>
+          <input id="api-token" className="input" type="password" value={token} autoComplete="off"
+            onChange={(e) => setTokenState(e.target.value)} style={{ width: '160px', fontSize: '12px' }} />
+          <button type="submit" className="btn" style={{ fontSize: '12px', padding: '3px 10px' }}>Use</button>
+        </form>
+        <span role="status" style={{ fontSize: '11px' }} className="muted">
+          {apiStatus === 'ok' ? '● API connected'
+            : apiStatus === 'unauthorized' ? '○ Sign in with an access token'
+            : apiStatus === 'error' ? '○ API unavailable' : 'connecting…'}
         </span>
       </header>
       {view === 'replay' ? (
