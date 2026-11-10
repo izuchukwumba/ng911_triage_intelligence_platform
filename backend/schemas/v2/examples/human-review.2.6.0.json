@@ -1,0 +1,12 @@
+{
+  "assessment_id": "assess_sample0009",
+  "corrected_classification": null,
+  "decision": "override_priority",
+  "incident_id": "inc_sample0001",
+  "override_priority": "P1",
+  "reason": "Sample override: crews already on scene (synthetic).",
+  "review_id": "rev_sample0012",
+  "reviewed_at": "2026-01-01T12:01:30Z",
+  "reviewer_id": "operator_1",
+  "schema_version": "2.6.0"
+}

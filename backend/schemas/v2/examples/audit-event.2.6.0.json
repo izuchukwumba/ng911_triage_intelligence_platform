@@ -1,0 +1,15 @@
+{
+  "actor": {
+    "actor_id": "analyst_1",
+    "kind": "operator"
+  },
+  "component_version": "triage-engine-1.2.0",
+  "correlation_id": "req_sample4",
+  "event_id": "ae_sample0015",
+  "event_type": "incident.replayed",
+  "incident_id": "inc_sample0001",
+  "occurred_at": "2026-01-01T12:01:30Z",
+  "schema_version": "2.6.0",
+  "subject_digest": "sha256:3da6fe63986576253129de7d4bdab5b226b596ecf5bcd2f8bb63f14f46230de0",
+  "subject_id": "replay_sample0014"
+}

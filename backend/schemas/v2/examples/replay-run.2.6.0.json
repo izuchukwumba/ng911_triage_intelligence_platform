@@ -1,0 +1,61 @@
+{
+  "candidate_ruleset": "research-1.0.0",
+  "cases": [
+    {
+      "candidate": {
+        "advisory_priority": "P0",
+        "reason_codes": [
+          "OCCUPANTS_TRAPPED",
+          "FIRE_REPORTED",
+          "SMOKE_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "ruleset_version": "research-1.0.0",
+        "severity_band": "critical"
+      },
+      "candidate_lowers_priority": false,
+      "incident_id": "inc_sample0001",
+      "priority_changed": false,
+      "reproduced": {
+        "advisory_priority": "P0",
+        "reason_codes": [
+          "OCCUPANTS_TRAPPED",
+          "FIRE_REPORTED",
+          "SMOKE_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "ruleset_version": "research-1.1.0",
+        "severity_band": "critical"
+      },
+      "reproducible": true,
+      "skipped_reason": null,
+      "stored": {
+        "advisory_priority": "P0",
+        "reason_codes": [
+          "OCCUPANTS_TRAPPED",
+          "FIRE_REPORTED",
+          "SMOKE_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "ruleset_version": "research-1.1.0",
+        "severity_band": "critical"
+      },
+      "stored_assessment_id": "assess_sample0009"
+    }
+  ],
+  "created_at": "2026-01-01T12:01:30Z",
+  "engine_version": "1.2.0",
+  "note": "Replay never modifies stored incidents or assessments. Differences are illustrative and are not validated improvements.",
+  "requested_by": "analyst_1",
+  "run_id": "replay_sample0014",
+  "schema_version": "2.6.0",
+  "summary": {
+    "candidate_lowers_priority": 0,
+    "incidents": 1,
+    "not_reproducible": 0,
+    "priority_changed": 0,
+    "reproducible": 1,
+    "skipped": 0
+  },
+  "tenant_id": "default"
+}

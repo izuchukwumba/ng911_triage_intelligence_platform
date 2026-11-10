@@ -1,0 +1,34 @@
+{
+  "incident_id": "inc_sample0001",
+  "payload_digest": "sha256:b4b3963d800efe2570e895c8a854f0fcd69d7087a6adb735bd99fd067562f8a5",
+  "received_at": "2026-01-01T12:00:40Z",
+  "schema_version": "2.6.0",
+  "source_event_id": "evt_sample0007",
+  "source_type": "structured_test_event",
+  "supersedes": "evt_sample0002",
+  "supplied_locations": [
+    {
+      "civic_address": {
+        "floor": null,
+        "house_number": "14",
+        "landmark": null,
+        "locality": "Springfield",
+        "postal_code": null,
+        "region": "IL",
+        "street": "Elm Street",
+        "unit": null
+      },
+      "coordinates": {
+        "crs": "EPSG:4326",
+        "lat": 39.7817,
+        "lng": -89.6501,
+        "uncertainty_m": 25.0
+      },
+      "description": null,
+      "origin": "/sample/location"
+    }
+  ],
+  "synthetic": true,
+  "tenant_id": "default",
+  "text": "Now I can see flames and people are trapped inside."
+}
