@@ -155,6 +155,16 @@ describe('parseTranscript', () => {
       const record = parseTranscript('The patient has a wound but there is no bleeding visible at this time.');
       expect(record.incident.severity_indicators).not.toContain('active_bleeding');
     });
+
+    it('does not extract weapon_present when negated by "without"', () => {
+      const record = parseTranscript('He walked in without a gun and sat down at 45 Oak Street.');
+      expect(record.incident.severity_indicators).not.toContain('weapon_present');
+    });
+
+    it('does not extract active_bleeding when the caller "denies" it', () => {
+      const record = parseTranscript('She fell down the stairs but denies any bleeding.');
+      expect(record.incident.severity_indicators).not.toContain('active_bleeding');
+    });
   });
 
   // ---------------------------------------------------------------------------
