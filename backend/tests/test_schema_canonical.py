@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from ntip.schema.base import FactStatus, SourceSpan
+from ntip.schema.base import Fact, FactStatus, SourceSpan
 from ntip.schema.canonical import (
     Classification,
     Conflict,
@@ -194,3 +194,19 @@ class TestConflicts:
         )
         with pytest.raises(ValidationError, match="unknown location"):
             incident(source_event, conflicts=[conflict])
+
+
+class TestVictimCountEvidence:
+    def test_count_evidence_is_checked_against_the_source(self, source_event: SourceEvent) -> None:
+        quote = evidence(source_event, "My father")
+        count = Fact[int](status=FactStatus.REPORTED, value=1, evidence=[quote])
+        record = incident(source_event, victim_count=count)
+
+        assert list(record.evidence())[-1] == quote
+        assert provenance_errors(record, {source_event.source_event_id: source_event}) == []
+
+    def test_count_evidence_must_cite_an_incident_source(self, source_event: SourceEvent) -> None:
+        foreign = Evidence(source_event_id="evt_other", span=SourceSpan(start=0, end=2), text="My")
+        count = Fact[int](status=FactStatus.REPORTED, value=2, evidence=[foreign])
+        with pytest.raises(ValidationError, match="unknown source event"):
+            incident(source_event, victim_count=count)

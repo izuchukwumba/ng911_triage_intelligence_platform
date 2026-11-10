@@ -12,7 +12,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
-SCHEMA_VERSION = "1.1.0"
+SCHEMA_VERSION = "2.0.0"
 
 
 class SchemaModel(BaseModel):
@@ -59,6 +59,14 @@ class SourceSpan(SchemaModel):
         return text[self.start : self.end]
 
 
+class Evidence(SchemaModel):
+    """A quoted stretch of a specific source event."""
+
+    source_event_id: Identifier
+    span: SourceSpan
+    text: str = Field(min_length=1)
+
+
 class FactStatus(StrEnum):
     """How much is known about a fact (design v1.2, sections 3B.4 and 4.3).
 
@@ -89,7 +97,7 @@ class Fact[T](SchemaModel):
     status: FactStatus
     value: T | None = None
     candidates: list[T] = Field(default_factory=list)
-    source_spans: list[SourceSpan] = Field(default_factory=list)
+    evidence: list[Evidence] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _value_matches_status(self) -> Self:
