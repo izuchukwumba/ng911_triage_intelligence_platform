@@ -1,21 +1,9 @@
-# Local research stack: PostgreSQL, migrations, backend API and dashboard.
+# Local research stack: PostgreSQL, migrations, backend API, optional
+# inference service and dashboard.
 # SIMULATION ONLY: synthetic data, no connection to any real emergency system.
 #
 #   docker compose -f infra/docker/docker-compose.yml up --build
-#   # Stateless model service. The backend falls back to rules-only (and marks
-  # results "degraded") whenever it is slow or unavailable.
-  inference:
-    build: ../../backend
-    command: ["uvicorn", "ntip.ml.service:create_inference_app", "--factory",
-              "--host", "0.0.0.0", "--port", "8100"]
-    environment:
-      NTIP_MODEL: ${NTIP_MODEL:-b0-rules-as-model}
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
-      interval: 5s
-      retries: 20
-
-  dashboard: http://localhost:8080   API docs: http://localhost:8000/docs
+#   Dashboard: http://localhost:8080     API docs: http://localhost:8000/docs
 
 services:
   postgres:
@@ -38,6 +26,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  # Stateless model service. The backend falls back to rules-only (and marks
+  # results "degraded") whenever it is slow or unavailable.
+  inference:
+    build: ../../backend
+    command: ["uvicorn", "ntip.ml.service:create_inference_app", "--factory", "--host", "0.0.0.0", "--port", "8100"]
+    environment:
+      NTIP_MODEL: ${NTIP_MODEL:-b0-rules-as-model}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
+      interval: 5s
+      retries: 20
 
   backend:
     build: ../../backend
