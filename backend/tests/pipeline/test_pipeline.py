@@ -10,6 +10,7 @@ from ntip.schema.base import sha256_digest
 from ntip.schema.canonical import Incident
 from ntip.schema.review import ReviewDecision
 from ntip.store import InMemoryEventStore, UnknownIncident
+from ntip.triage.engine import ENGINE_VERSION
 
 
 def make_pipeline(**overrides: Any) -> Pipeline:
@@ -49,7 +50,7 @@ class TestIngest:
         [source] = pipeline.store.source_events(result.incident_id)
         assert received.subject_digest == sha256_digest(source.model_dump_json())
         assert assessed.subject_id == result.assessment.assessment_id
-        assert assessed.component_version == "triage-engine-1.0.0"
+        assert assessed.component_version == f"triage-engine-{ENGINE_VERSION}"
 
     def test_follow_up_message_reprocesses_the_whole_conversation(self) -> None:
         pipeline = make_pipeline()

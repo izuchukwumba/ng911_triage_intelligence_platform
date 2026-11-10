@@ -35,7 +35,12 @@ SEVERITY_ORDER: list[SeverityBand] = [
 
 
 class Rule(SchemaModel):
-    """Fires when every code in ``all_of`` is reported as a current affirmation.
+    """Fires when every code in ``all_of`` is reported (affirmed or uncertain).
+
+    By default the cues must describe the present. A rule with
+    ``temporality: historical`` instead fires on cues reported as having
+    happened earlier ("he wasn't breathing a minute ago"), so a recovered
+    critical event is not treated as if nothing had happened.
 
     ``severity`` sets a floor on the incident's severity band. ``escalate``
     instead raises the band reached by other rules by one step (used for
@@ -49,6 +54,7 @@ class Rule(SchemaModel):
     all_of: list[ReasonCode] = Field(min_length=1)
     severity: SeverityBand
     effect: Literal["floor", "escalate"] = "floor"
+    temporality: Literal["current", "historical"] = "current"
     reason_code: ReasonCode
 
     @model_validator(mode="after")
