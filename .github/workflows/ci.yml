@@ -12,10 +12,6 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# The legacy TypeScript backend (services/*, packages/*) is not checked here:
-# it is being replaced by backend/ (DDL-012) and has known failing tests.
-# Run `npm test` locally when making safety fixes to it.
-
 jobs:
   backend:
     name: Backend (Python)
@@ -98,3 +94,28 @@ jobs:
 
       - name: Type check and build
         run: npm run build
+
+  stack:
+    name: Container stack (smoke test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and start PostgreSQL, migrations, backend and dashboard
+        run: docker compose -f infra/docker/docker-compose.yml up --build --detach --wait
+
+      - name: Ingest through the dashboard's API proxy and read it back
+        run: |
+          set -euo pipefail
+          id=$(curl -fsS -X POST localhost:8080/v1/incidents                  -H 'Content-Type: application/json'                  -d '{"text":"My wife is not breathing. I do not know where I am.","synthetic":true}'                | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["advisory_priority"]=="P0", d; print(d["incident_id"])')
+          curl -fsS "localhost:8000/v1/incidents/$id" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["state"]=="awaiting_review", d'
+          curl -fsS localhost:8000/health/ready | grep -q '"event_store":true'
+
+      - name: Logs on failure
+        if: failure()
+        run: docker compose -f infra/docker/docker-compose.yml logs
+
+      - name: Stop
+        if: always()
+        run: docker compose -f infra/docker/docker-compose.yml down --volumes
+

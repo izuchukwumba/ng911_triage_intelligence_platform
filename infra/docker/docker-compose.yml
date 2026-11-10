@@ -1,36 +1,48 @@
-version: "3.9"
+# Local research stack: PostgreSQL, migrations, backend API and dashboard.
+# SIMULATION ONLY: synthetic data, no connection to any real emergency system.
+#
+#   docker compose -f infra/docker/docker-compose.yml up --build
+#   dashboard: http://localhost:8080   API docs: http://localhost:8000/docs
 
 services:
   postgres:
     image: postgres:16-alpine
-    restart: unless-stopped
     environment:
-      POSTGRES_USER: ng911
-      POSTGRES_PASSWORD: ng911dev
-      POSTGRES_DB: ng911
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ntip
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ntip-dev-only}
+      POSTGRES_DB: ntip
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ng911"]
+      test: ["CMD-SHELL", "pg_isready -U ntip"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
-  ingestion-api:
-    build:
-      context: ../..
-      dockerfile: services/ingestion-api/Dockerfile
-    restart: unless-stopped
-    ports:
-      - "3001:3001"
-    environment:
-      PORT: 3001
-      DATABASE_URL: postgres://ng911:ng911dev@postgres:5432/ng911
-      NODE_ENV: development
+  migrate:
+    build: ../../backend
+    command: ["python", "-m", "ntip.store.migrate", "postgresql://ntip:${POSTGRES_PASSWORD:-ntip-dev-only}@postgres:5432/ntip"]
     depends_on:
       postgres:
+        condition: service_healthy
+
+  backend:
+    build: ../../backend
+    environment:
+      NTIP_DATABASE_URL: postgresql://ntip:${POSTGRES_PASSWORD:-ntip-dev-only}@postgres:5432/ntip
+      NTIP_CORS_ORIGINS: http://localhost:8080
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  dashboard:
+    build: ../../apps/dashboard
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
         condition: service_healthy
 
 volumes:
