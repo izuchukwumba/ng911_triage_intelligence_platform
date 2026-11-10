@@ -238,3 +238,16 @@ The engine therefore separates two kinds of input:
 
 **Limitations:** the bands and the research-v1 priority labels are project-defined and have not been reviewed by public-safety practitioners (design v1.2, open question 6).
 
+---
+
+## DDL-014: Rules-only stays the default inference mode
+
+**Decision:** The platform defaults to `rules_only`. `ml_shadow` and `hybrid_review` with B1 remain available for research and are exercised in CI, but are not the default.
+
+**Rationale:**
+The first comparison (docs/evaluation/results, "ML comparison") shows hybrid B0+B1 never increases critical false negatives and removes the two critical under-triages B0 makes on the curated test split (milestone ML-4 gate met). It also roughly doubles over-triage and lowers cue precision, B1 is uncalibrated, it has no negation or tense model, and every result is on synthetic, author- or generator-labelled data. Trading precision for recall is a judgement about operator workload that should be made with qualified practitioners, not by the author on synthetic benchmarks (design v1.2, sections 3A.6 and 16.3).
+
+`ml_shadow` is the recommended next step for any pilot: it records model output beside every incident without affecting what operators see, so the trade-off can be measured on realistic traffic before anyone relies on it.
+
+**Revisit when:** independent annotation, practitioner review of the over-triage cost, or a calibrated model with negation handling changes the trade-off.
+
