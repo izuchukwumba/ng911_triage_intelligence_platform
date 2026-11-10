@@ -6,6 +6,8 @@ This log records significant architectural and implementation decisions, the rat
 
 ## DDL-001: Zod for schema definition and runtime validation
 
+> **Superseded for the backend by DDL-012.** Schemas move to Pydantic; the dashboard consumes TypeScript types generated from the backend's OpenAPI document.
+
 **Decision:** Use Zod to define the incident schema rather than plain TypeScript interfaces.
 
 **Rationale:**
@@ -93,6 +95,8 @@ Operators using the platform need to understand not just the score but why it wa
 
 ## DDL-008: TypeScript/Node.js for the full backend stack
 
+> **Superseded by DDL-012** (Python backend, TypeScript frontend).
+
 **Decision:** Implement all backend services, packages, and tooling in TypeScript running on Node.js, rather than Python or a mixed-language approach.
 
 **Rationale:**
@@ -168,4 +172,39 @@ Uncertainty should change the *workflow* (verify the location, confirm the class
 - Clamping so penalties cannot cross a tier boundary: still lowers scores, and tier boundaries move
 
 **Not addressed here:** `POSSIBLE_PRANK` (−0.40) can still suppress credible emergency evidence, which the v1.2 design also prohibits. It is a separate behaviour change and needs its own decision.
+
+---
+
+## DDL-012: Python backend, TypeScript frontend
+
+**Decision:** Move all backend code — API, parser, triage engine, location assessment, audit store, NG911 interop adapters, ML inference, and evaluation — to a single Python package under `backend/`. Keep TypeScript only for the operator dashboard (`apps/dashboard`). Supersedes DDL-008, the backend half of DDL-001, and §3.3 / ADR-002 of the v1.2 design document, which proposed a TypeScript core with a separate Python ML service.
+
+**Rationale:**
+DDL-008 rested on the NLP being rule-based ("Python's NLP library advantage does not apply to a keyword-matching pipeline") and named Python as the way forward once models were involved. The v1.2 design makes machine learning the core research component, which removes that premise:
+
+- **The central experiment is a comparison.** The rules parser (baseline B0) must be evaluated against ML models (B1/B2) on the same frozen dataset, with the same scoring code and one reproducibility manifest. With B0 in TypeScript and B1/B2 in Python, that needs either two evaluation harnesses or a cross-language bridge — both undermine "reproduce from a single command" (design §3A.10, ML-1).
+- **The ML and statistics ecosystem is Python.** Model training and serving, calibration, span-aware NLP and bootstrap confidence intervals (design §3A.8) are first-class in Python and partial or absent in Node.
+- **Single-maintainer cost.** Two backend languages mean two type systems, two test runners, two lockfiles and a schema-sync step, for no isolation benefit at this stage.
+- **Migration is cheapest now.** The TypeScript backend is about 3.5k lines, and its schema, parser output and scorer need a structural rewrite for v1.2 anyway (layered source/canonical/advisory records, evidence spans, severity separated from location quality).
+
+**Shape:**
+- One installable package, `ntip`, organised as a modular monolith (`api`, `schema`, `parser`, `triage`, `location`, `audit`, `interop`, `ml`, `evaluation`). Modules are split into services only when isolation or scaling is measured to require it (design §3.2).
+- **Contracts:** Pydantic v2 models are the single source of truth. They produce JSON Schema 2020-12 (design §4.3) and, through FastAPI, an OpenAPI document from which the dashboard's TypeScript types are generated.
+- **Tooling:** Python 3.12, FastAPI, Pydantic v2, pytest, ruff, mypy (strict). PostgreSQL access through SQLAlchemy 2 with Alembic migrations when persistence is ported.
+
+**Migration plan (strangler, not big-bang):**
+1. Scaffold `backend/` alongside the existing TypeScript services; nothing is removed yet.
+2. Implement the v1.2 layered schema in Pydantic.
+3. Port the rules parser and triage engine as baseline B0, driven by the existing fixtures plus the intended behaviour in the TypeScript tests (including the 11 tests that currently fail on `main`).
+4. Port persistence as an append-only event store, then the API surface, then replay and evaluation.
+5. Point the dashboard at the Python API using generated types.
+6. Delete `services/*` and the TypeScript backend packages once the dashboard runs end to end on the Python backend.
+
+Until step 6, the TypeScript backend remains the running system and receives only safety fixes.
+
+**Alternatives considered:**
+- TypeScript core + Python ML service (design v1.2 §3A.3): adds a network boundary and duplicate contracts between B0 and the models it is compared against; better suited to a larger existing TypeScript codebase than this one.
+- Stay on TypeScript and call ML via ONNX/transformers.js: viable for inference, poor for training, calibration and statistical evaluation.
+
+**Trade-off:** The existing TypeScript tests and Express API are rewritten rather than reused, and backend/frontend types are no longer shared directly — they are generated from OpenAPI instead.
 
