@@ -54,6 +54,7 @@ class TestObservations:
             ("He's lying on the floor and won't answer me.", "UNCONSCIOUS"),
             ("My foot hurts badly.", "INJURY_REPORTED"),
             ("She fell and she can't get up.", "UNABLE_TO_GET_UP"),
+            ("Hay un incendio y hay personas atrapadas.", "OCCUPANTS_TRAPPED"),
             (
                 "HELP HELP PLEASE MY SON IS NOT BREATHING HELP. PLEASE HURRY.",
                 "CALLER_HIGH_DISTRESS",

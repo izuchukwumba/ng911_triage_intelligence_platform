@@ -59,6 +59,8 @@ class TestDomain:
             ("Two cars crashed on Route 66.", "ems"),
             ("Someone broke into my car on Elm Street.", "police"),
             ("Can you do a welfare check? My neighbor lives alone.", "ems"),
+            ("I think a woman overdosed on something.", "ems"),
+            ("My grandfather is seizing on the floor.", "ems"),
         ],
     )
     def test_extended_domain_keywords(self, text: str, domain: str) -> None:
