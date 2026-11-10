@@ -10,7 +10,7 @@ The single EIDO edition the platform accepts, and exactly what it does with it
 | `schemaArtifactDigest` | `PROFILE.schema_artifact_digest` — sha256 over the per-file digests of `Schema/openapi.yaml` and 43 NIEM component files |
 | Root type | `EmergencyIncidentDataObjectType` |
 | Accepted `eidoVersion` | `1.0` (the only value the schema's enum allows) |
-| `conveyanceProfile` | none: the platform's endpoint is project-defined, not NENA-STA-024 |
+| `conveyanceProfile` | `ntip-sta024-ws-subscriber-v1` (NENA WebSocket subscribe/notify message schema v1.1, subscriber role); the HTTP import endpoint remains project-defined |
 | `adapterVersion` | `eido-adapter-0.2.0` |
 
 ## Why the schema is fetched, not vendored

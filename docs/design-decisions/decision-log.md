@@ -292,3 +292,15 @@ The threat model listed the unauthenticated research API as the main gap before 
 - *A database per tenant:* the strongest isolation, but heavy for a research platform; the column-based design can move there later without API changes.
 - *Admins see all tenants:* convenient, but it would make a single token a cross-tenant credential; rejected until there is a real need and an audit design for it.
 
+---
+
+## DDL-018: NENA-STA-024 conveyance as a subscriber only
+
+**Decision:** The platform implements only the subscriber role of NENA's WebSocket subscribe/notify conveyance. It connects out to an authorised notifier over TLS, subscribes to EIDOs, acknowledges each notification and passes every EIDO through the existing import gateway. It does not act as a notifier, send push messages or dereference EIDOs by URL. Messages are validated against NENA's message schema, pinned to a commit and a sha256, and fetched rather than vendored because the repository has no licence.
+
+**Rationale:** The platform consumes incident data and never writes back (§3B.1, ADR-INT-002), so the subscriber is the only role it needs. Routing conveyed EIDOs through the gateway means they get the same validation, idempotency, revision ordering, tenant scoping and receipts as HTTP imports. Fetching by reference would make the platform send requests to addresses an external party chose, so it is not done.
+
+**Acknowledgements:** 200 only when every EIDO in a notification was accepted, 400 when any was rejected (its receipt is kept), 413 when too large, 500 on a processing failure, and 481 for an unknown subscription. A resent transaction gets its original answer, so a notifier's retries cannot cause double processing.
+
+**Limits:** Only the message schema has been reviewed, not the standard's normative text, so no conveyance compliance is claimed (§3B.2). Validation dispatches on the message's top-level key because the published `oneOf` unions are ambiguous.
+

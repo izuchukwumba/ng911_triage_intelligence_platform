@@ -29,6 +29,13 @@ release version identifies the platform as a whole.
   that only moves the location still updates the incident. Reference URLs are
   never fetched, and unsafe or unsupported PIDF-LO is preserved with a reason.
 
+- **NENA-STA-024 conveyance, subscriber role** (`python -m ntip.interop.conveyance`):
+  subscribes to EIDOs from an authorised notifier over `wss://` and feeds each
+  through the gateway. It acknowledges every notification with a status derived
+  from the gateway's receipt, re-acknowledges resends without reprocessing them,
+  renews before expiry, and reconnects with backoff. Every message is validated
+  against NENA's pinned message schema v1.1 (DDL-018).
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.

@@ -70,6 +70,12 @@ the role existed, recreate it (`docker compose ... down --volumes`).
 | `NTIP_RATE_LIMIT_PER_MINUTE` | `600` | Requests per client (token, else address) per minute; `0` disables. 429 with `Retry-After` when exceeded; `/health` is exempt |
 | `NTIP_INTEROP_TOKENS` | none | `token:tenant,...` for the EIDO gateway; unset disables interop |
 
+The NENA-STA-024 conveyance subscriber runs as a separate worker
+(`python -m ntip.interop.conveyance`), configured with `NTIP_CONVEYANCE_URL`
+(`wss://` only), `NTIP_CONVEYANCE_TENANT`, `NTIP_CONVEYANCE_TOKEN` and,
+optionally, `NTIP_CONVEYANCE_INCIDENT` and `NTIP_CONVEYANCE_EXPIRES_S`. It
+uses the same database and model settings as the API.
+
 ### API (`/v1`)
 
 | Method | Path | Purpose |
