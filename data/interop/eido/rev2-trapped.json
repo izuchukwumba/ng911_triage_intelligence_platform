@@ -1,0 +1,42 @@
+{
+  "$id": "urn:emergency:uid:incidentid:synthetic-0001:synthetic.example",
+  "lastUpdateTimeStamp": "2026-11-10T12:03:00Z",
+  "updatedByAgencyReference": {
+    "$ref": "psap.synthetic.example"
+  },
+  "eidoVersion": "1.0",
+  "issuingElementIdentification": "cad.synthetic.example",
+  "agencyComponent": [
+    {
+      "$id": "psap.synthetic.example",
+      "lastUpdateTimeStamp": "2026-11-10T12:03:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "agencyRoleDescriptionRegistryText": [
+        "Owner"
+      ],
+      "agencyType": [
+        "psap"
+      ]
+    }
+  ],
+  "notesComponent": [
+    {
+      "$id": "note-1",
+      "lastUpdateTimeStamp": "2026-11-10T12:03:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "notesActionComments": "Caller reports smoke on the second floor at 12 Oak Street."
+    },
+    {
+      "$id": "note-2",
+      "lastUpdateTimeStamp": "2026-11-10T12:03:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "notesActionComments": "Update: two children are trapped in the back bedroom."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "$id": "urn:emergency:uid:incidentid:synthetic-0004:synthetic.example",
+  "lastUpdateTimeStamp": "2026-11-10T12:07:00Z",
+  "updatedByAgencyReference": {
+    "$ref": "psap.synthetic.example"
+  },
+  "eidoVersion": "1.0",
+  "issuingElementIdentification": "cad.synthetic.example",
+  "agencyComponent": [
+    {
+      "$id": "psap.synthetic.example",
+      "lastUpdateTimeStamp": "2026-11-10T12:07:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "agencyRoleDescriptionRegistryText": [
+        "Owner"
+      ],
+      "agencyType": [
+        "psap"
+      ]
+    }
+  ],
+  "notesComponent": [
+    {
+      "$id": "note-1",
+      "lastUpdateTimeStamp": "2026-11-10T12:07:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "notesActionComments": "Gas smell in the basement at 301 Cedar Drive."
+    }
+  ],
+  "vendorExtension": {
+    "cadUnit": "E12"
+  }
+}

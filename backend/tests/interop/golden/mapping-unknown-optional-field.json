@@ -1,0 +1,51 @@
+{
+  "adapter_version": "eido-adapter-0.1.0",
+  "notes": [
+    {
+      "note_id": "note-1",
+      "text": "Gas smell in the basement at 301 Cedar Drive."
+    }
+  ],
+  "fields": [
+    {
+      "source_pointer": "/notesComponent/0/notesActionComments",
+      "source_value_digest": "sha256:7fdecc7159dc5da82e2f386d35066980bda130fc69e98907c3217ad5a1dbb006",
+      "transformation_id": "eido-notes-to-narrative",
+      "transformation_version": "1.0.0",
+      "target": "SourceEvent.text",
+      "status": "mapped"
+    },
+    {
+      "source_pointer": "/agencyComponent",
+      "source_value_digest": "sha256:caf85c33f32ffa930af2b9c81fca7fc86b93adbf2dd352fa25da9c084040ab68",
+      "transformation_id": "none",
+      "transformation_version": "eido-adapter-0.1.0",
+      "target": null,
+      "status": "preserved_unmapped"
+    },
+    {
+      "source_pointer": "/issuingElementIdentification",
+      "source_value_digest": "sha256:a980cf08ef3f064bb9cfc71782d83cd7e9f6a80a0acbd03d45faa8778a9d469a",
+      "transformation_id": "none",
+      "transformation_version": "eido-adapter-0.1.0",
+      "target": null,
+      "status": "preserved_unmapped"
+    },
+    {
+      "source_pointer": "/updatedByAgencyReference",
+      "source_value_digest": "sha256:2ab2bebb67b7e38707492a97e84a2a966c9ed4773133e599a321ed2610bc8204",
+      "transformation_id": "none",
+      "transformation_version": "eido-adapter-0.1.0",
+      "target": null,
+      "status": "preserved_unmapped"
+    },
+    {
+      "source_pointer": "/vendorExtension",
+      "source_value_digest": "sha256:7f20a33a18429c3e3b8f333ec71736ce91058e52120c2645cce96bd96dbc897f",
+      "transformation_id": "none",
+      "transformation_version": "eido-adapter-0.1.0",
+      "target": null,
+      "status": "preserved_unmapped"
+    }
+  ]
+}
