@@ -18,6 +18,7 @@ from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
 from ntip.schema.base import Identifier, SchemaModel, Sha256Digest, UtcDatetime
 from ntip.schema.canonical import Incident
+from ntip.schema.replay import ReplayRun
 from ntip.schema.review import HumanReview
 from ntip.schema.source import SourceEvent
 
@@ -31,7 +32,9 @@ class IdempotencyClaim(SchemaModel):
     claimed_at: UtcDatetime
 
 
-Record = SourceEvent | Incident | Assessment | HumanReview | AuditEvent | IdempotencyClaim
+Record = (
+    SourceEvent | Incident | Assessment | HumanReview | AuditEvent | IdempotencyClaim | ReplayRun
+)
 
 
 class StoreError(Exception):
@@ -78,6 +81,11 @@ class EventStore(Protocol):
 
     def list_incidents(self, *, limit: int, offset: int) -> tuple[int, list[IncidentSummary]]:
         """(total, page) ordered by first receipt, newest first."""
+
+    def replay_run(self, run_id: str) -> ReplayRun | None: ...
+
+    def replay_runs(self, *, limit: int) -> list[ReplayRun]:
+        """Newest first."""
 
     def ping(self) -> bool:
         """True when the store can serve requests (used by readiness checks)."""
