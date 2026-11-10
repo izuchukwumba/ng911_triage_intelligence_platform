@@ -165,6 +165,11 @@ describe('parseTranscript', () => {
       const record = parseTranscript('She fell down the stairs but denies any bleeding.');
       expect(record.incident.severity_indicators).not.toContain('active_bleeding');
     });
+
+    it('does not extract weapon_present when a multi-word cue negates it ("ruled out")', () => {
+      const record = parseTranscript('Police ruled out a gun after searching the car at 45 Oak Street.');
+      expect(record.incident.severity_indicators).not.toContain('weapon_present');
+    });
   });
 
   // ---------------------------------------------------------------------------
