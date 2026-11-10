@@ -199,7 +199,10 @@ def score(results: Sequence[CaseResult], *, seed: int, critical: set[str]) -> di
     return {
         "cases": len(results),
         "cue_extraction": {
-            "micro": {**micro.as_dict(), "f1_ci95": [f1_low, f1_high]},
+            "micro": {
+                **micro.as_dict(),
+                "f1_ci95": [None if v is None else round(v, 4) for v in (f1_low, f1_high)],
+            },
             "per_code": {code: _prf(results, code).as_dict() for code in labels_seen},
             "denied_or_past_cues_treated_as_live": sum(
                 len(set(x.case.labels.absent_cues) & x.predicted_cues) for x in results
