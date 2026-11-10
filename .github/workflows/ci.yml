@@ -209,6 +209,18 @@ jobs:
         run: docker compose -f infra/docker/docker-compose.yml down --volumes
 
 
+  workflows:
+    name: Workflow lint (actionlint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Workflows that only run on tags or a schedule are otherwise not
+      # validated until they fire; actionlint checks syntax, expressions
+      # and which contexts are available where.
+      - name: actionlint
+        run: docker run --rm -v "$PWD:/repo" --workdir /repo rhysd/actionlint:1.7.7 -color
+
   security:
     name: Dependency and secret scanning
     runs-on: ubuntu-latest
