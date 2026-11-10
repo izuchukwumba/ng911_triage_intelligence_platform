@@ -14,6 +14,7 @@ TABLES = [
     "idempotency_claims",
     "replay_runs",
     "model_outputs",
+    "interop_receipts",
 ]
 
 
@@ -58,6 +59,8 @@ def _insert_dummy(conn: psycopg.Connection, table: str) -> None:
         " VALUES ('a', 'i', now(), 'r', 'completed', '{}', 'd')",
         "audit_events": "INSERT INTO audit_events (event_id, incident_id, occurred_at, event_type,"
         " correlation_id, payload) VALUES ('e', 'i', now(), 't', 'c', '{}')",
+        "interop_receipts": "INSERT INTO interop_receipts (receipt_id, tenant_id, received_at,"
+        " status, payload, payload_digest) VALUES ('r', 't', now(), 's', '{}', 'd')",
         "model_outputs": "INSERT INTO model_outputs (output_id, incident_id, recorded_at, mode,"
         " payload, payload_digest) VALUES ('m', 'i', now(), 'ml_shadow', '{}', 'd')",
         "replay_runs": "INSERT INTO replay_runs (run_id, created_at, payload, payload_digest)"

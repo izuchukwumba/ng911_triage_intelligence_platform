@@ -25,6 +25,8 @@ MAX_TRANSCRIPT_CHARS = 20_000
 class SourceType(StrEnum):
     SYNTHETIC_TRANSCRIPT = "synthetic_transcript"
     STRUCTURED_TEST_EVENT = "structured_test_event"
+    # Narrative imported from an EIDO through the interop gateway.
+    EIDO_IMPORT = "eido_import"
 
 
 class SourceEvent(SchemaModel):

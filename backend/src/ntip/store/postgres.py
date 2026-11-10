@@ -6,6 +6,7 @@ from typing import Any
 import psycopg
 from psycopg.types.json import Jsonb
 
+from ntip.interop.receipts import InteropReceipt
 from ntip.ml.contract import ModelOutput
 from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
@@ -65,6 +66,13 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
                 " payload_digest) VALUES (%s, %s, %s, %s, %s)",
                 (record.run_id, record.created_at, record.candidate_ruleset, payload, digest),
             )
+        case InteropReceipt():
+            cur.execute(
+                "INSERT INTO interop_receipts (receipt_id, tenant_id, source_event_id, received_at,"
+                " status, payload, payload_digest) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (record.receipt_id, record.tenant_id, record.source_event_id, record.received_at,
+                 record.status, payload, digest),
+            )  # fmt: skip
         case ModelOutput():
             cur.execute(
                 "INSERT INTO model_outputs (output_id, incident_id, recorded_at, mode, payload,"
@@ -176,6 +184,20 @@ class PostgresEventStore:
             "SELECT payload FROM model_outputs WHERE incident_id = %s ORDER BY seq", (incident_id,)
         )
         return [ModelOutput.model_validate(r) for r in rows]
+
+    def interop_receipt(self, receipt_id: str) -> InteropReceipt | None:
+        rows = self._payloads(
+            "SELECT payload FROM interop_receipts WHERE receipt_id = %s", (receipt_id,)
+        )
+        return InteropReceipt.model_validate(rows[0]) if rows else None
+
+    def interop_receipts(self, tenant_id: str, source_event_id: str) -> list[InteropReceipt]:
+        rows = self._payloads(
+            "SELECT payload FROM interop_receipts WHERE tenant_id = %s AND source_event_id = %s"
+            " ORDER BY seq",
+            (tenant_id, source_event_id),
+        )
+        return [InteropReceipt.model_validate(r) for r in rows]
 
     def replay_run(self, run_id: str) -> ReplayRun | None:
         rows = self._payloads("SELECT payload FROM replay_runs WHERE run_id = %s", (run_id,))

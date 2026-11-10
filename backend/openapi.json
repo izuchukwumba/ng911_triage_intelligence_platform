@@ -143,7 +143,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.2.0",
+            "default": "2.3.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -238,7 +238,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.2.0",
+            "default": "2.3.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -874,7 +874,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.2.0",
+            "default": "2.3.0",
             "title": "Schema Version",
             "type": "string"
           }
@@ -956,7 +956,7 @@
             "type": "array"
           },
           "schema_version": {
-            "default": "2.2.0",
+            "default": "2.3.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2054,7 +2054,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.2.0",
+            "default": "2.3.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2304,7 +2304,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.2.0",
+            "default": "2.3.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2382,7 +2382,8 @@
       "SourceType": {
         "enum": [
           "synthetic_transcript",
-          "structured_test_event"
+          "structured_test_event",
+          "eido_import"
         ],
         "title": "SourceType",
         "type": "string"
@@ -2899,6 +2900,198 @@
         "summary": "Create Review",
         "tags": [
           "incidents"
+        ]
+      }
+    },
+    "/v1/interop/eido/ingest": {
+      "post": {
+        "operationId": "ingest_eido_v1_interop_eido_ingest_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-interop-profile",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Interop-Profile"
+            }
+          },
+          {
+            "in": "header",
+            "name": "content-type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Content-Type"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ingest Eido",
+        "tags": [
+          "interop"
+        ]
+      }
+    },
+    "/v1/interop/receipts/{receipt_id}": {
+      "get": {
+        "operationId": "get_receipt_v1_interop_receipts__receipt_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "receipt_id",
+            "required": true,
+            "schema": {
+              "title": "Receipt Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Receipt",
+        "tags": [
+          "interop"
+        ]
+      }
+    },
+    "/v1/interop/receipts/{receipt_id}/payload": {
+      "get": {
+        "description": "The original payload, unchanged (design v1.2, INT-011).",
+        "operationId": "get_receipt_payload_v1_interop_receipts__receipt_id__payload_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "receipt_id",
+            "required": true,
+            "schema": {
+              "title": "Receipt Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Receipt Payload",
+        "tags": [
+          "interop"
         ]
       }
     },

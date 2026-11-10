@@ -77,8 +77,13 @@ class Pipeline:
         source_type: SourceType = SourceType.SYNTHETIC_TRANSCRIPT,
         idempotency_key: str | None = None,
         correlation_id: str | None = None,
+        new_incident_id: str | None = None,
     ) -> "IngestResult":
-        """Accept a new message, either opening an incident or adding to one."""
+        """Accept a new message, either opening an incident or adding to one.
+
+        ``new_incident_id`` names a new incident (used by the interop gateway
+        so an external incident always maps to the same platform incident).
+        """
         correlation_id = correlation_id or self.new_id("req")
         request_digest = sha256_digest(f"{incident_id or ''}\n{source_type}\n{text}")
 
@@ -94,7 +99,7 @@ class Pipeline:
             previous = self.store.source_events(incident_id)
             if not previous:
                 raise UnknownIncident(incident_id)
-        incident_id = incident_id or self.new_id("inc")
+        incident_id = incident_id or new_incident_id or self.new_id("inc")
 
         now = self.clock()
         source = SourceEvent.from_text(

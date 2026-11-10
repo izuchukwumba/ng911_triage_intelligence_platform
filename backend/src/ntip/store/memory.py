@@ -3,6 +3,7 @@
 import threading
 from collections.abc import Sequence
 
+from ntip.interop.receipts import InteropReceipt
 from ntip.ml.contract import ModelOutput
 from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
@@ -32,6 +33,8 @@ def _identity(record: Record) -> tuple[str, ...]:
             return ("replay", record.run_id)
         case ModelOutput():
             return ("model_output", record.output_id)
+        case InteropReceipt():
+            return ("receipt", record.receipt_id)
 
 
 class InMemoryEventStore:
@@ -96,6 +99,16 @@ class InMemoryEventStore:
 
     def model_outputs(self, incident_id: str) -> list[ModelOutput]:
         return self._of(ModelOutput, incident_id)
+
+    def interop_receipt(self, receipt_id: str) -> InteropReceipt | None:
+        return next((r for r in self._of(InteropReceipt) if r.receipt_id == receipt_id), None)
+
+    def interop_receipts(self, tenant_id: str, source_event_id: str) -> list[InteropReceipt]:
+        return [
+            r
+            for r in self._of(InteropReceipt)
+            if r.tenant_id == tenant_id and r.source_event_id == source_event_id
+        ]
 
     def replay_run(self, run_id: str) -> ReplayRun | None:
         return next((r for r in self._of(ReplayRun) if r.run_id == run_id), None)
