@@ -35,14 +35,41 @@ pip install -e ".[dev]"
 uvicorn ntip.api:create_app --factory --reload
 ```
 
-- Liveness: <http://localhost:8000/health/live>
-- Readiness: <http://localhost:8000/health/ready>
-- OpenAPI docs: <http://localhost:8000/docs>
+Without configuration the API uses an in-memory event store (lost on restart).
+To persist to PostgreSQL:
+
+```sh
+export NTIP_DATABASE_URL=postgresql://user:pass@localhost:5432/ntip
+python -m ntip.store.migrate "$NTIP_DATABASE_URL"        # apply migrations
+python -m ntip.store.migrate "$NTIP_DATABASE_URL" --down 0000   # roll back (dev only)
+```
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `NTIP_DATABASE_URL` | unset (in-memory) | PostgreSQL event store |
+| `NTIP_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated dashboard origins |
+
+### API (`/v1`)
+
+| Method | Path | Purpose |
+|---|---|---|
+| POST | `/v1/incidents` | Open an incident from a synthetic message (202, honours `Idempotency-Key`) |
+| POST | `/v1/incidents/{id}/messages` | Add a follow-up message; the conversation is re-assessed |
+| GET | `/v1/incidents` | Paginated list, newest first |
+| GET | `/v1/incidents/{id}` | Current state, sources, incident, assessment, reviews |
+| GET | `/v1/incidents/{id}/events` | Append-only audit trail |
+| POST | `/v1/incidents/{id}/reviews` | Confirm, correct, override, escalate or annotate |
+| GET | `/v1/assessments/{id}` | One assessment |
+| GET | `/health/live`, `/health/ready` | Liveness; readiness (checks the event store) |
+
+Every response carries `X-Correlation-ID`. Errors look like
+`{"error": {"code", "message", "correlation_id"}}` and never echo submitted
+text. Interactive docs: <http://localhost:8000/docs>.
 
 ## Check
 
 ```sh
-pytest              # tests
+pytest              # tests (PostgreSQL tests need NTIP_TEST_DATABASE_URL, else skipped)
 ruff check .        # lint
 ruff format --check .
 mypy                # strict type check
