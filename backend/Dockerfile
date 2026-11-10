@@ -9,7 +9,7 @@ ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/app/.venv \
     PATH="/app/.venv/bin:$PATH" \
-    NTIP_B1_TRAINING_DATA=/app/data/eval/generated-1.0.0-seed42.jsonl
+    NTIP_B1_TRAINING_DATA=/app/data/eval/generated-1.0.0-seed42.jsonl     NTIP_EVAL_DATA_DIR=/app/data/eval
 
 # Dependencies first (cached layer), exactly as pinned in uv.lock, including
 # the "ml" extra so the inference service can serve B1.
@@ -19,8 +19,9 @@ RUN uv sync --locked --extra ml --no-install-project
 COPY backend/src ./src
 RUN uv sync --locked --extra ml
 
-# B1 trains from this committed synthetic dataset when it is selected.
-COPY data/eval/generated-1.0.0-seed42.jsonl ./data/eval/
+# Committed synthetic datasets: B1 trains from the generated one when it is
+# selected, and the evaluation report runs over both.
+COPY data/eval/curated.jsonl data/eval/generated-1.0.0-seed42.jsonl ./data/eval/
 
 RUN useradd --system --uid 10001 ntip
 USER ntip

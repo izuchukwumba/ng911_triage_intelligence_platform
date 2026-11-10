@@ -669,6 +669,111 @@
         "title": "Coordinates",
         "type": "object"
       },
+      "CueExtraction": {
+        "properties": {
+          "denied_or_past_cues_treated_as_live": {
+            "title": "Denied Or Past Cues Treated As Live",
+            "type": "integer"
+          },
+          "f1": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "F1"
+          },
+          "f1_ci95": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "F1 Ci95",
+            "type": "array"
+          },
+          "precision": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Precision"
+          },
+          "recall": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recall"
+          }
+        },
+        "required": [
+          "precision",
+          "recall",
+          "f1",
+          "f1_ci95",
+          "denied_or_past_cues_treated_as_live"
+        ],
+        "title": "CueExtraction",
+        "type": "object"
+      },
+      "DatasetName": {
+        "enum": [
+          "curated",
+          "generated"
+        ],
+        "title": "DatasetName",
+        "type": "string"
+      },
+      "EvaluationReport": {
+        "properties": {
+          "dataset": {
+            "$ref": "#/components/schemas/DatasetName"
+          },
+          "failed_cases": {
+            "items": {
+              "$ref": "#/components/schemas/FailedCase"
+            },
+            "title": "Failed Cases",
+            "type": "array"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "pins": {
+            "$ref": "#/components/schemas/Pins"
+          }
+        },
+        "required": [
+          "note",
+          "dataset",
+          "pins",
+          "metrics",
+          "failed_cases"
+        ],
+        "title": "EvaluationReport",
+        "type": "object"
+      },
       "Evidence": {
         "additionalProperties": false,
         "description": "A quoted stretch of a specific source event.",
@@ -788,6 +893,57 @@
           "evidence"
         ],
         "title": "Fact[int]",
+        "type": "object"
+      },
+      "FailedCase": {
+        "properties": {
+          "case_id": {
+            "title": "Case Id",
+            "type": "string"
+          },
+          "critical": {
+            "title": "Critical",
+            "type": "boolean"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "expected_priority": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Priority"
+          },
+          "messages": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "split": {
+            "title": "Split",
+            "type": "string"
+          }
+        },
+        "required": [
+          "case_id",
+          "split",
+          "messages",
+          "expected_priority",
+          "critical",
+          "errors"
+        ],
+        "title": "FailedCase",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1680,6 +1836,70 @@
         "title": "MessageIn",
         "type": "object"
       },
+      "Metrics": {
+        "properties": {
+          "cases": {
+            "title": "Cases",
+            "type": "integer"
+          },
+          "critical_cue_sensitivity": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "critical_undertriage": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "cue_extraction": {
+            "$ref": "#/components/schemas/CueExtraction"
+          },
+          "domain_accuracy": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "location_accuracy": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "overtriage": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "priority_confusion": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "title": "Priority Confusion",
+            "type": "object"
+          },
+          "priority_exact": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "severity_exact": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "undertriage": {
+            "$ref": "#/components/schemas/Rate"
+          },
+          "victim_count_accuracy": {
+            "$ref": "#/components/schemas/Rate"
+          }
+        },
+        "required": [
+          "cases",
+          "critical_cue_sensitivity",
+          "critical_undertriage",
+          "priority_exact",
+          "undertriage",
+          "overtriage",
+          "severity_exact",
+          "domain_accuracy",
+          "location_accuracy",
+          "victim_count_accuracy",
+          "cue_extraction",
+          "priority_confusion"
+        ],
+        "title": "Metrics",
+        "type": "object"
+      },
       "ModelOutput": {
         "additionalProperties": false,
         "description": "The exact request and response of one model call, kept for audit.\n\nGenerative or retrained models are not guaranteed to reproduce their\noutput, so replay of a model-assisted incident uses this recorded output\nrather than calling the model again (design v1.2, section 3A.9).",
@@ -1802,6 +2022,94 @@
         "title": "Observation",
         "type": "object"
       },
+      "Pins": {
+        "properties": {
+          "bootstrap": {
+            "title": "Bootstrap",
+            "type": "string"
+          },
+          "dataset_digest": {
+            "title": "Dataset Digest",
+            "type": "string"
+          },
+          "dataset_path": {
+            "title": "Dataset Path",
+            "type": "string"
+          },
+          "engine": {
+            "title": "Engine",
+            "type": "string"
+          },
+          "git_commit": {
+            "title": "Git Commit",
+            "type": "string"
+          },
+          "lockfile_digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lockfile Digest"
+          },
+          "parser": {
+            "title": "Parser",
+            "type": "string"
+          },
+          "python": {
+            "title": "Python",
+            "type": "string"
+          },
+          "ruleset": {
+            "title": "Ruleset",
+            "type": "string"
+          },
+          "ruleset_digest": {
+            "title": "Ruleset Digest",
+            "type": "string"
+          },
+          "schema_version": {
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "splits": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Splits",
+            "type": "array"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "git_commit",
+          "dataset_path",
+          "dataset_digest",
+          "splits",
+          "parser",
+          "engine",
+          "ruleset",
+          "ruleset_digest",
+          "schema_version",
+          "python",
+          "lockfile_digest",
+          "seed",
+          "bootstrap"
+        ],
+        "title": "Pins",
+        "type": "object"
+      },
       "Polarity": {
         "enum": [
           "affirmed",
@@ -1810,6 +2118,51 @@
         ],
         "title": "Polarity",
         "type": "string"
+      },
+      "Rate": {
+        "properties": {
+          "ci95": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ci95"
+          },
+          "denominator": {
+            "title": "Denominator",
+            "type": "integer"
+          },
+          "numerator": {
+            "title": "Numerator",
+            "type": "integer"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "numerator",
+          "denominator",
+          "ci95"
+        ],
+        "title": "Rate",
+        "type": "object"
       },
       "ReadyResponse": {
         "properties": {
@@ -2140,6 +2493,15 @@
         ],
         "title": "ReplaySummary",
         "type": "object"
+      },
+      "ReportSplit": {
+        "description": "The splits that may be browsed. ``test`` is deliberately absent.",
+        "enum": [
+          "dev",
+          "regression"
+        ],
+        "title": "ReportSplit",
+        "type": "string"
       },
       "ReviewAction": {
         "enum": [
@@ -2673,6 +3035,167 @@
         "summary": "Get Assessment",
         "tags": [
           "incidents"
+        ]
+      }
+    },
+    "/v1/evaluation/report": {
+      "get": {
+        "description": "Evaluate B0 now, on the dev and/or regression split of a committed dataset.",
+        "operationId": "get_report_v1_evaluation_report_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "dataset",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DatasetName",
+              "default": "curated"
+            }
+          },
+          {
+            "description": "default: dev and regression",
+            "in": "query",
+            "name": "split",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ReportSplit"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "default: dev and regression",
+              "title": "Split"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Report",
+        "tags": [
+          "evaluation"
+        ]
+      }
+    },
+    "/v1/evaluation/report.md": {
+      "get": {
+        "description": "The same evaluation as a Markdown report, for export.",
+        "operationId": "get_report_markdown_v1_evaluation_report_md_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "dataset",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/DatasetName",
+              "default": "curated"
+            }
+          },
+          {
+            "description": "default: dev and regression",
+            "in": "query",
+            "name": "split",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ReportSplit"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "default: dev and regression",
+              "title": "Split"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/markdown": {},
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Report Markdown",
+        "tags": [
+          "evaluation"
         ]
       }
     },

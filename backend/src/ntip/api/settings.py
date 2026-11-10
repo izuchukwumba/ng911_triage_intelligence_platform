@@ -3,8 +3,10 @@
 import os
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from ntip.api.auth import Principal, Role
+from ntip.evaluation.runner import REPO_ROOT
 from ntip.ml.extractors import HttpExtractor, ModelExtractor
 from ntip.schema.base import DEFAULT_TENANT
 from ntip.schema.canonical import InferenceMode
@@ -19,6 +21,8 @@ class Settings:
     database_url: str | None = None
     # Maximum PostgreSQL connections held by the event store's pool.
     database_pool_size: int = 10
+    # Directory of the committed evaluation datasets (for the evaluation report).
+    eval_data_dir: Path = REPO_ROOT / "data" / "eval"
     # Browser origins allowed to call the API (the dashboard in development).
     cors_origins: list[str] = field(default_factory=lambda: ["http://localhost:5173"])
     # Model use (design v1.2, 3A.3). rules_only needs no inference service.
@@ -53,6 +57,7 @@ class Settings:
             auth_disabled=auth_disabled and not api_tokens,
             database_url=os.environ.get("NTIP_DATABASE_URL") or None,
             database_pool_size=int(os.environ.get("NTIP_DATABASE_POOL_SIZE", "10")),
+            eval_data_dir=Path(os.environ.get("NTIP_EVAL_DATA_DIR") or REPO_ROOT / "data" / "eval"),
             cors_origins=[o.strip() for o in origins.split(",")] if origins else cls().cors_origins,
             inference_mode=InferenceMode(os.environ.get("NTIP_INFERENCE_MODE", "rules_only")),
             inference_url=os.environ.get("NTIP_INFERENCE_URL") or None,
