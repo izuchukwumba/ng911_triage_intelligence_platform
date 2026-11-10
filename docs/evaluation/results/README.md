@@ -4,10 +4,11 @@ Reports produced by `python -m ntip.evaluation`. Each has a JSON and a Markdown
 version, and each records the git commit, dataset digest, ruleset digest,
 versions and seed needed to reproduce it.
 
-| Report | System | Data | Notes |
+| Report | Parser / ruleset | Data | Notes |
 |---|---|---|---|
-| [b0-dev-regression.md](b0-dev-regression.md) | B0 rules (parser 1.0.0, ruleset research-1.0.0) | curated dev + regression (30) | Development view; failures here may drive changes |
-| [b0-test.md](b0-test.md) | same | curated test (20) | Held-out baseline. Recorded once; its failures are **not** used to change the parser |
+| [1.0.0 dev+regression](b0-1.0.0-research-1.0.0-dev-regression.md) | 1.0.0 / research-1.0.0 | curated dev + regression (30) | First development view |
+| [1.0.0 test](b0-1.0.0-research-1.0.0-test.md) | 1.0.0 / research-1.0.0 | curated test (20) | **Held-out baseline.** Recorded once; its failures are not used to change the parser |
+| [1.1.0 dev+regression](b0-1.1.0-research-1.0.0-dev-regression.md) | 1.1.0 / research-1.0.0 | curated dev + regression (30) | After closing the regression miss; CI gate enabled |
 
 ## First baseline (B0, curated v1)
 
@@ -26,3 +27,13 @@ evidence of real-world dispatch performance (design v1.2, §16.3).
 
 `../benchmark-report-v0.2.0.md` describes the retired TypeScript scorer and is
 kept for history.
+
+## Parser 1.1.0 (dev + regression only)
+
+Changes were driven only by dev and regression failures. Critical-cue
+sensitivity 15/15 (was 13/15), critical under-triage 0/13 (was 1/13), cue
+micro F1 0.985 (was 0.906), priority agreement 0.800 (was 0.667). The
+remaining failures are triage-rubric gaps (older adult unable to get up, a
+recovered critical event, retractions and past events), not extraction
+errors. The held-out test split has not been re-run.
+

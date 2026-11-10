@@ -51,6 +51,8 @@ class TestObservations:
             ("Él no está respirando. Necesito ayuda ahora mismo.", "NOT_BREATHING"),
             ("Smoke is coming from the second floor and people are trapped.", "OCCUPANTS_TRAPPED"),
             ("I don't know where I am, my wife is not breathing.", "CALLER_LOCATION_UNKNOWN"),
+            ("He's lying on the floor and won't answer me.", "UNCONSCIOUS"),
+            ("My foot hurts badly.", "INJURY_REPORTED"),
             (
                 "HELP HELP PLEASE MY SON IS NOT BREATHING HELP. PLEASE HURRY.",
                 "CALLER_HIGH_DISTRESS",
@@ -84,6 +86,11 @@ class TestObservations:
                   if o.code == "FIRE_REPORTED"]  # fmt: skip
         assert fire.temporality is Temporality.HISTORICAL
         assert fire.attribution is Attribution.SECOND_HAND
+
+    def test_unsure_whether_breathing_is_an_uncertain_critical_cue(self) -> None:
+        [cue] = [o for o in parse_text("I'm not sure if he's breathing.").observations
+                 if o.code == "NOT_BREATHING"]  # fmt: skip
+        assert (cue.polarity, cue.temporality) == (Polarity.UNCERTAIN, Temporality.CURRENT)
 
     def test_uncertain_gunshot(self) -> None:
         [shot] = [o for o in parse_text("I think I heard a gunshot.").observations

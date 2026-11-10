@@ -10,6 +10,7 @@ from ntip.parser.lexicon import (
     DOMAIN_KEYWORDS,
     DOMAIN_PRECEDENCE,
     LANGUAGE_MARKERS,
+    OBSERVATION_CUES,
     SUBTYPES,
 )
 from ntip.parser.text import find_all, phrase_pattern
@@ -84,6 +85,14 @@ def classify(text: str, language: str | None) -> Classification:
     result = domain_scores(text, language)
     best = max(result.scores.values(), default=0)
     if best == 0:
+        # Nothing points to a service, but the caller says it is a prank or a
+        # joke: a non-emergency call rather than an unknown one.
+        prank = sum(
+            _counts(text, OBSERVATION_CUES["POSSIBLE_PRANK"].get(lang, []))
+            for lang in _languages(language)
+        )
+        if prank:
+            return Classification(domain=IncidentDomain.OTHER, heuristic_confidence=0.3)
         return Classification(domain=IncidentDomain.UNKNOWN, heuristic_confidence=0.1)
 
     # Ties are broken by DOMAIN_PRECEDENCE (scene safety first).

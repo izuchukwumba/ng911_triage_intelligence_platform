@@ -73,6 +73,18 @@ class TestTemporality:
         text = "I'm calling in case he stops breathing."
         assert context(text, "stops breathing").temporality is Temporality.HYPOTHETICAL
 
+    def test_conditional_with_modal_is_hypothetical(self) -> None:
+        text = "I'm worried my dad might have a heart attack if he keeps shoveling snow."
+        assert context(text, "heart attack").temporality is Temporality.HYPOTHETICAL
+
+    def test_modal_without_condition_stays_current_and_uncertain(self) -> None:
+        result = context("He might be having a heart attack.", "heart attack")
+        assert (result.temporality, result.polarity) == (Temporality.CURRENT, Polarity.UNCERTAIN)
+
+    def test_embedded_question_if_is_not_a_condition(self) -> None:
+        text = "I'm not sure if he's breathing, he's on the floor and won't answer me."
+        assert context(text, "won't answer").temporality is Temporality.CURRENT
+
     def test_current_by_default(self) -> None:
         assert context("There is a fire.", "fire").temporality is Temporality.CURRENT
 
