@@ -3,6 +3,8 @@ node_modules/
 dist/
 *.js.map
 coverage/
+test-results/
+playwright-report/
 
 # Python (backend)
 .venv/

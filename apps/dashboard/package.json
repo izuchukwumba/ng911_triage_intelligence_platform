@@ -1,19 +1,22 @@
 {
   "name": "@ng911/dashboard",
   "version": "0.1.0",
-  "description": "Operator dashboard — ranked incident queue, detail panel, and score breakdown",
+  "description": "Operator dashboard \u2014 ranked incident queue, detail panel, and score breakdown",
   "private": true,
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "gen:api": "openapi-typescript ../../backend/openapi.json -o src/api/schema.ts"
+    "gen:api": "openapi-typescript ../../backend/openapi.json -o src/api/schema.ts",
+    "test:a11y": "playwright test"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
