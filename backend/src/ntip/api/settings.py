@@ -1,12 +1,16 @@
 """Runtime configuration from environment variables."""
 
 import os
+import re
 from dataclasses import dataclass, field
 
 from ntip.api.auth import Principal, Role
 from ntip.ml.extractors import HttpExtractor, ModelExtractor
+from ntip.schema.base import DEFAULT_TENANT
 from ntip.schema.canonical import InferenceMode
 from ntip.store import EventStore, InMemoryEventStore
+
+IDENTIFIER = re.compile(r"[A-Za-z0-9_.:-]{1,128}")
 
 
 @dataclass(frozen=True)
@@ -77,15 +81,18 @@ class ConfigurationError(RuntimeError):
 
 
 def _parse_api_tokens(raw: str) -> dict[str, Principal]:
-    """``token:principal:role,...`` -> {token: Principal}."""
+    """``token:principal:role[:tenant],...`` -> {token: Principal}."""
     tokens: dict[str, Principal] = {}
     for item in raw.split(","):
         parts = [p.strip() for p in item.split(":")]
-        if len(parts) != 3 or not all(parts):
+        if len(parts) not in (3, 4) or not all(parts):
             continue
-        token, principal_id, role = parts
+        token, principal_id, role = parts[:3]
+        tenant = parts[3] if len(parts) == 4 else DEFAULT_TENANT
+        if not IDENTIFIER.fullmatch(tenant):
+            raise ConfigurationError(f"invalid tenant {tenant!r} in NTIP_API_TOKENS")
         try:
-            tokens[token] = Principal(principal_id, Role(role))
+            tokens[token] = Principal(principal_id, Role(role), tenant_id=tenant)
         except ValueError:
             raise ConfigurationError(f"unknown role {role!r} in NTIP_API_TOKENS") from None
     return tokens

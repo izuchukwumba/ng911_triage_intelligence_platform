@@ -52,7 +52,7 @@ Last updated: 2026-11-10.
 | Phase V: external engineering and practitioner review | External | — |
 | Mapping beyond notes (locations, persons, PIDF-LO) | Not done | Preserved as unmapped; see interop gaps |
 | NENA-STA-024 conveyance | Not done | Endpoint is project-defined |
-| Tenant isolation (INT-010) | Partial | Interop receipts are tenant-scoped; `/v1` requires authentication with roles, but incidents are not partitioned by tenant |
+| Tenant isolation (INT-010) | Done | Incidents, replay runs, idempotency keys and interop receipts are scoped to a tenant; another tenant's incident is indistinguishable from a missing one (DDL-017); `tests/api/test_tenants.py` |
 
 ## Parser, triage and location (§6, §7, §8)
 

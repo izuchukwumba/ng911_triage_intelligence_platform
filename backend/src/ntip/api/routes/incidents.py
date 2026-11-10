@@ -35,6 +35,13 @@ def _pipeline(request: Request) -> Pipeline:
     return pipeline
 
 
+def _own(request: Request, incident_id: str, principal: Principal) -> Pipeline:
+    """The pipeline, once the incident is known to belong to the caller's tenant."""
+    pipeline = _pipeline(request)
+    pipeline.check_tenant(incident_id, principal.tenant_id)
+    return pipeline
+
+
 def _accepted(response: Response, result: IngestOut) -> IngestOut:
     if result.idempotent_replay:
         response.headers["Idempotent-Replayed"] = "true"
@@ -44,14 +51,18 @@ def _accepted(response: Response, result: IngestOut) -> IngestOut:
 @router.post(
     "/incidents",
     status_code=status.HTTP_202_ACCEPTED,
-    dependencies=[Depends(require(Permission.INGEST))],
 )
 def create_incident(
-    body: MessageIn, request: Request, response: Response, idempotency_key: IdempotencyKey = None
+    body: MessageIn,
+    request: Request,
+    response: Response,
+    principal: Annotated[Principal, Depends(require(Permission.INGEST))],
+    idempotency_key: IdempotencyKey = None,
 ) -> IngestOut:
-    """Open an incident from a first synthetic message."""
+    """Open an incident from a first synthetic message, in the caller's tenant."""
     result = _pipeline(request).ingest(
         body.text,
+        tenant_id=principal.tenant_id,
         source_type=body.source_type,
         idempotency_key=idempotency_key,
         correlation_id=correlation_id(request),
@@ -62,18 +73,19 @@ def create_incident(
 @router.post(
     "/incidents/{incident_id}/messages",
     status_code=status.HTTP_202_ACCEPTED,
-    dependencies=[Depends(require(Permission.INGEST))],
 )
 def add_message(
     incident_id: str,
     body: MessageIn,
     request: Request,
     response: Response,
+    principal: Annotated[Principal, Depends(require(Permission.INGEST))],
     idempotency_key: IdempotencyKey = None,
 ) -> IngestOut:
     """Add a follow-up message; the whole conversation is re-assessed."""
     result = _pipeline(request).ingest(
         body.text,
+        tenant_id=principal.tenant_id,
         incident_id=incident_id,
         source_type=body.source_type,
         idempotency_key=idempotency_key,
@@ -82,41 +94,50 @@ def add_message(
     return _accepted(response, IngestOut.of(result))
 
 
-@router.get("/incidents", dependencies=[Depends(require(Permission.READ))])
+@router.get("/incidents")
 def list_incidents(
     request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.READ))],
     limit: Annotated[int, Query(ge=1, le=200)] = 50,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> IncidentPage:
-    total, page = _pipeline(request).store.list_incidents(limit=limit, offset=offset)
+    """The caller's tenant's incidents, newest first."""
+    total, page = _pipeline(request).store.list_incidents(
+        limit=limit, offset=offset, tenant_id=principal.tenant_id
+    )
     return IncidentPage(
         total=total, limit=limit, offset=offset, items=[IncidentSummaryOut.of(s) for s in page]
     )
 
 
-@router.get("/incidents/{incident_id}", dependencies=[Depends(require(Permission.READ))])
-def get_incident(incident_id: str, request: Request) -> IncidentDetail:
-    return IncidentDetail.of(_pipeline(request).view(incident_id))
+@router.get("/incidents/{incident_id}")
+def get_incident(
+    incident_id: str,
+    request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.READ))],
+) -> IncidentDetail:
+    pipeline = _own(request, incident_id, principal)
+    return IncidentDetail.of(pipeline.view(incident_id))
 
 
-@router.get("/incidents/{incident_id}/events", dependencies=[Depends(require(Permission.READ))])
-def get_events(incident_id: str, request: Request) -> AuditTrail:
-    store = _pipeline(request).store
-    events = store.audit_events(incident_id)
-    if not events:
-        raise UnknownIncident(incident_id)
-    return AuditTrail(incident_id=incident_id, events=events)
+@router.get("/incidents/{incident_id}/events")
+def get_events(
+    incident_id: str,
+    request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.READ))],
+) -> AuditTrail:
+    store = _own(request, incident_id, principal).store
+    return AuditTrail(incident_id=incident_id, events=store.audit_events(incident_id))
 
 
-@router.get(
-    "/incidents/{incident_id}/model-outputs", dependencies=[Depends(require(Permission.READ))]
-)
-def get_model_outputs(incident_id: str, request: Request) -> list[ModelOutput]:
+@router.get("/incidents/{incident_id}/model-outputs")
+def get_model_outputs(
+    incident_id: str,
+    request: Request,
+    principal: Annotated[Principal, Depends(require(Permission.READ))],
+) -> list[ModelOutput]:
     """Exact model requests and responses recorded for this incident (design 3A.9)."""
-    store = _pipeline(request).store
-    if not store.source_events(incident_id):
-        raise UnknownIncident(incident_id)
-    return store.model_outputs(incident_id)
+    return _own(request, incident_id, principal).store.model_outputs(incident_id)
 
 
 @router.post("/incidents/{incident_id}/reviews", status_code=status.HTTP_201_CREATED)
@@ -127,8 +148,9 @@ def create_review(
     principal: Annotated[Principal, Depends(require(Permission.REVIEW))],
 ) -> HumanReview:
     """Record a confirmation, correction, override, escalation or note."""
+    pipeline = _own(request, incident_id, principal)
     try:
-        return _pipeline(request).review(
+        return pipeline.review(
             incident_id,
             assessment_id=body.assessment_id,
             # With authentication on, the reviewer is whoever the token belongs to.

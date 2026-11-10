@@ -11,6 +11,7 @@ from typing import Self
 from pydantic import Field, model_validator
 
 from ntip.schema.base import (
+    DEFAULT_TENANT,
     SCHEMA_VERSION,
     Identifier,
     SchemaModel,
@@ -42,6 +43,9 @@ class SourceEvent(SchemaModel):
     payload_digest: Sha256Digest
     # Revision lineage: the source event this one corrects or extends, if any.
     supersedes: Identifier | None = None
+    # The organisation the incident belongs to (2.5.0). Every message of an
+    # incident has the same tenant; only that tenant's users can see it.
+    tenant_id: Identifier = DEFAULT_TENANT
 
     @model_validator(mode="after")
     def _check(self) -> Self:
@@ -63,6 +67,7 @@ class SourceEvent(SchemaModel):
         text: str,
         source_type: SourceType = SourceType.SYNTHETIC_TRANSCRIPT,
         supersedes: str | None = None,
+        tenant_id: str = DEFAULT_TENANT,
     ) -> Self:
         """Build a synthetic source event, computing its digest."""
         return cls(
@@ -74,4 +79,5 @@ class SourceEvent(SchemaModel):
             synthetic=True,
             payload_digest=sha256_digest(text),
             supersedes=supersedes,
+            tenant_id=tenant_id,
         )

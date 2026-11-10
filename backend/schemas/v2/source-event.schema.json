@@ -10,7 +10,7 @@
       "type": "string"
     }
   },
-  "$id": "https://ntip.local/schemas/v2.4.0/source-event.schema.json",
+  "$id": "https://ntip.local/schemas/v2.5.0/source-event.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -32,7 +32,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "2.4.0",
+      "default": "2.5.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -65,6 +65,14 @@
       "title": "Synthetic",
       "type": "boolean"
     },
+    "tenant_id": {
+      "default": "default",
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.:-]+$",
+      "title": "Tenant Id",
+      "type": "string"
+    },
     "text": {
       "maxLength": 20000,
       "minLength": 1,
@@ -83,5 +91,5 @@
   ],
   "title": "SourceEvent",
   "type": "object",
-  "x-schema-version": "2.4.0"
+  "x-schema-version": "2.5.0"
 }

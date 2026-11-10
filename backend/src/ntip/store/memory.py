@@ -100,10 +100,13 @@ class InMemoryEventStore:
     def audit_events(self, incident_id: str) -> list[AuditEvent]:
         return self._of(AuditEvent, incident_id)
 
-    def list_incidents(self, *, limit: int, offset: int) -> tuple[int, list[IncidentSummary]]:
+    def list_incidents(
+        self, *, limit: int, offset: int, tenant_id: str | None = None
+    ) -> tuple[int, list[IncidentSummary]]:
         first: dict[str, SourceEvent] = {}
         for source in self._of(SourceEvent):
-            first.setdefault(source.incident_id, source)
+            if tenant_id is None or source.tenant_id == tenant_id:
+                first.setdefault(source.incident_id, source)
         ordered = sorted(first.values(), key=lambda s: s.received_at, reverse=True)
         page = [
             IncidentSummary(
@@ -131,8 +134,13 @@ class InMemoryEventStore:
     def replay_run(self, run_id: str) -> ReplayRun | None:
         return next((r for r in self._of(ReplayRun) if r.run_id == run_id), None)
 
-    def replay_runs(self, *, limit: int) -> list[ReplayRun]:
-        return list(reversed(self._of(ReplayRun)))[:limit]
+    def tenant_of(self, incident_id: str) -> str | None:
+        first = next(iter(self._of(SourceEvent, incident_id)), None)
+        return first.tenant_id if first else None
+
+    def replay_runs(self, *, limit: int, tenant_id: str | None = None) -> list[ReplayRun]:
+        runs = [r for r in self._of(ReplayRun) if tenant_id is None or r.tenant_id == tenant_id]
+        return list(reversed(runs))[:limit]
 
     def ping(self) -> bool:
         return True

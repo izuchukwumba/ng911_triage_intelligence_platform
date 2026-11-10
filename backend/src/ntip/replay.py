@@ -5,7 +5,7 @@ from datetime import datetime
 
 from ntip.schema.advisory import Assessment, AssessmentStatus
 from ntip.schema.audit import Actor, ActorKind, AuditEvent, AuditEventType
-from ntip.schema.base import sha256_digest
+from ntip.schema.base import DEFAULT_TENANT, sha256_digest
 from ntip.schema.replay import ReplayCase, ReplayOutcome, ReplayRun, ReplaySummary
 from ntip.store import EventStore, Record, UnknownIncident
 from ntip.triage.engine import ENGINE_VERSION, assess
@@ -95,14 +95,19 @@ def run_replay(
     clock: Callable[[], datetime],
     new_id: Callable[[str], str],
     correlation_id: str,
+    tenant_id: str = DEFAULT_TENANT,
 ) -> ReplayRun:
-    """Replay incidents (all when ``incident_ids`` is None) and store the run."""
+    """Replay one tenant's incidents (all of them when ``incident_ids`` is None)
+    and store the run. An incident of another tenant is reported as unknown."""
     if candidate_ruleset is not None and candidate_ruleset not in RELEASED:
         raise UnknownRuleset(candidate_ruleset)
     if incident_ids is None:
-        total, _ = store.list_incidents(limit=1, offset=0)
-        _, page = store.list_incidents(limit=max(total, 1), offset=0)
+        total, _ = store.list_incidents(limit=1, offset=0, tenant_id=tenant_id)
+        _, page = store.list_incidents(limit=max(total, 1), offset=0, tenant_id=tenant_id)
         incident_ids = [s.incident_id for s in page]
+    for incident_id in incident_ids:
+        if store.tenant_of(incident_id) != tenant_id:
+            raise UnknownIncident(incident_id)
 
     now = clock()
     cases = [replay_incident(store, i, candidate_ruleset) for i in incident_ids]
@@ -112,6 +117,7 @@ def run_replay(
         requested_by=requested_by,
         candidate_ruleset=candidate_ruleset,
         engine_version=ENGINE_VERSION,
+        tenant_id=tenant_id,
         cases=cases,
         summary=ReplaySummary(
             incidents=len(cases),

@@ -18,6 +18,11 @@ release version identifies the platform as a whole.
   streams, from files or stored traffic, in order on a simulated clock. It
   reports the queue after each message and each incident's time to P0, and
   compares a candidate ruleset step by step (design v1.2, section 10.2).
+- **Tenant separation** (schema 2.5.0, migration 0007): every incident and
+  replay run belongs to a tenant. API tokens may name one
+  (`token:principal:role:tenant`). Users see only their tenant's incidents,
+  idempotency keys are per tenant, and EIDO imports belong to the submitting
+  tenant. Another tenant's incident answers 404 (DDL-017).
 
 ## [0.1.0] - 2026-11-10
 

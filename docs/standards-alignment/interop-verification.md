@@ -26,9 +26,8 @@ Additionally, NENA's own published sample validates against the pinned schema
 
 ## Known gaps
 
-- **Tenant isolation covers the interop endpoints only.** The `/v1/incidents`
-  research API has no authentication; a deployment beyond the local research
-  setting would need it (design v1.2, §3B.6 and §13).
+- Tenant isolation extends to `/v1` (DDL-017): an imported incident belongs
+  to the submitting tenant and is visible only to `/v1` users of that tenant.
 - Only `notesComponent[].notesActionComments` is mapped. Location, person,
   vehicle and call components are preserved but not interpreted; in particular
   PIDF-LO location values are not parsed.

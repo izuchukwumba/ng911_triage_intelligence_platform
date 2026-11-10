@@ -12,6 +12,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from ntip.api import create_app
+from ntip.api.auth import Principal, Role
 from ntip.api.settings import Settings
 from ntip.evaluation.runner import REPO_ROOT
 from ntip.interop.eido.adapter import map_eido
@@ -35,9 +36,17 @@ def schema() -> None:
         pytest.skip(f"pinned EIDO schema unavailable: {err}")
 
 
+# A /v1 user in tenant A, who sees what tenant A's systems imported.
+VIEWER_A = {"Authorization": "Bearer viewer-a"}
+
+
 @pytest.fixture
 def client() -> TestClient:
-    settings = Settings(interop_tokens={"token-a": "tenant-a", "token-b": "tenant-b"})
+    settings = Settings(
+        interop_tokens={"token-a": "tenant-a", "token-b": "tenant-b"},
+        api_tokens={"viewer-a": Principal("vera", Role.VIEWER, tenant_id="tenant-a")},
+        auth_disabled=False,
+    )
     return TestClient(create_app(store=InMemoryEventStore(), settings=settings))
 
 
@@ -61,7 +70,7 @@ def test_int_001_valid_payload_is_accepted_with_traceable_mapping(client: TestCl
     [notes] = [m for m in receipt["mapping"] if m["status"] == "mapped"]
     assert notes["source_pointer"] == "/notesComponent/0/notesActionComments"
     assert notes["target"] == "SourceEvent.text"
-    detail = client.get(f"/v1/incidents/{body['incidentId']}").json()
+    detail = client.get(f"/v1/incidents/{body['incidentId']}", headers=VIEWER_A).json()
     assert detail["sources"][0]["source_type"] == "eido_import"
     assert detail["assessment"]["severity_band"] == "elevated"
 
@@ -83,7 +92,9 @@ def test_int_003_missing_required_fields_are_quarantined_without_processing(
     response = post(client, json.dumps(eido).encode())
     assert response.status_code == 422
     assert response.json()["status"] == "quarantined_invalid"
-    assert client.get("/v1/incidents").json()["total"] == 0  # nothing reached the parser
+    assert (
+        client.get("/v1/incidents", headers=VIEWER_A).json()["total"] == 0
+    )  # nothing reached the parser
 
 
 def test_int_004_unknown_optional_field_is_preserved_and_flagged(client: TestClient) -> None:
@@ -101,7 +112,7 @@ def test_int_005_duplicate_submission_is_one_logical_intake(client: TestClient) 
     assert again.status_code == 202
     assert again.headers["Idempotent-Replayed"] == "true"
     assert again.json()["receiptId"] == first.json()["receiptId"]
-    detail = client.get(f"/v1/incidents/{first.json()['incidentId']}").json()
+    detail = client.get(f"/v1/incidents/{first.json()['incidentId']}", headers=VIEWER_A).json()
     assert len(detail["sources"]) == 1
 
 
@@ -117,7 +128,7 @@ def test_int_006_out_of_order_revisions_keep_history_without_rollback(client: Te
     older = post(client, raw("rev1-smoke.json")).json()
     assert older["status"] == "accepted_out_of_order"
     assert older["assessmentStatus"] == "no_new_narrative"
-    detail = client.get(f"/v1/incidents/{newer['incidentId']}").json()
+    detail = client.get(f"/v1/incidents/{newer['incidentId']}", headers=VIEWER_A).json()
     assert detail["assessment"]["advisory_priority"] == "P0"  # not rolled back
     assert len(detail["sources"]) == 1
 
@@ -126,7 +137,7 @@ def test_int_006b_in_order_revision_adds_only_new_notes(client: TestClient) -> N
     first = post(client, raw("rev1-smoke.json")).json()
     second = post(client, raw("rev2-trapped.json")).json()
     assert second["incidentId"] == first["incidentId"]
-    detail = client.get(f"/v1/incidents/{first['incidentId']}").json()
+    detail = client.get(f"/v1/incidents/{first['incidentId']}", headers=VIEWER_A).json()
     assert [s["text"] for s in detail["sources"]] == [
         "Caller reports smoke on the second floor at 12 Oak Street.",
         "Update: two children are trapped in the back bedroom.",
@@ -145,14 +156,18 @@ def test_int_007_model_outage_does_not_block_the_incident_flow(client: TestClien
     pipeline.inference_mode, pipeline.extractor = InferenceMode.HYBRID_REVIEW, Down()
     body = post(client, raw("rev1-smoke.json")).json()
     assert body["assessmentStatus"] == "assessed"
-    incident = client.get(f"/v1/incidents/{body['incidentId']}").json()["incident"]
+    incident = client.get(f"/v1/incidents/{body['incidentId']}", headers=VIEWER_A).json()[
+        "incident"
+    ]
     assert Incident.model_validate(incident).inference is not None
     assert incident["inference"]["status"] == "degraded"
 
 
 def test_int_008_contradictory_location_keeps_urgency(client: TestClient) -> None:
     body = post(client, raw("conflicting-location.json")).json()
-    assessment = client.get(f"/v1/incidents/{body['incidentId']}").json()["assessment"]
+    assessment = client.get(f"/v1/incidents/{body['incidentId']}", headers=VIEWER_A).json()[
+        "assessment"
+    ]
     assert assessment["advisory_priority"] == "P0"
     assert assessment["location_quality"]["status"] == "conflicting"
     assert "VERIFY_LOCATION" in assessment["review_actions"]
@@ -160,7 +175,9 @@ def test_int_008_contradictory_location_keeps_urgency(client: TestClient) -> Non
 
 def test_int_009_instructions_in_the_narrative_are_not_executed(client: TestClient) -> None:
     body = post(client, raw("injection.json")).json()
-    assessment = client.get(f"/v1/incidents/{body['incidentId']}").json()["assessment"]
+    assessment = client.get(f"/v1/incidents/{body['incidentId']}", headers=VIEWER_A).json()[
+        "assessment"
+    ]
     assert assessment["advisory_priority"] == "P0"
 
 

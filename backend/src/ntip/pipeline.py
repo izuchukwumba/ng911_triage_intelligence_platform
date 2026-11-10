@@ -21,7 +21,7 @@ from ntip.ml.verify import verify
 from ntip.parser.parser import PARSER_ID, PARSER_VERSION, parse
 from ntip.schema.advisory import Assessment, AssessmentStatus
 from ntip.schema.audit import Actor, ActorKind, AuditEvent, AuditEventType
-from ntip.schema.base import SchemaModel, sha256_digest
+from ntip.schema.base import DEFAULT_TENANT, SchemaModel, sha256_digest
 from ntip.schema.canonical import Incident, InferenceMode
 from ntip.schema.review import HumanReview, ReviewDecision
 from ntip.schema.source import SourceEvent, SourceType
@@ -88,24 +88,31 @@ class Pipeline:
         idempotency_key: str | None = None,
         correlation_id: str | None = None,
         new_incident_id: str | None = None,
+        tenant_id: str = DEFAULT_TENANT,
     ) -> "IngestResult":
         """Accept a new message, either opening an incident or adding to one.
 
         ``new_incident_id`` names a new incident (used by the interop gateway
         so an external incident always maps to the same platform incident).
+        A follow-up must come from the incident's own tenant; to anyone else
+        the incident does not exist.
         """
         correlation_id = correlation_id or self.new_id("req")
         request_digest = sha256_digest(f"{incident_id or ''}\n{source_type}\n{text}")
 
         if idempotency_key is not None:
+            # Keys are scoped to the tenant (default-tenant keys keep their
+            # original form, so claims stored before tenants existed still hold).
+            if tenant_id != DEFAULT_TENANT:
+                idempotency_key = f"{tenant_id}/{idempotency_key}"
             claim = self.store.idempotency_claim(idempotency_key)
             if claim is not None:
                 if claim.request_digest != request_digest:
                     raise IdempotencyConflict(idempotency_key)
                 return self._replayed(claim.incident_id)
 
-        if incident_id is not None and not self.store.source_events(incident_id):
-            raise UnknownIncident(incident_id)
+        if incident_id is not None:
+            self.check_tenant(incident_id, tenant_id)
         incident_id = incident_id or new_incident_id or self.new_id("inc")
 
         # Optimistic concurrency: derive from the conversation as read, and
@@ -121,6 +128,7 @@ class Pipeline:
                 text=text,
                 source_type=source_type,
                 supersedes=previous[-1].source_event_id if previous else None,
+                tenant_id=tenant_id,
             )
             records: list[Record] = []
             if idempotency_key is not None:
@@ -287,6 +295,15 @@ class Pipeline:
         return review
 
     # ------------------------------------------------------------------ views
+
+    def check_tenant(self, incident_id: str, tenant_id: str) -> None:
+        """Raise UnknownIncident unless the incident exists and belongs to the tenant.
+
+        Another tenant's incident is reported as unknown, not as forbidden, so
+        its existence is not revealed.
+        """
+        if self.store.tenant_of(incident_id) != tenant_id:
+            raise UnknownIncident(incident_id)
 
     def view(self, incident_id: str) -> "IncidentView":
         sources = self.store.source_events(incident_id)
