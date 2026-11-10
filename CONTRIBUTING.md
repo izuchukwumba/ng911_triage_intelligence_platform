@@ -34,6 +34,8 @@ python -m ntip.evaluation --split regression --gate     # safety gate
 python -m ntip.schema.export --check && python -m ntip.api.openapi --check
 cd ../apps/dashboard
 npm run gen:api && git diff --exit-code -- src/api/schema.ts && npm run build
+npx playwright install chromium   # once
+npm run test:a11y                 # axe (WCAG 2.1 A/AA) and keyboard checks on every screen
 ```
 
 ## Rules of the road

@@ -86,7 +86,7 @@ Last updated: 2026-11-10.
 | Requirement | Status | Evidence |
 |---|---|---|
 | Simulation banner, queue, detail with evidence, why panel, review/override, replay, audit (§11.1) | Done | `apps/dashboard` |
-| No colour-only signals, keyboard focus, labels (§11.2) | Partial | Implemented; no automated accessibility tests |
+| No colour-only signals, keyboard focus, labels (§11.2) | Done | `apps/dashboard/e2e/accessibility.spec.ts`: axe (WCAG 2.0/2.1 A and AA) on the queue, detail, replay and evaluation screens; keyboard-only triage; priorities in text; simulation warning on every screen. Runs in CI against a real backend |
 | Evaluation report screen (§11.1) | Done | Dashboard **Evaluation** tab over `GET /v1/evaluation/report` (and `report.md`): live B0 metrics with intervals, confusion matrix, failed cases (critical first), version pins, Markdown/JSON export; dev and regression splits only. `tests/api/test_evaluation_report.py` |
 | State machine RECEIVED → … → CLOSED (§11.3) | Done | `awaiting_review` / `reviewed` / `processing_failed` / `closed`; closing is a review decision and a new message reopens |
 
