@@ -62,6 +62,9 @@ jobs:
       - name: Test
         run: uv run pytest
 
+      - name: Evaluate B0 on dev + regression
+        run: uv run python -m ntip.evaluation --split dev --split regression
+
       - name: Published contracts are current
         run: |
           uv run python -m ntip.schema.export --check
