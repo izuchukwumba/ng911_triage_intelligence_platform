@@ -1,0 +1,7 @@
+# Findings reviewed and accepted. Each line is one finding's fingerprint
+# (commit:file:rule:line); a new occurrence anywhere else still fails the scan.
+
+# The documented compose development token ("dev-operator", also in
+# infra/docker/docker-compose.yml) in a README curl example, replaced by
+# $NTIP_TOKEN in the next commit. Not a secret.
+27735f851878c75fbf935a264e5b0e06d15a99f0:README.md:curl-auth-header:78
