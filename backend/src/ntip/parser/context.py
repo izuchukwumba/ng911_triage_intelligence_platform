@@ -48,6 +48,13 @@ _HYPOTHETICAL = re.compile(
     r"|afraid (?:that|he|she|it|they)|could start|might start|si)(?![\w'])"
 )
 
+# "He might have a heart attack if he keeps shoveling": a modal before the cue
+# and a condition after it describe something that has not happened. Without
+# the condition ("he might be having a heart attack") the cue stays current
+# and uncertain, so it still counts.
+_MODAL = re.compile(r"(?<![\w'])(?:might|could|may|would|will)(?![\w'])")
+_CONDITION = re.compile(r"(?<![\w'])(?:if|unless|once)(?![\w'])")
+
 _SECOND_HAND = re.compile(
     r"(?<![\w'])(?:someone said|somebody said|they said|he said|she said|people said"
     r"|people are saying|i was told|we were told|i heard that|i heard there"
@@ -85,6 +92,7 @@ def analyse(text: str, match: Match) -> CueContext:
 
     before_in_clause = text[clause.start : match.start].lower()
     whole_clause = text[clause.start : clause.end].lower()
+    after_in_clause = text[match.end : clause.end].lower()
     before_in_sentence = text[sentence.start : match.start].lower()
     window = last_words(before_in_clause, NEGATION_WINDOW)
 
@@ -95,7 +103,8 @@ def analyse(text: str, match: Match) -> CueContext:
     else:
         polarity = Polarity.AFFIRMED
 
-    if _HYPOTHETICAL.search(before_in_clause):
+    conditional = _MODAL.search(before_in_clause) and _CONDITION.search(after_in_clause)
+    if _HYPOTHETICAL.search(before_in_clause) or conditional:
         temporality = Temporality.HYPOTHETICAL
     elif _HISTORICAL.search(whole_clause):
         temporality = Temporality.HISTORICAL
