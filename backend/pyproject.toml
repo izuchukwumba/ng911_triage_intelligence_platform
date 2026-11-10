@@ -16,6 +16,11 @@ dependencies = [
 ml = [
   "scikit-learn>=1.5",
 ]
+# B2: structured-output language model through the Anthropic API. Sends
+# transcripts to an external service; opt-in only (see ntip.ml.b2).
+llm = [
+  "anthropic>=1.0",
+]
 dev = [
   "httpx2>=1.0",
   "mypy>=1.13",
