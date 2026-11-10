@@ -1,138 +1,61 @@
 # Contributing
 
-## Project scope
+## Scope
 
-This project is a decision-support platform for emergency call triage, not a general-purpose emergency communications system. Before contributing a feature, check that it improves at least one of:
+This is a research and simulation platform. Contributions must keep it that
+way: synthetic data only, advisory output only, no connection to real
+emergency systems, and no claims (in code, docs or UI) beyond what tests and
+reports show. Read the [safety case](docs/safety/safety-case.md) before
+changing parsing, triage, fusion or storage.
 
-1. **Interpretation** — the quality of structured incident extraction
-2. **Prioritization** — the accuracy and explainability of urgency scoring
-3. **Accountability** — the auditability, replayability, and reviewability of decisions
+## Setup
 
-If a proposed change does not map to one of these three goals, it is probably out of scope.
-
----
-
-## Getting started
-
-### Prerequisites
-- Node.js >= 18
-- npm >= 8
-
-### Install and build
-
-```bash
-npm install
-npm run build
+```sh
+cd backend
+uv sync --extra dev --extra ml --extra llm
+cd ../apps/dashboard
+npm ci
 ```
 
-### Run tests
+PostgreSQL tests need a server where the user may create databases:
 
-```bash
-npm test
+```sh
+export NTIP_TEST_DATABASE_URL=postgresql://postgres@localhost:5432/postgres
 ```
 
-### Start the API
+Without it they are skipped locally; CI always runs them.
 
-```bash
-cd services/ingestion-api
-npm run dev
+## Checks (all run in CI)
+
+```sh
+cd backend
+ruff check . && ruff format --check . && mypy && pytest
+python -m ntip.evaluation --split regression --gate     # safety gate
+python -m ntip.schema.export --check && python -m ntip.api.openapi --check
+cd ../apps/dashboard
+npm run gen:api && git diff --exit-code -- src/api/schema.ts && npm run build
 ```
 
-### Start the dashboard
+## Rules of the road
 
-```bash
-cd apps/dashboard
-npm run dev
-# → http://localhost:5173
-```
+- **Never weaken a safety invariant silently.** Uncertainty, missing location,
+  prank cues and model output may add review actions; they must not lower
+  severity or priority (DDL-011, DDL-013).
+- **Rulesets are immutable once released.** Change rules by adding a new
+  ruleset file with a new version and pinning its digest.
+- **Schemas are versioned.** Additive changes bump the minor version; breaking
+  changes bump the major version and publish under a new `schemas/vN/`. After
+  any model change, regenerate the JSON Schema files, `openapi.json` and the
+  dashboard types.
+- **Evaluation discipline.** Tune only on `dev` and `regression` splits. Never
+  change the parser, rules or models in response to `test` failures. Report
+  results with counts and intervals, including failures.
+- **Every extracted fact needs evidence**, quoted from the source.
+- **Decisions go in the decision log** (`docs/design-decisions/decision-log.md`)
+  when they change architecture or safety behaviour.
 
-### Run evaluation
+## Pull requests
 
-```bash
-cd packages/evaluation-harness
-npx ts-node src/cli.ts
-```
-
----
-
-## Repository structure
-
-```
-packages/
-  incident-schema/        Zod-validated types — edit carefully, downstream impact is high
-  location-validator/     Location quality scoring
-  test-data-generator/    Synthetic scenario generation
-  evaluation-harness/     Accuracy measurement and scoring version comparison
-services/
-  transcript-parser/      NLP pipeline — keyword dicts, negation, language detection
-  prioritization-engine/  Weighted rule scorer + versioned config
-  ingestion-api/          Express REST API + store adapters
-apps/
-  dashboard/              React operator dashboard (Vite)
-data/
-  fixtures/               Labeled evaluation scenarios (do not delete)
-docs/
-  architecture/
-  design-decisions/
-  standards-alignment/
-  evaluation/
-infra/
-  docker/                 docker-compose.yml + Dockerfile
-```
-
----
-
-## Key conventions
-
-### Schema changes
-Any change to `packages/incident-schema/src/index.ts` that modifies existing field types (not adding optional fields) is a **breaking change**. Bump `SCHEMA_VERSION` and update the design decision log.
-
-### Scoring config changes
-Do not edit `scoring-rules.json` without bumping `scoring_version`. Every stored incident record carries the version that produced its score. Changing weights without bumping breaks audit traceability.
-
-Run the comparison CLI before and after any scoring config change:
-
-```bash
-cd packages/evaluation-harness
-npx ts-node src/compare-versions.ts \
-  --baseline ../../services/prioritization-engine/config/scoring-rules.json \
-  --revised  ./my-candidate-config.json
-```
-
-### Parser keyword additions
-When adding keywords to `services/transcript-parser/src/keywords.ts`:
-- Test that new keywords do not trigger on negated forms
-- Run the full evaluation harness to check for regressions
-- Add a fixture to `data/fixtures/sample-incidents.json` if the keyword covers a new scenario type
-
-### Tests
-New logic in packages and services should have corresponding tests in `__tests__/`. Tests must not mock the parser or scorer — use the real implementations with controlled inputs.
-
-### TypeScript
-- Strict mode is on. No `any` without a comment explaining why.
-- Avoid `as` type assertions in production code paths.
-
----
-
-## Pull request checklist
-
-- [ ] Tests pass (`npm test`)
-- [ ] TypeScript compiles cleanly (`npm run typecheck`)
-- [ ] If schema changed: `SCHEMA_VERSION` bumped
-- [ ] If scoring config changed: `scoring_version` bumped and comparison CLI run
-- [ ] Evaluation harness passes with no regressions (`cd packages/evaluation-harness && npx ts-node src/cli.ts`)
-- [ ] Change maps to interpretation, prioritization, or accountability
-
----
-
-## Scope boundaries
-
-The following are explicitly **not** in scope and contributions in these areas will not be merged:
-
-- SIP/i3 call routing implementation
-- Full ESInet infrastructure
-- Production telephony or audio transcription
-- Autonomous dispatch logic (the system must remain human-in-the-loop)
-- Compliance certification claims
-
-See [docs/standards-alignment/ng911-alignment.md](docs/standards-alignment/ng911-alignment.md).
+One concern per branch; commits small enough that each message explains one
+change. A PR description says what changed, why, how it was tested, and what
+it deliberately does not do. CI must be green before merging.
