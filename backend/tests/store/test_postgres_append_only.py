@@ -50,8 +50,9 @@ def test_migrations_are_reversible(postgres_url: str) -> None:
 
 def _insert_dummy(conn: psycopg.Connection, table: str) -> None:
     statements = {
-        "source_events": "INSERT INTO source_events (source_event_id, incident_id, received_at,"
-        " synthetic, payload, payload_digest) VALUES ('s', 'i', now(), true, '{}', 'd')",
+        "source_events": "INSERT INTO source_events (source_event_id, incident_id, tenant_id,"
+        " received_at, synthetic, payload, payload_digest)"
+        " VALUES ('s', 'i', 'default', now(), true, '{}', 'd')",
         "incident_versions": "INSERT INTO incident_versions (incident_id, version, derived_at,"
         " schema_version, payload, payload_digest) VALUES ('i', 1, now(), '2', '{}', 'd')",
         "assessments": "INSERT INTO assessments (assessment_id, incident_id, assessed_at,"
@@ -63,8 +64,8 @@ def _insert_dummy(conn: psycopg.Connection, table: str) -> None:
         " status, payload, payload_digest) VALUES ('r', 't', now(), 's', '{}', 'd')",
         "model_outputs": "INSERT INTO model_outputs (output_id, incident_id, recorded_at, mode,"
         " payload, payload_digest) VALUES ('m', 'i', now(), 'ml_shadow', '{}', 'd')",
-        "replay_runs": "INSERT INTO replay_runs (run_id, created_at, payload, payload_digest)"
-        " VALUES ('r', now(), '{}', 'd')",
+        "replay_runs": "INSERT INTO replay_runs (run_id, tenant_id, created_at, payload,"
+        " payload_digest) VALUES ('r', 'default', now(), '{}', 'd')",
         "idempotency_claims": "INSERT INTO idempotency_claims (key, request_digest, incident_id,"
         " claimed_at, payload) VALUES ('k', 'sha256:x', 'i', now(), '{}')",
     }
@@ -76,3 +77,21 @@ def _insert_dummy(conn: psycopg.Connection, table: str) -> None:
         )
     else:
         conn.execute(statements[table])
+
+
+def test_rows_from_before_tenants_belong_to_the_default_tenant(postgres_url: str) -> None:
+    from ntip.store.postgres import PostgresEventStore
+
+    upgrade(postgres_url)
+    downgrade(postgres_url, "0006")
+    with psycopg.connect(postgres_url) as conn:
+        conn.execute(
+            "INSERT INTO source_events (source_event_id, incident_id, received_at, synthetic,"
+            " payload, payload_digest) VALUES ('s', 'inc_old', now(), true, '{}', 'd')"
+        )
+    upgrade(postgres_url)
+    store = PostgresEventStore(postgres_url)
+    try:
+        assert store.tenant_of("inc_old") == "default"
+    finally:
+        store.close()

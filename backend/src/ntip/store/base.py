@@ -110,8 +110,13 @@ class EventStore(Protocol):
     def audit_events(self, incident_id: str) -> list[AuditEvent]:
         """In the order they were appended."""
 
-    def list_incidents(self, *, limit: int, offset: int) -> tuple[int, list[IncidentSummary]]:
-        """(total, page) ordered by first receipt, newest first."""
+    def list_incidents(
+        self, *, limit: int, offset: int, tenant_id: str | None = None
+    ) -> tuple[int, list[IncidentSummary]]:
+        """(total, page) ordered by first receipt, newest first; one tenant's if given."""
+
+    def tenant_of(self, incident_id: str) -> str | None:
+        """The incident's tenant, or None if the incident does not exist."""
 
     def model_outputs(self, incident_id: str) -> list[ModelOutput]:
         """Recorded model calls for an incident, oldest first."""
@@ -123,8 +128,8 @@ class EventStore(Protocol):
 
     def replay_run(self, run_id: str) -> ReplayRun | None: ...
 
-    def replay_runs(self, *, limit: int) -> list[ReplayRun]:
-        """Newest first."""
+    def replay_runs(self, *, limit: int, tenant_id: str | None = None) -> list[ReplayRun]:
+        """Newest first; one tenant's if given."""
 
     def ping(self) -> bool:
         """True when the store can serve requests (used by readiness checks)."""

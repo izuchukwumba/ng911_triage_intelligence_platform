@@ -36,10 +36,10 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
     match record:
         case SourceEvent():
             cur.execute(
-                "INSERT INTO source_events (source_event_id, incident_id, received_at, synthetic,"
-                " payload, payload_digest) VALUES (%s, %s, %s, %s, %s, %s)",
-                (record.source_event_id, record.incident_id, record.received_at,
-                 record.synthetic, payload, digest),
+                "INSERT INTO source_events (source_event_id, incident_id, tenant_id, received_at,"
+                " synthetic, payload, payload_digest) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (record.source_event_id, record.incident_id, record.tenant_id,
+                 record.received_at, record.synthetic, payload, digest),
             )  # fmt: skip
         case Incident():
             cur.execute(
@@ -77,9 +77,16 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
             )  # fmt: skip
         case ReplayRun():
             cur.execute(
-                "INSERT INTO replay_runs (run_id, created_at, candidate_ruleset, payload,"
-                " payload_digest) VALUES (%s, %s, %s, %s, %s)",
-                (record.run_id, record.created_at, record.candidate_ruleset, payload, digest),
+                "INSERT INTO replay_runs (run_id, tenant_id, created_at, candidate_ruleset,"
+                " payload, payload_digest) VALUES (%s, %s, %s, %s, %s, %s)",
+                (
+                    record.run_id,
+                    record.tenant_id,
+                    record.created_at,
+                    record.candidate_ruleset,
+                    payload,
+                    digest,
+                ),
             )
         case InteropReceipt():
             cur.execute(
@@ -213,26 +220,33 @@ class PostgresEventStore:
         )
         return [AuditEvent.model_validate(r) for r in rows]
 
-    def list_incidents(self, *, limit: int, offset: int) -> tuple[int, list[IncidentSummary]]:
+    def list_incidents(
+        self, *, limit: int, offset: int, tenant_id: str | None = None
+    ) -> tuple[int, list[IncidentSummary]]:
+        # Every message of an incident has the same tenant.
         with self._connect() as conn:
             total_row = conn.execute(
                 "SELECT count(DISTINCT incident_id) FROM source_events"
+                " WHERE %(tenant)s::text IS NULL OR tenant_id = %(tenant)s",
+                {"tenant": tenant_id},
             ).fetchone()
             rows = conn.execute(
                 """
                 SELECT s.incident_id, s.first_received_at, a.payload
                 FROM (
                     SELECT incident_id, min(received_at) AS first_received_at, min(seq) AS seq
-                    FROM source_events GROUP BY incident_id
+                    FROM source_events
+                    WHERE %(tenant)s::text IS NULL OR tenant_id = %(tenant)s
+                    GROUP BY incident_id
                 ) s
                 LEFT JOIN LATERAL (
                     SELECT payload FROM assessments
                     WHERE incident_id = s.incident_id ORDER BY seq DESC LIMIT 1
                 ) a ON true
                 ORDER BY s.first_received_at DESC, s.seq DESC
-                LIMIT %s OFFSET %s
+                LIMIT %(limit)s OFFSET %(offset)s
                 """,
-                (limit, offset),
+                {"tenant": tenant_id, "limit": limit, "offset": offset},
             ).fetchall()
         page = [
             IncidentSummary(
@@ -268,9 +282,19 @@ class PostgresEventStore:
         rows = self._payloads("SELECT payload FROM replay_runs WHERE run_id = %s", (run_id,))
         return ReplayRun.model_validate(rows[0]) if rows else None
 
-    def replay_runs(self, *, limit: int) -> list[ReplayRun]:
+    def tenant_of(self, incident_id: str) -> str | None:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT tenant_id FROM source_events WHERE incident_id = %s ORDER BY seq LIMIT 1",
+                (incident_id,),
+            ).fetchone()
+        return row[0] if row else None
+
+    def replay_runs(self, *, limit: int, tenant_id: str | None = None) -> list[ReplayRun]:
         rows = self._payloads(
-            "SELECT payload FROM replay_runs ORDER BY seq DESC LIMIT %s", (limit,)
+            "SELECT payload FROM replay_runs WHERE %s::text IS NULL OR tenant_id = %s"
+            " ORDER BY seq DESC LIMIT %s",
+            (tenant_id, tenant_id, limit),
         )
         return [ReplayRun.model_validate(r) for r in rows]
 

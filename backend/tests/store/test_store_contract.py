@@ -197,3 +197,40 @@ def test_expectation_rejects_a_stale_write(store: EventStore) -> None:
     with pytest.raises(ConcurrentModification):
         store.append([stale], expect=Expectation("inc_1", 1))  # read before `first` was written
     assert len(store.source_events("inc_1")) == 2
+
+
+def test_incidents_and_replay_runs_are_filtered_by_tenant(store: EventStore) -> None:
+    from itertools import count
+
+    from ntip.replay import run_replay
+
+    ingest(store, "inc_default", "Smoke from the shed at 3 Pine Road.")
+    other = SourceEvent.from_text(
+        source_event_id="inc_b_evt_1",
+        incident_id="inc_b",
+        received_at=T0 + timedelta(minutes=1),
+        text="He is not breathing at 12 Oak Street.",
+        tenant_id="psap-b",
+    )
+    store.append([other])
+
+    assert store.tenant_of("inc_default") == "default"
+    assert store.tenant_of("inc_b") == "psap-b"
+    assert store.tenant_of("inc_missing") is None
+    total, page = store.list_incidents(limit=10, offset=0, tenant_id="psap-b")
+    assert (total, [s.incident_id for s in page]) == (1, ["inc_b"])
+    assert store.list_incidents(limit=10, offset=0)[0] == 2  # unfiltered
+
+    ids = count(1)
+    run = run_replay(
+        store,
+        incident_ids=None,
+        candidate_ruleset=None,
+        requested_by="analyst_1",
+        clock=lambda: T0,
+        new_id=lambda prefix: f"{prefix}_{next(ids)}",
+        correlation_id="req_r",
+    )
+    assert [c.incident_id for c in run.cases] == ["inc_default"]
+    assert store.replay_runs(limit=10, tenant_id="default") == [run]
+    assert store.replay_runs(limit=10, tenant_id="psap-b") == []
