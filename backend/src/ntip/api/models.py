@@ -23,6 +23,10 @@ class _Body(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class _Out(BaseModel):
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
+
 class MessageIn(_Body):
     text: str = Field(min_length=1, max_length=MAX_TRANSCRIPT_CHARS)
     # The research prototype accepts synthetic data only (design v1.2, ADR-006).
@@ -30,7 +34,7 @@ class MessageIn(_Body):
     source_type: SourceType = SourceType.SYNTHETIC_TRANSCRIPT
 
 
-class IngestOut(BaseModel):
+class IngestOut(_Out):
     status: Literal["accepted"] = "accepted"
     incident_id: str
     source_event_id: str
@@ -51,7 +55,7 @@ class IngestOut(BaseModel):
         )
 
 
-class IncidentSummaryOut(BaseModel):
+class IncidentSummaryOut(_Out):
     incident_id: str
     first_received_at: datetime
     assessment_id: str | None
@@ -74,14 +78,14 @@ class IncidentSummaryOut(BaseModel):
         )
 
 
-class IncidentPage(BaseModel):
+class IncidentPage(_Out):
     total: int
     limit: int
     offset: int
     items: list[IncidentSummaryOut]
 
 
-class IncidentDetail(BaseModel):
+class IncidentDetail(_Out):
     incident_id: str
     state: IncidentState
     effective_priority: AdvisoryPriority | None
@@ -103,7 +107,7 @@ class IncidentDetail(BaseModel):
         )
 
 
-class AuditTrail(BaseModel):
+class AuditTrail(_Out):
     incident_id: str
     events: list[AuditEvent]
 

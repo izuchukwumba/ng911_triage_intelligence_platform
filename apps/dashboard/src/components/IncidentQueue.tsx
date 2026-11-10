@@ -1,195 +1,75 @@
-import type { IncidentRecord } from '../api/client';
+import type { IncidentSummary } from '../api/client';
+import { REVIEW_ACTION_LABELS, SEVERITY_LABELS } from '../labels';
 import { PriorityBadge } from './PriorityBadge';
 
 interface Props {
-  incidents: IncidentRecord[];
+  incidents: IncidentSummary[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   loading: boolean;
 }
 
-const DOMAIN_ICONS: Record<string, string> = {
-  police: '🚓',  fire: '🔥',  ems: '🚑',  hazmat: '☣',
-  other: '⚠',   unknown: '?',
-};
+const ORDER: Record<string, number> = { P0: 0, P1: 1, P2: 2, P3: 3, P4: 4 };
 
-// Reason codes important enough to surface in the queue row
-const HIGH_SIGNAL_CODES = new Set([
-  'NOT_BREATHING', 'CARDIAC_EVENT', 'VICTIM_UNCONSCIOUS',
-  'WEAPON_PRESENT', 'ACTIVE_BLEEDING', 'ACTIVE_VIOLENCE',
-  'FIRE_SPREADING', 'MULTIPLE_VICTIMS', 'POSSIBLE_PRANK',
-]);
-
-const CODE_SHORT: Record<string, string> = {
-  NOT_BREATHING:      'not breathing',
-  CARDIAC_EVENT:      'cardiac',
-  VICTIM_UNCONSCIOUS: 'unconscious',
-  WEAPON_PRESENT:     'weapon',
-  ACTIVE_BLEEDING:    'bleeding',
-  ACTIVE_VIOLENCE:    'violence',
-  FIRE_SPREADING:     'spreading',
-  MULTIPLE_VICTIMS:   'multi-victim',
-  POSSIBLE_PRANK:     'prank?',
-};
-
-// Permanent left-border accent per tier (shows urgency even when unselected)
-const TIER_ACCENT_BORDER: Record<string, string> = {
-  P0: '3px solid rgba(255,77,79,0.7)',
-  P1: '3px solid rgba(255,122,69,0.55)',
-  P2: '3px solid rgba(255,169,64,0.4)',
-  P3: '3px solid transparent',
-  P4: '3px solid transparent',
-};
-
-// Subtle background tint per tier — makes queue scannable by color
-const TIER_ROW_BG: Record<string, string> = {
-  P0: 'rgba(255,77,79,0.06)',
-  P1: 'rgba(255,122,69,0.04)',
-  P2: 'rgba(255,169,64,0.025)',
-  P3: 'transparent',
-  P4: 'transparent',
-};
-
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const s = Math.floor(diff / 1000);
-  if (s < 60)   return `${s}s ago`;
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
-  return `${Math.floor(s / 3600)}h ago`;
+// Failed processing first (it has no priority but needs urgent attention),
+// then by research priority, then newest first.
+function rank(i: IncidentSummary): number {
+  if (i.processing_status === 'processing_failed') return -1;
+  return ORDER[i.advisory_priority ?? ''] ?? 5;
 }
 
 export function IncidentQueue({ incidents, selectedId, onSelect, loading }: Props) {
+  const sorted = [...incidents].sort(
+    (a, b) => rank(a) - rank(b) || b.first_received_at.localeCompare(a.first_received_at),
+  );
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Header */}
-      <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontWeight: 700, fontSize: '13px' }}>Incident Queue</span>
-        <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
-          {loading ? 'Refreshing…' : `${incidents.length} incident${incidents.length !== 1 ? 's' : ''}`}
-        </span>
+    <section aria-label="Incident queue" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between' }}>
+        <h2 style={{ fontSize: '13px', fontWeight: 600 }}>Queue ({incidents.length})</h2>
+        <span className="muted" style={{ fontSize: '11px' }}>{loading ? 'refreshing…' : 'suggested review order'}</span>
       </div>
-
-      {/* Column headers */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '130px 70px 1fr 64px',
-        gap: '8px',
-        padding: '5px 16px 5px 19px', // 19px = 16px + 3px border offset
-        color: 'var(--text-muted)',
-        fontSize: '10px',
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.06em',
-        borderBottom: '1px solid var(--border)',
-      }}>
-        <span>Priority</span>
-        <span>Domain</span>
-        <span>Summary</span>
-        <span>Age</span>
-      </div>
-
-      {/* Rows */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        {incidents.length === 0 && !loading && (
-          <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
-            No incidents yet. Submit one via the panel above.
-          </div>
+      <ul style={{ listStyle: 'none', overflowY: 'auto', flex: 1 }}>
+        {sorted.length === 0 && (
+          <li className="muted" style={{ padding: '24px 16px', fontSize: '13px' }}>No incidents yet. Submit a synthetic transcript above.</li>
         )}
-
-        {incidents.map((inc) => {
-          const tier       = inc.triage.priority_tier;
-          const isSelected = selectedId === inc.incident_id;
-
-          const surfacedCodes = inc.triage.reason_codes.filter((c) => HIGH_SIGNAL_CODES.has(c));
-          const showStress    = inc.caller_context.caller_stress_level === 'high' || inc.caller_context.caller_stress_level === 'moderate';
-
+        {sorted.map((i) => {
+          const failed = i.processing_status === 'processing_failed';
+          const selected = i.incident_id === selectedId;
           return (
-            <button
-              key={inc.incident_id}
-              onClick={() => onSelect(inc.incident_id)}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-                padding: '9px 16px',
-                width: '100%',
-                border: 'none',
-                borderBottom: '1px solid var(--border)',
-                // Selected: accent blue left rail; unselected: tier-colored left rail for P0/P1/P2
-                borderLeft: isSelected
-                  ? '3px solid var(--accent)'
-                  : (TIER_ACCENT_BORDER[tier ?? ''] ?? '3px solid transparent'),
-                // Selected: accent tint; unselected: tier tint (P0 red, P1 orange, etc.)
-                background: isSelected
-                  ? 'rgba(88,166,255,0.07)'
-                  : (TIER_ROW_BG[tier ?? ''] ?? 'transparent'),
-                color: 'var(--text)',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'background 0.12s, border-left-color 0.12s',
-              }}
-            >
-              {/* Main row: grid-aligned */}
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 70px 1fr 64px', gap: '8px', alignItems: 'center', width: '100%' }}>
-                <PriorityBadge tier={tier} score={inc.triage.priority_score} />
-
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}>
-                  <span>{DOMAIN_ICONS[inc.incident.domain] ?? '?'}</span>
-                  <span style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>{inc.incident.domain}</span>
-                </span>
-
-                <span style={{ fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {inc.incident.summary}
-                </span>
-
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)', whiteSpace: 'nowrap', textAlign: 'right' }}>
-                  {timeAgo(inc.received_at)}
-                </span>
-              </div>
-
-              {/* Signal row: reason code chips + stress badge */}
-              {(surfacedCodes.length > 0 || showStress) && (
-                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                  {surfacedCodes.slice(0, 4).map((code) => {
-                    const isPenalty = code === 'POSSIBLE_PRANK';
-                    return (
-                      <span
-                        key={code}
-                        style={{
-                          padding: '1px 6px',
-                          borderRadius: '3px',
-                          fontSize: '10px',
-                          fontFamily: 'var(--mono)',
-                          fontWeight: 600,
-                          background: isPenalty ? 'rgba(255,77,79,0.12)' : 'rgba(82,196,26,0.10)',
-                          border: `1px solid ${isPenalty ? 'rgba(255,77,79,0.35)' : 'rgba(82,196,26,0.35)'}`,
-                          color: isPenalty ? 'var(--p0)' : 'var(--p3)',
-                        }}
-                      >
-                        {CODE_SHORT[code] ?? code.toLowerCase()}
-                      </span>
-                    );
-                  })}
-
-                  {showStress && (
-                    <span style={{
-                      padding: '1px 6px',
-                      borderRadius: '3px',
-                      fontSize: '10px',
-                      fontWeight: 600,
-                      background: 'rgba(255,77,79,0.08)',
-                      border: '1px solid rgba(255,77,79,0.25)',
-                      color: inc.caller_context.caller_stress_level === 'high' ? 'var(--p0)' : 'var(--p2)',
-                    }}>
-                      {inc.caller_context.caller_stress_level} stress
-                    </span>
+            <li key={i.incident_id}>
+              <button
+                type="button"
+                onClick={() => onSelect(i.incident_id)}
+                aria-current={selected}
+                style={{
+                  width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '4px',
+                  padding: '10px 16px', border: 'none', borderBottom: '1px solid var(--border)',
+                  background: selected ? 'rgba(88,166,255,0.08)' : 'transparent', color: 'inherit', cursor: 'pointer',
+                  borderLeft: `3px solid ${selected ? 'var(--accent)' : 'transparent'}`,
+                }}
+              >
+                <span style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  {failed ? (
+                    <span style={{ color: 'var(--p0)', fontWeight: 700, fontSize: '12px' }}>⚠ PROCESSING FAILED</span>
+                  ) : (
+                    <PriorityBadge priority={i.advisory_priority} />
                   )}
-                </div>
-              )}
-            </button>
+                  <span style={{ fontSize: '12px' }}>{SEVERITY_LABELS[i.severity_band ?? ''] ?? '—'} severity</span>
+                  <span className="muted mono" style={{ marginLeft: 'auto', fontSize: '11px' }}>
+                    {new Date(i.first_received_at).toLocaleTimeString()}
+                  </span>
+                </span>
+                {i.review_actions.length > 0 && (
+                  <span className="muted" style={{ fontSize: '11px' }}>
+                    {i.review_actions.map((a) => REVIEW_ACTION_LABELS[a] ?? a).join(' · ')}
+                  </span>
+                )}
+              </button>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 }

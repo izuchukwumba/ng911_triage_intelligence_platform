@@ -16,7 +16,11 @@ SCHEMA_VERSION = "2.0.0"
 
 
 class SchemaModel(BaseModel):
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    # Serialised documents always contain defaulted fields, so the
+    # serialization schema (used for API responses) marks them required.
+    model_config = ConfigDict(
+        frozen=True, extra="forbid", json_schema_serialization_defaults_required=True
+    )
 
 
 def _to_utc(value: datetime) -> datetime:

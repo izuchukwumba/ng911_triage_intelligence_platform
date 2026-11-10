@@ -1,530 +1,252 @@
-import { useState, useEffect } from 'react';
-import type { IncidentRecord, ScoreBreakdown, ReplayResponse } from '../api/client';
+import { useCallback, useEffect, useState } from 'react';
+import type { AuditEvent, IncidentDetail as Detail, Observation } from '../api/client';
 import { api } from '../api/client';
+import {
+  LOCATION_QUALITY_LABELS,
+  POLARITY_LABELS,
+  REVIEW_ACTION_LABELS,
+  SEVERITY_LABELS,
+  STATE_LABELS,
+  codeLabel,
+} from '../labels';
+import { EvidenceText, type Highlight } from './EvidenceText';
 import { PriorityBadge } from './PriorityBadge';
-import { ScoreBreakdownPanel } from './ScoreBreakdown';
+import { ReviewPanel } from './ReviewPanel';
 
 interface Props {
-  incident: IncidentRecord;
-  initialBreakdown?: ScoreBreakdown[];
+  incidentId: string;
+  onChanged: () => void;
 }
 
-// ---------------------------------------------------------------------------
-// Plain-English map for reason codes (excluding DOMAIN_BASE)
-// ---------------------------------------------------------------------------
+type Tab = 'overview' | 'review' | 'audit';
 
-const CODE_PROSE: Record<string, string> = {
-  NOT_BREATHING:           'patient is not breathing',
-  CARDIAC_EVENT:           'cardiac event reported',
-  VICTIM_UNCONSCIOUS:      'victim is unconscious',
-  WEAPON_PRESENT:          'weapon present at scene',
-  ACTIVE_BLEEDING:         'active bleeding reported',
-  ACTIVE_VIOLENCE:         'active violence in progress',
-  RESPIRATORY_DISTRESS:    'patient in respiratory distress',
-  MULTIPLE_VICTIMS:        'multiple victims reported',
-  CHILD_INVOLVED:          'child involved',
-  CALLER_HIGH_DISTRESS:    'caller is in extreme distress',
-  FIRE_SPREADING:          'fire is spreading',
-  HAZARDOUS_ENVIRONMENT:   'hazardous environment reported',
-  SEIZURE:                 'active or recent seizure',
-  VICTIM_COUNT_MULTIPLIER: 'victim count increases severity',
-  POSSIBLE_PRANK:          'possible prank call',
-  LOW_LOCATION_CONFIDENCE: 'location cannot be reliably dispatched',
-  LOW_PARSE_CONFIDENCE:    'transcript could not be parsed with confidence',
-};
-
-const TIER_LABELS: Record<string, string> = {
-  P0: 'IMMEDIATE',  P1: 'URGENT',  P2: 'ELEVATED',  P3: 'STANDARD',  P4: 'NON-URGENT',
-};
-
-const TIER_COLOR: Record<string, string> = {
-  P0: 'var(--p0)',  P1: 'var(--p1)',  P2: 'var(--p2)',  P3: 'var(--p3)',  P4: 'var(--p4)',
-};
-
-const TIER_BG: Record<string, string> = {
-  P0: 'rgba(255,77,79,0.10)',
-  P1: 'rgba(255,122,69,0.10)',
-  P2: 'rgba(255,169,64,0.08)',
-  P3: 'rgba(82,196,26,0.08)',
-  P4: 'rgba(139,148,158,0.08)',
-};
-
-// ---------------------------------------------------------------------------
-// WhyPanel — plain-English triage explanation
-// ---------------------------------------------------------------------------
-
-function WhyPanel({ tier, score, breakdown, reasonCodes }: {
-  tier: string | null;
-  score: number | null;
-  breakdown: ScoreBreakdown[];
-  reasonCodes: string[];
-}) {
-  const t     = tier ?? '—';
-  const color = TIER_COLOR[t] ?? 'var(--text-muted)';
-  const bg    = TIER_BG[t]    ?? 'rgba(139,148,158,0.08)';
-  const label = TIER_LABELS[t] ?? t;
-
-  let prose: string;
-
-  if (breakdown.length > 0) {
-    const positives = breakdown
-      .filter((b) => b.weight > 0 && b.reason_code !== 'DOMAIN_BASE')
-      .sort((a, b) => b.weight - a.weight);
-    const penalties = breakdown.filter((b) => b.weight < 0);
-
-    if (positives.length === 0) {
-      prose = `Scored ${t} (${score?.toFixed(3) ?? '—'}) from the domain baseline alone.`;
-      if (penalties.length > 0) {
-        prose += ` Penalised for ${penalties.map((p) => CODE_PROSE[p.reason_code] ?? p.reason_code.toLowerCase()).join(' and ')}.`;
-      }
-    } else {
-      const top = positives.slice(0, 2);
-      const topProse = top.map((b) => `${CODE_PROSE[b.reason_code] ?? b.reason_code.toLowerCase()} (+${b.weight.toFixed(2)})`).join(' and ');
-      prose = `Classified as ${t} — ${label.toLowerCase()} — primarily because ${topProse}.`;
-      if (positives.length > 2) {
-        prose += ` ${positives.length - 2} additional indicator${positives.length - 2 > 1 ? 's' : ''} also contributed.`;
-      }
-      if (penalties.length > 0) {
-        prose += ` Penalised for ${penalties.map((p) => CODE_PROSE[p.reason_code] ?? p.reason_code.toLowerCase()).join(' and ')}.`;
-      }
-    }
-  } else if (reasonCodes.filter((c) => c !== 'DOMAIN_BASE').length > 0) {
-    const codes = reasonCodes.filter((c) => c !== 'DOMAIN_BASE');
-    const proseItems = codes.slice(0, 3).map((c) => CODE_PROSE[c] ?? c.toLowerCase());
-    prose = `Classified as ${t} based on: ${proseItems.join(', ')}.`;
-  } else {
-    prose = `Classified as ${t} (${score?.toFixed(3) ?? '—'}) from the domain baseline with no significant severity indicators.`;
-  }
-
-  return (
-    <div style={{
-      padding: '12px 14px',
-      borderRadius: '7px',
-      background: bg,
-      border: `1.5px solid ${color}`,
-      marginBottom: '16px',
-    }}>
-      {/* Prominent heading — the key question a viewer asks */}
-      <div style={{ fontSize: '13px', fontWeight: 700, color, marginBottom: '7px' }}>
-        Why {t} — {label}?
-      </div>
-      <div style={{ fontSize: '13px', lineHeight: 1.65, color: 'var(--text)' }}>{prose}</div>
-    </div>
-  );
+function isLive(o: Observation): boolean {
+  return o.polarity !== 'negated' && o.temporality === 'current';
 }
 
-// ---------------------------------------------------------------------------
-// ConfidenceMeters — three distinct confidence signals
-// ---------------------------------------------------------------------------
-
-function ConfidenceMeter({ label, value, tooltip }: { label: string; value: number; tooltip: string }) {
-  const pct   = Math.round(value * 100);
-  const color = value >= 0.65 ? 'var(--p3)' : value >= 0.35 ? 'var(--p2)' : 'var(--p0)';
-
-  return (
-    <div title={tooltip} style={{ flex: 1 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '4px' }}>
-        <span style={{ color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.03em' }}>{label}</span>
-        <span style={{ fontFamily: 'var(--mono)', color, fontWeight: 700 }}>{pct}%</span>
-      </div>
-      <div style={{ height: '5px', background: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: '3px', transition: 'width 0.3s ease' }} />
-      </div>
-    </div>
-  );
+function describe(o: Observation): string {
+  const parts = [POLARITY_LABELS[o.polarity] ?? o.polarity];
+  if (o.temporality !== 'current') parts.push(o.temporality);
+  if (o.attribution === 'second_hand') parts.push('second-hand');
+  return `${codeLabel(o.code)} — ${parts.join(', ')}`;
 }
 
-function ConfidenceMeters({ inc }: { inc: IncidentRecord }) {
-  return (
-    <div style={{ marginBottom: '16px' }}>
-      <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-muted)', marginBottom: '8px' }}>
-        Confidence Signals
-      </div>
-      <div style={{ display: 'flex', gap: '16px' }}>
-        <ConfidenceMeter
-          label="Parse Quality"
-          value={inc.incident.confidence}
-          tooltip="How well the parser understood this transcript. Low values mean the domain or subtype may be incorrect."
-        />
-        <ConfidenceMeter
-          label="Location (Semantic)"
-          value={inc.location.location_confidence}
-          tooltip="Confidence that the reported location was understood — not necessarily dispatchable."
-        />
-        <ConfidenceMeter
-          label="Location (Dispatchable)"
-          value={inc.location.dispatchable_location_score}
-          tooltip="Confidence that emergency services can navigate to this location. Low values raise the LOW_LOCATION_CONFIDENCE verification flag; priority is unaffected."
-        />
-      </div>
-    </div>
-  );
-}
+export function IncidentDetail({ incidentId, onChanged }: Props) {
+  const [detail, setDetail] = useState<Detail | null>(null);
+  const [events, setEvents] = useState<AuditEvent[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>('overview');
+  const [focus, setFocus] = useState<string | null>(null);
+  const [followUp, setFollowUp] = useState('');
 
-// ---------------------------------------------------------------------------
-// Shared Field component
-// ---------------------------------------------------------------------------
-
-function Field({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '7px 0', borderBottom: '1px solid var(--border)' }}>
-      <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
-      <span style={{ fontSize: '13px' }}>{value}</span>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Reason code chips with prominent styling
-// ---------------------------------------------------------------------------
-
-function ReasonCodeChips({ codes }: { codes: string[] }) {
-  if (codes.length === 0) {
-    return <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>none</span>;
-  }
-
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '2px' }}>
-      {codes.map((code) => {
-        const isPenalty = code.startsWith('LOW_') || code === 'POSSIBLE_PRANK';
-        return (
-          <span
-            key={code}
-            title={CODE_PROSE[code] ?? code}
-            style={{
-              padding: '3px 8px',
-              borderRadius: '4px',
-              fontSize: '11px',
-              fontFamily: 'var(--mono)',
-              fontWeight: 600,
-              background: isPenalty ? 'rgba(255,77,79,0.12)' : 'rgba(82,196,26,0.12)',
-              border: `1px solid ${isPenalty ? 'rgba(255,77,79,0.4)' : 'rgba(82,196,26,0.4)'}`,
-              color: isPenalty ? 'var(--p0)' : 'var(--p3)',
-              cursor: 'default',
-            }}
-          >
-            {code}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Audit footer
-// ---------------------------------------------------------------------------
-
-function AuditBlock({ inc }: { inc: IncidentRecord }) {
-  return (
-    <div style={{ marginTop: '12px', padding: '8px 10px', borderRadius: '4px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
-      <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>Audit Trail</div>
-      <div style={{ fontFamily: 'var(--mono)', fontSize: '10px', color: 'var(--text-muted)', lineHeight: 2 }}>
-        <div>schema  {inc.audit.schema_version}</div>
-        <div>parser  {inc.audit.parser_version ?? '—'}</div>
-        <div>scoring {inc.audit.scoring_version ?? '—'}</div>
-        <div>at      {inc.audit.processed_at ? new Date(inc.audit.processed_at).toLocaleString() : '—'}</div>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-
-export function IncidentDetail({ incident: inc, initialBreakdown }: Props) {
-  const [breakdown, setBreakdown] = useState<ScoreBreakdown[]>(initialBreakdown ?? []);
-  const [breakdownLoading, setBreakdownLoading] = useState(false);
-  const [replay, setReplay]       = useState<ReplayResponse | null>(null);
-  const [replayLoading, setReplayLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'triage' | 'location' | 'caller' | 'replay'>('triage');
-
-  // When an incident is selected from the queue (no breakdown provided), silently
-  // replay it to populate the score breakdown. This keeps the triage tab useful
-  // without requiring the user to manually trigger a replay.
-  useEffect(() => {
-    if (breakdown.length > 0) return;
-    let cancelled = false;
-    setBreakdownLoading(true);
-    api.replay(inc.incident_id)
-      .then((result) => {
-        if (!cancelled) {
-          setBreakdown(result.score_breakdown);
-          setBreakdownLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setBreakdownLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, [inc.incident_id]); // re-run only when the selected incident changes
-
-  async function handleReplay() {
-    setReplayLoading(true);
+  const load = useCallback(async () => {
     try {
-      const result = await api.replay(inc.incident_id);
-      setReplay(result);
-      setBreakdown(result.score_breakdown);
-      setActiveTab('replay');
-    } finally {
-      setReplayLoading(false);
+      const [d, e] = await Promise.all([api.getIncident(incidentId), api.getEvents(incidentId)]);
+      setDetail(d);
+      setEvents(e.events);
+      setError(null);
+    } catch (err) {
+      setError((err as Error).message);
     }
+  }, [incidentId]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function refresh() {
+    await load();
+    onChanged();
   }
 
-  const TAB_STYLE = (active: boolean): React.CSSProperties => ({
-    padding: '7px 14px',
-    border: 'none',
-    borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
-    background: 'transparent',
-    color: active ? 'var(--accent)' : 'var(--text-muted)',
-    cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: active ? 700 : 400,
-    letterSpacing: active ? '0.01em' : 0,
-  });
+  async function sendFollowUp(e: React.FormEvent) {
+    e.preventDefault();
+    if (!followUp.trim()) return;
+    await api.addMessage(incidentId, followUp.trim());
+    setFollowUp('');
+    await refresh();
+  }
+
+  if (error) return <div role="alert" style={{ padding: '24px', color: 'var(--p0)' }}>{error}</div>;
+  if (!detail) return <div className="muted" style={{ padding: '24px' }}>Loading…</div>;
+
+  const { assessment, incident } = detail;
+  const failed = assessment.status === 'processing_failed';
+  const overridden = detail.effective_priority !== assessment.advisory_priority;
+  const observations = incident?.observations ?? [];
+  const observationById = new Map(observations.map((o) => [o.observation_id, o]));
+  const reviewsOnLatest = detail.reviews.filter((r) => r.assessment_id === assessment.assessment_id);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
-
-      {/* Title bar — large priority badge on the right, summary + ID on the left */}
-      <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', flexShrink: 0 }}>
-        <div style={{ flex: 1, minWidth: 0, paddingTop: '4px' }}>
-          <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '6px', lineHeight: 1.4 }}>{inc.incident.summary}</div>
-          <span style={{ fontFamily: 'var(--mono)', fontSize: '10px', color: 'var(--text-muted)' }}>{inc.incident_id}</span>
+    <article aria-label="Incident detail" style={{ height: '100%', overflowY: 'auto', padding: '16px 24px', display: 'grid', gap: '16px', alignContent: 'start' }}>
+      <header style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+        {failed ? (
+          <div role="alert" style={{ border: '1.5px solid var(--p0)', borderRadius: '8px', padding: '10px 16px', color: 'var(--p0)', fontWeight: 700 }}>
+            ⚠ PROCESSING FAILED<div style={{ fontSize: '11px', fontWeight: 400 }}>{assessment.failure_reason}</div>
+          </div>
+        ) : (
+          <>
+            <PriorityBadge priority={detail.effective_priority} size="lg" caption={overridden ? 'human override' : 'machine suggestion'} />
+            {overridden && <PriorityBadge priority={assessment.advisory_priority} size="lg" caption="original machine" />}
+          </>
+        )}
+        <div style={{ display: 'grid', gap: '2px' }}>
+          <h2 style={{ fontSize: '16px' }}>
+            {incident ? `${codeLabel(incident.classification.domain)}${incident.classification.subtype ? ` · ${codeLabel(incident.classification.subtype)}` : ''}` : 'Unclassified'}
+            <span className="muted" style={{ fontSize: '12px', fontWeight: 400 }}> ({incident?.classification.status ?? 'n/a'})</span>
+          </h2>
+          <span style={{ fontSize: '13px' }}>
+            Severity: <strong>{SEVERITY_LABELS[assessment.severity_band]}</strong> · Location: <strong>{LOCATION_QUALITY_LABELS[assessment.location_quality.status]}</strong> · {STATE_LABELS[detail.state]}
+          </span>
+          <span className="muted mono" style={{ fontSize: '11px' }}>{detail.incident_id} · ruleset {assessment.ruleset_version}</span>
         </div>
-        {/* Large badge — the tier is the primary output; make it visually obvious */}
-        <PriorityBadge tier={inc.triage.priority_tier} score={inc.triage.priority_score} size="lg" />
+      </header>
+
+      <div role="tablist" aria-label="Incident views" style={{ display: 'flex', gap: '4px', borderBottom: '1px solid var(--border)' }}>
+        {(['overview', 'review', 'audit'] as Tab[]).map((t) => (
+          <button key={t} role="tab" type="button" aria-selected={tab === t} onClick={() => setTab(t)} className={`tab ${tab === t ? 'tab-active' : ''}`}>
+            {t === 'overview' ? 'Overview' : t === 'review' ? `Review (${detail.reviews.length})` : `Audit trail (${events.length})`}
+          </button>
+        ))}
       </div>
 
-      {/* Raw transcript */}
-      <div style={{ padding: '10px 16px', background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Transcript</div>
-        <div style={{ fontFamily: 'var(--mono)', fontSize: '12px', color: 'var(--text)', lineHeight: 1.7 }}>{inc.raw_input.text}</div>
-      </div>
+      {tab === 'overview' && (
+        <>
+          {assessment.review_actions.length > 0 && (
+            <section aria-label="Required review actions" className="panel" style={{ borderColor: 'var(--p2)' }}>
+              <h3 className="section-title">Needs a human to</h3>
+              <ul style={{ paddingLeft: '18px', fontSize: '13px' }}>
+                {assessment.review_actions.map((a) => <li key={a}>{REVIEW_ACTION_LABELS[a] ?? a}</li>)}
+              </ul>
+            </section>
+          )}
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-        <button style={TAB_STYLE(activeTab === 'triage')}   onClick={() => setActiveTab('triage')}>Triage</button>
-        <button style={TAB_STYLE(activeTab === 'location')} onClick={() => setActiveTab('location')}>Location</button>
-        <button style={TAB_STYLE(activeTab === 'caller')}   onClick={() => setActiveTab('caller')}>Caller</button>
-        <button style={TAB_STYLE(activeTab === 'replay')}   onClick={() => setActiveTab('replay')}>Replay</button>
-      </div>
-
-      {/* Tab content */}
-      <div style={{ padding: '14px 16px', flex: 1, overflowY: 'auto' }}>
-
-        {/* ── TRIAGE ── */}
-        {activeTab === 'triage' && (
-          <div>
-            {/* Why this priority? — the most important UI element */}
-            <WhyPanel
-              tier={inc.triage.priority_tier}
-              score={inc.triage.priority_score}
-              breakdown={breakdown}
-              reasonCodes={inc.triage.reason_codes}
-            />
-
-            {/* Three confidence signals */}
-            <ConfidenceMeters inc={inc} />
-
-            {/* Key fields */}
-            <Field label="Domain" value={
-              <span style={{ textTransform: 'capitalize', fontWeight: 600 }}>{inc.incident.domain}</span>
-            } />
-            <Field label="Subtype" value={
-              <span style={{ textTransform: 'capitalize' }}>{inc.incident.subtype.replace(/_/g, ' ')}</span>
-            } />
-            <Field label="Victim Count" value={
-              inc.incident.victim_count_estimate !== null
-                ? String(inc.incident.victim_count_estimate)
-                : <span style={{ color: 'var(--text-muted)' }}>unknown</span>
-            } />
-            <Field label="Reason Codes" value={
-              <ReasonCodeChips codes={inc.triage.reason_codes} />
-            } />
-
-            {/* Score breakdown — auto-populated via silent replay when viewing from queue */}
-            <div style={{ marginTop: '16px' }}>
-              {breakdownLoading ? (
-                <div style={{ color: 'var(--text-muted)', fontSize: '12px', padding: '8px 0' }}>
-                  Loading score breakdown…
+          <section aria-label="Transcript" className="panel">
+            <h3 className="section-title">Transcript (highlighted evidence)</h3>
+            {detail.sources.map((s, i) => {
+              const highlights: Highlight[] = [
+                ...observations
+                  .filter((o) => o.evidence.source_event_id === s.source_event_id)
+                  .map((o) => ({
+                    start: o.evidence.span.start,
+                    end: o.evidence.span.end,
+                    label: describe(o),
+                    muted: !isLive(o),
+                    active: focus === o.observation_id,
+                  })),
+                ...(incident?.locations ?? [])
+                  .filter((l) => l.evidence?.source_event_id === s.source_event_id)
+                  .map((l) => ({ start: l.evidence!.span.start, end: l.evidence!.span.end, label: 'Reported location', active: focus === l.location_id })),
+              ];
+              return (
+                <div key={s.source_event_id} style={{ marginTop: i ? '8px' : 0 }}>
+                  <div className="muted mono" style={{ fontSize: '11px' }}>Message {i + 1} · {new Date(s.received_at).toLocaleTimeString()}</div>
+                  <EvidenceText text={s.text} highlights={highlights} />
                 </div>
-              ) : (
-                <ScoreBreakdownPanel breakdown={breakdown} totalScore={inc.triage.priority_score} />
+              );
+            })}
+            <form onSubmit={sendFollowUp} style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+              <input className="input" style={{ flex: 1 }} aria-label="Follow-up message" placeholder="Add a follow-up message from the caller…" value={followUp} onChange={(e) => setFollowUp(e.target.value)} />
+              <button type="submit" className="btn" disabled={!followUp.trim()}>Add</button>
+            </form>
+          </section>
+
+          <section aria-label="Why this recommendation" className="panel">
+            <h3 className="section-title">Why this recommendation?</h3>
+            {assessment.reasons.length === 0 && <p className="muted" style={{ fontSize: '13px' }}>No rules fired.</p>}
+            <ul style={{ listStyle: 'none', display: 'grid', gap: '6px' }}>
+              {assessment.reasons.map((r, i) => (
+                <li key={`${r.rule_id}-${i}`} style={{ fontSize: '13px' }}>
+                  <span className="mono" style={{ color: 'var(--accent)' }}>{r.rule_id}</span>
+                  <span className="muted mono" style={{ fontSize: '11px' }}> v{r.rule_version}</span>{' '}
+                  {codeLabel(r.reason_code)}
+                  {r.observation_ids.map((id) => {
+                    const o = observationById.get(id);
+                    return o ? (
+                      <button key={id} type="button" className="chip" onMouseEnter={() => setFocus(id)} onMouseLeave={() => setFocus(null)} onFocus={() => setFocus(id)} onBlur={() => setFocus(null)}>
+                        “{o.evidence.text}”
+                      </button>
+                    ) : null;
+                  })}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {incident && (
+            <section aria-label="Extracted facts" className="panel">
+              <h3 className="section-title">Extracted facts</h3>
+              <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                <thead><tr className="muted" style={{ textAlign: 'left' }}><th>Cue</th><th>Status</th><th>Quote</th></tr></thead>
+                <tbody>
+                  {observations.map((o) => (
+                    <tr key={o.observation_id} onMouseEnter={() => setFocus(o.observation_id)} onMouseLeave={() => setFocus(null)} style={{ opacity: isLive(o) ? 1 : 0.6 }}>
+                      <td>{codeLabel(o.code)}</td>
+                      <td>{describe(o).split(' — ')[1]}</td>
+                      <td className="mono">“{o.evidence.text}”</td>
+                    </tr>
+                  ))}
+                  <tr><td>Victim count</td><td>{incident.victim_count.status.replace('_', ' ')}</td><td className="mono">{incident.victim_count.value ?? (incident.victim_count.candidates.join(' or ') || '—')}</td></tr>
+                </tbody>
+              </table>
+              {incident.conflicts.length > 0 && (
+                <p style={{ fontSize: '12px', color: 'var(--p2)', marginTop: '6px' }}>
+                  ⚠ {incident.conflicts.length} contradiction(s) kept side by side — see highlighted quotes.
+                </p>
               )}
-            </div>
-          </div>
-        )}
+            </section>
+          )}
 
-        {/* ── LOCATION ── */}
-        {activeTab === 'location' && (
-          <div>
-            <Field label="Address Text" value={
-              inc.location.address_text
-                ?? <span style={{ color: 'var(--text-muted)' }}>none detected</span>
-            } />
-            <Field label="Coordinates" value={
-              inc.location.lat !== null
-                ? `${inc.location.lat}, ${inc.location.lng}`
-                : <span style={{ color: 'var(--text-muted)' }}>none</span>
-            } />
+          <section aria-label="Locations" className="panel">
+            <h3 className="section-title">Reported locations · {LOCATION_QUALITY_LABELS[assessment.location_quality.status]}</h3>
+            {(incident?.locations ?? []).length === 0 && <p style={{ fontSize: '13px', color: 'var(--p2)' }}>No location reported — verify with the caller. Severity is not reduced.</p>}
+            <ul style={{ listStyle: 'none', display: 'grid', gap: '4px' }}>
+              {(incident?.locations ?? []).map((l) => (
+                <li key={l.location_id} style={{ fontSize: '13px' }} onMouseEnter={() => setFocus(l.location_id)} onMouseLeave={() => setFocus(null)}>
+                  <span className="mono">{l.raw_text}</span>{' '}
+                  <span className="muted" style={{ fontSize: '11px' }}>{l.validation}{l.missing_fields.length ? ` · missing ${l.missing_fields.join(', ')}` : ''}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+      )}
 
-            <div style={{ marginTop: '14px', marginBottom: '4px' }}>
-              <ConfidenceMeter
-                label="Location Confidence (Semantic)"
-                value={inc.location.location_confidence}
-                tooltip="Confidence that the reported location was understood semantically."
-              />
-            </div>
-            <div style={{ marginTop: '10px' }}>
-              <ConfidenceMeter
-                label="Dispatchable Location Score"
-                value={inc.location.dispatchable_location_score}
-                tooltip="Confidence that emergency services can navigate to this location. Below 0.30 raises the LOW_LOCATION_CONFIDENCE verification flag; priority is unaffected."
-              />
-            </div>
+      {tab === 'review' && (
+        <section aria-label="Review" className="panel" style={{ display: 'grid', gap: '12px' }}>
+          {failed ? (
+            <p style={{ fontSize: '13px' }}>Processing failed; handle this incident manually from the transcript.</p>
+          ) : (
+            <ReviewPanel incidentId={incidentId} assessment={assessment} onReviewed={() => void refresh()} />
+          )}
+          <h3 className="section-title">History</h3>
+          {detail.reviews.length === 0 && <p className="muted" style={{ fontSize: '13px' }}>No reviews yet.</p>}
+          <ul style={{ listStyle: 'none', display: 'grid', gap: '6px' }}>
+            {detail.reviews.map((r) => (
+              <li key={r.review_id} style={{ fontSize: '13px', opacity: reviewsOnLatest.includes(r) ? 1 : 0.6 }}>
+                <span className="mono muted" style={{ fontSize: '11px' }}>{new Date(r.reviewed_at).toLocaleString()} · {r.reviewer_id}</span>{' '}
+                <strong>{codeLabel(r.decision)}</strong>
+                {r.override_priority && <> → {r.override_priority}</>}
+                {r.reason && <> — {r.reason}</>}
+                {!reviewsOnLatest.includes(r) && <span className="muted"> (earlier assessment)</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-            {inc.location.dispatchable_location_score < 0.30 && (
-              <div style={{ marginTop: '10px', padding: '8px 10px', borderRadius: '4px', background: 'rgba(255,77,79,0.08)', border: '1px solid rgba(255,77,79,0.3)', fontSize: '12px', color: 'var(--p0)' }}>
-                LOW_LOCATION_CONFIDENCE — verify location with the caller. This location may not be navigable by emergency services. Priority is not reduced.
-              </div>
-            )}
-
-            {inc.location.validation_notes.length > 0 && (
-              <div style={{ marginTop: '12px' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>Validation Notes</div>
-                {inc.location.validation_notes.map((n, i) => (
-                  <div key={i} style={{ padding: '5px 8px', background: 'rgba(255,122,69,0.08)', border: '1px solid rgba(255,122,69,0.3)', borderRadius: '4px', fontSize: '12px', marginBottom: '4px', color: 'var(--p1)' }}>
-                    {n}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── CALLER ── */}
-        {activeTab === 'caller' && (
-          <div>
-            <Field label="Language" value={
-              inc.caller_context.language_hint
-                ? <span style={{ fontFamily: 'var(--mono)', fontWeight: 600 }}>{inc.caller_context.language_hint}</span>
-                : <span style={{ color: 'var(--text-muted)' }}>—</span>
-            } />
-            <Field label="Stress Level" value={
-              inc.caller_context.caller_stress_level
-                ? <span style={{
-                    textTransform: 'capitalize',
-                    fontWeight: 700,
-                    color: inc.caller_context.caller_stress_level === 'high'
-                      ? 'var(--p0)'
-                      : inc.caller_context.caller_stress_level === 'moderate'
-                        ? 'var(--p2)'
-                        : 'var(--p3)',
-                  }}>
-                    {inc.caller_context.caller_stress_level}
-                  </span>
-                : <span style={{ color: 'var(--text-muted)' }}>not detected</span>
-            } />
-            <Field label="Background Noise" value={
-              inc.caller_context.background_noise_level
-                ?? <span style={{ color: 'var(--text-muted)' }}>—</span>
-            } />
-
-            {inc.caller_context.caller_stress_level === 'high' && (
-              <div style={{ marginTop: '10px', padding: '8px 10px', borderRadius: '4px', background: 'rgba(255,77,79,0.08)', border: '1px solid rgba(255,77,79,0.3)', fontSize: '12px', color: 'var(--p0)' }}>
-                CALLER_HIGH_DISTRESS detected. Extreme stress signals (repetition, all-caps, fragmented speech) were found in the transcript. Added +0.08 to the priority score.
-              </div>
-            )}
-
-            <AuditBlock inc={inc} />
-          </div>
-        )}
-
-        {/* ── REPLAY ── */}
-        {activeTab === 'replay' && (
-          <div>
-            {!replay && (
-              <div style={{ padding: '28px 0', textAlign: 'center' }}>
-                <div style={{ color: 'var(--text-muted)', marginBottom: '6px', fontSize: '13px', lineHeight: 1.6 }}>
-                  Re-run the full parse and score pipeline against this incident's original transcript.
-                </div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '11px', marginBottom: '16px' }}>
-                  Differences in the result reflect changes to parser or scoring rules since this incident was ingested.
-                </div>
-                <button
-                  onClick={handleReplay}
-                  disabled={replayLoading}
-                  style={{ padding: '8px 22px', background: 'var(--accent)', color: '#0d1117', border: 'none', borderRadius: '6px', fontWeight: 700, cursor: 'pointer', opacity: replayLoading ? 0.6 : 1, fontSize: '13px' }}
-                >
-                  {replayLoading ? 'Replaying…' : 'Run Replay'}
-                </button>
-              </div>
-            )}
-
-            {replay && (
-              <div>
-                {/* Original vs Replayed */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
-                  <div style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>Original</div>
-                    <PriorityBadge tier={replay.original.triage.priority_tier} score={replay.original.triage.priority_score} />
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginTop: '6px' }}>
-                      scoring v{replay.original.audit.scoring_version ?? '—'}
-                    </div>
-                  </div>
-                  <div style={{ padding: '10px 12px', background: 'rgba(88,166,255,0.05)', borderRadius: '6px', border: '1px solid rgba(88,166,255,0.3)' }}>
-                    <div style={{ fontSize: '10px', color: 'var(--accent)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>Replayed</div>
-                    <PriorityBadge tier={replay.replayed.triage.priority_tier} score={replay.replayed.triage.priority_score} />
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--mono)', marginTop: '6px' }}>
-                      scoring v{replay.replayed.audit.scoring_version ?? '—'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Diff status */}
-                <div style={{
-                  padding: '8px 12px', borderRadius: '6px', marginBottom: '14px', fontSize: '12px',
-                  background: replay.diff.priority_tier_changed ? 'rgba(255,169,64,0.08)' : 'rgba(82,196,26,0.08)',
-                  border: `1px solid ${replay.diff.priority_tier_changed ? 'var(--p2)' : 'var(--p3)'}`,
-                  color: replay.diff.priority_tier_changed ? 'var(--p2)' : 'var(--p3)',
-                }}>
-                  {replay.diff.priority_tier_changed
-                    ? `Tier changed: ${replay.original.triage.priority_tier} → ${replay.replayed.triage.priority_tier}  |  score Δ ${replay.diff.score_delta >= 0 ? '+' : ''}${replay.diff.score_delta.toFixed(3)}`
-                    : `No tier change  |  score Δ ${replay.diff.score_delta >= 0 ? '+' : ''}${replay.diff.score_delta.toFixed(3)}`
-                  }
-                </div>
-
-                {/* Code diffs */}
-                {replay.diff.reason_codes_added.length > 0 && (
-                  <Field label="Reason Codes Added" value={
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                      {replay.diff.reason_codes_added.map((c) => (
-                        <span key={c} style={{ padding: '2px 7px', background: 'rgba(82,196,26,0.12)', border: '1px solid rgba(82,196,26,0.4)', borderRadius: '4px', fontSize: '11px', color: 'var(--p3)', fontFamily: 'var(--mono)', fontWeight: 600 }}>{c}</span>
-                      ))}
-                    </div>
-                  } />
-                )}
-                {replay.diff.reason_codes_removed.length > 0 && (
-                  <Field label="Reason Codes Removed" value={
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                      {replay.diff.reason_codes_removed.map((c) => (
-                        <span key={c} style={{ padding: '2px 7px', background: 'rgba(255,77,79,0.12)', border: '1px solid rgba(255,77,79,0.4)', borderRadius: '4px', fontSize: '11px', color: 'var(--p0)', fontFamily: 'var(--mono)', fontWeight: 600 }}>{c}</span>
-                      ))}
-                    </div>
-                  } />
-                )}
-
-                {/* Replayed breakdown */}
-                <div style={{ marginTop: '16px' }}>
-                  <ScoreBreakdownPanel breakdown={replay.score_breakdown} totalScore={replay.replayed.triage.priority_score} />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+      {tab === 'audit' && (
+        <section aria-label="Audit trail" className="panel">
+          <ol style={{ listStyle: 'none', display: 'grid', gap: '4px' }}>
+            {events.map((e) => (
+              <li key={e.event_id} className="mono" style={{ fontSize: '12px' }}>
+                <span className="muted">{new Date(e.occurred_at).toLocaleTimeString()}</span>{' '}
+                <span style={{ color: 'var(--accent)' }}>{e.event_type}</span>{' '}
+                {e.actor.kind}:{e.actor.actor_id}{e.component_version ? ` (${e.component_version})` : ''}
+                <span className="muted"> · {e.subject_digest.slice(0, 19)}… · {e.correlation_id}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </article>
   );
 }
