@@ -221,7 +221,8 @@
     "ConflictKind": {
       "enum": [
         "observation_polarity",
-        "location_mismatch"
+        "location_mismatch",
+        "model_rule_disagreement"
       ],
       "title": "ConflictKind",
       "type": "string"
@@ -396,6 +397,99 @@
         "unknown"
       ],
       "title": "IncidentDomain",
+      "type": "string"
+    },
+    "InferenceInfo": {
+      "additionalProperties": false,
+      "description": "Which model contributed to an incident version, and how it went.",
+      "properties": {
+        "abstained_codes": {
+          "items": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "type": "string"
+          },
+          "title": "Abstained Codes",
+          "type": "array"
+        },
+        "accepted_candidates": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Accepted Candidates",
+          "type": "integer"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        },
+        "mode": {
+          "$ref": "#/$defs/InferenceMode"
+        },
+        "model_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Id"
+        },
+        "model_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Version"
+        },
+        "rejected_candidates": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Rejected Candidates",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/InferenceStatus"
+        }
+      },
+      "required": [
+        "mode",
+        "status"
+      ],
+      "title": "InferenceInfo",
+      "type": "object"
+    },
+    "InferenceMode": {
+      "description": "How model output is used (design v1.2, section 3A.3).",
+      "enum": [
+        "rules_only",
+        "ml_shadow",
+        "hybrid_review"
+      ],
+      "title": "InferenceMode",
+      "type": "string"
+    },
+    "InferenceStatus": {
+      "enum": [
+        "disabled",
+        "ok",
+        "degraded"
+      ],
+      "title": "InferenceStatus",
       "type": "string"
     },
     "LocationCandidate": {
@@ -610,7 +704,7 @@
       "type": "string"
     }
   },
-  "$id": "https://ntip.local/schemas/v2.1.0/incident.schema.json",
+  "$id": "https://ntip.local/schemas/v2.2.0/incident.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "The canonical interpretation of one or more source events.",
@@ -636,6 +730,17 @@
       "pattern": "^[A-Za-z0-9_.:-]+$",
       "title": "Incident Id",
       "type": "string"
+    },
+    "inference": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InferenceInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "language": {
       "anyOf": [
@@ -664,7 +769,7 @@
       "type": "array"
     },
     "schema_version": {
-      "default": "2.1.0",
+      "default": "2.2.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -691,5 +796,5 @@
   ],
   "title": "Incident",
   "type": "object",
-  "x-schema-version": "2.1.0"
+  "x-schema-version": "2.2.0"
 }
