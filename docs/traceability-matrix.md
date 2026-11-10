@@ -1,0 +1,138 @@
+# Design traceability matrix
+
+Status of each requirement of [technical design v1.2](design/technical-design-v1.2.md)
+against the repository, with evidence (design §15 Phase 0 and §20).
+
+Status key: **Done**: implemented and tested. **Partial**: implemented with
+stated gaps. **Not done**: not implemented yet. **External**: needs people or
+permissions outside the project (reviewers, practitioners, the data owner's
+budget). **By design**: deliberately out of scope (§1 non-goals).
+
+Last updated: 2026-11-10.
+
+## Architecture and contracts (§3, §4)
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| Modular monolith, one repository (§3.2, ADR-001) | Done | `backend/src/ntip/*`, `apps/dashboard` |
+| Python backend, TypeScript dashboard | Done (amends §3.3 / ADR-002) | DDL-012 |
+| Versioned contracts, JSON Schema 2020-12, generated client types (§3.3, §4.3, §4.4) | Done | `backend/schemas/v1`, `v2`; `backend/openapi.json`; `npm run gen:api`; CI freshness checks |
+| Layered records: source, canonical, advisory, review, audit (§4.1, §3B.4) | Done | `ntip/schema/*` |
+| `unknown` / `not_reported` / `negated` / `conflicting` never collapsed (§4.3) | Done | `Fact[T]`; safety case S9 |
+| Breaking changes bump the major version with old schemas kept (§4.4) | Done | schema 2.0.0 under `schemas/v2`, v1 retained |
+
+## ML layer (§3A)
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| Rules baseline B0 kept as permanent fallback (§3A.2) | Done | `ntip.parser`; fusion never removes rules findings |
+| B1 small task-specific model (§3A.4) | Done | `ntip/ml/b1.py`, [model card](ml/model-card-b1.md) |
+| B2 structured-output LLM (§3A.4) | Partial | Adapter and tests done (`ntip/ml/b2.py`); **not evaluated**: needs the owner's authorisation to call a paid API ([model card](ml/model-card-b2.md)) |
+| B3 domain-adapted model (§3A.4) | Not done | Only after dataset quality is established, per the design |
+| Inference contract, span verification, abstentions (§3A.5) | Done | `ntip/ml/contract.py`, `verify.py`; safety case S6 |
+| Modes `rules_only` / `ml_shadow` / `hybrid_review`, timeout fallback (§3A.3, §3A.6) | Done | `ntip/ml/fusion.py`, pipeline; safety case S7–S8; CI smoke test runs hybrid with B1 |
+| Separate inference service (§3A.3) | Done | `ntip.ml.service`, compose `inference` service |
+| Recorded-output replay for models (§3A.9) | Done | `ModelOutput` records, `/v1/incidents/{id}/model-outputs` |
+| Dataset with leakage-safe family splits and held-out set (§3A.7) | Done | `data/eval/curated.jsonl`, `generated-1.0.0-seed42.jsonl`; loader rejects leakage |
+| Labelling guide (§3A.7) | Done | [labelling-guide.md](evaluation/labelling-guide.md) |
+| Independent annotation and inter-annotator agreement (§3A.7) | External | Needs at least two qualified reviewers |
+| Metrics: per-field P/R/F1, critical false negatives separately, calibration, risk-coverage, slices, ablations (§3A.8) | Done | `ntip.evaluation`, `compare.py`, `calibration.py`; [results](evaluation/results/README.md) |
+| Reproducibility manifests (§3A.9, §10.3) | Done | Every report records commit, dataset, ruleset, schema, lockfile digests and seed |
+| Milestones ML-1 to ML-4 | Done | Baseline reproducible by one command; contract; comparison; ML-4 gate met (hybrid never increases critical FNs) |
+| ML-5 research release with independent review | External | Needs independent reviewers |
+
+## NG911 interoperability (§3B)
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| Phase I: pinned edition, source register, licence review (§3B.2, §3B.9) | Done | [eido-profile.md](standards-alignment/eido-profile.md), [source-register.md](standards-alignment/source-register.md) |
+| Phase II: import-only adapter, source preservation, idempotency, INT-001…012 (§3B.3, §3B.7) | Done | `ntip/interop/*`; [interop-verification.md](standards-alignment/interop-verification.md) |
+| Phase III: ML advisory attached without blocking ingestion | Done (synchronous, bounded by timeout) | INT-007; safety case S8 |
+| Phase IV: lab interoperability with NENA artefacts / Texas A&M tooling | Partial | NENA's published sample validates; Texas A&M `ng911-dev` coverage not yet reviewed |
+| Phase V: external engineering and practitioner review | External | — |
+| Mapping beyond notes (locations, persons, PIDF-LO) | Not done | Preserved as unmapped; see interop gaps |
+| NENA-STA-024 conveyance | Not done | Endpoint is project-defined |
+| Tenant isolation (INT-010) | Partial | Interop receipts are tenant-scoped; the research `/v1` incidents API has no authentication |
+
+## Parser, triage and location (§6, §7, §8)
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| Negation, hypothetical, historical, hearsay, conflicts (§6.2–6.3) | Done | `ntip/parser/context.py`, conflicts in `Incident` |
+| Heuristic confidence labelled as such (§6.4) | Done | `heuristic_confidence` fields |
+| Unit, golden, metamorphic, property-based tests (§6.5) | Done | `tests/parser/*`, `test_properties.py` (Hypothesis) |
+| Multilingual input | Partial | English and some Spanish |
+| Severity separate from location quality and review urgency (§7.1) | Done | `Assessment` fields; DDL-011, DDL-013 |
+| Versioned rules with ids, immutable releases (§7.2, §7.5) | Done | `rulesets/*.json` pinned by sha256 |
+| Explainability: rule id, version, evidence per recommendation (§7.4) | Done | `Assessment.reasons`; dashboard "Why this recommendation?" |
+| Location L0–L2 (§8.3) | Done | `ntip.location` |
+| Location L3 (GIS reference) / L4 (standards mapping) | Not done | Needs a licensed GIS dataset |
+
+## API, audit, replay (§5, §9, §10)
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| `/v1` endpoints, 202 ingest, idempotency, structured errors, correlation ids (§5.2–5.3) | Done | `ntip/api/*` |
+| Live and ready health checks (§5.2) | Done | `/health/live`, `/health/ready` |
+| Append-only events enforced by the database (§9.2) | Done | Triggers on every table; safety case S12 |
+| Restricted database role (§9.2) | Not done | Recommended in the threat model for shared deployments |
+| Replay: reproducibility and version comparison (§10.1–10.4) | Done | `POST /v1/replay-runs`; dashboard Replay tab |
+| Stream replay with relative timing (§10.2) | Not done | — |
+| Latency baseline (§10.5, §13.3) | Done | `ntip.evaluation.latency`; results README |
+| Human-factors study (§10.5, §16.1 RQ4) | External | Needs a controlled study with consent |
+
+## Dashboard (§11)
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| Simulation banner, queue, detail with evidence, why panel, review/override, replay, audit (§11.1) | Done | `apps/dashboard` |
+| No colour-only signals, keyboard focus, labels (§11.2) | Partial | Implemented; no automated accessibility tests |
+| Evaluation report screen (§11.1) | Not done | Reports live in `docs/evaluation/results` |
+| State machine RECEIVED → … → CLOSED (§11.3) | Partial | `awaiting_review` / `reviewed` / `processing_failed`; no explicit closed state |
+
+## Generator, security, CI (§12, §13, §14)
+
+| Requirement | Status | Evidence |
+|---|---|---|
+| Seeded generator with perturbations, generator-intended labels (§12) | Done | `ntip.generator` |
+| Threat model and controls (§13) | Done / Partial | [threat-model.md](safety/threat-model.md): API authentication and rate limiting outstanding |
+| CI: lint, types, tests, PostgreSQL, safety gate, contract freshness, containers, dependency and secret scanning (§14.2) | Done | `.github/workflows/ci.yml` |
+| Load tests under concurrency (§14.1) | Not done | Only single-request latency |
+| Release tags and changelog (§14.3) | Not done | — |
+
+## Definition of done (§20)
+
+| Item | Status |
+|---|---|
+| Synthetic scenario runs end to end on a clean machine | Done (compose stack, CI smoke test) |
+| Core payloads pass published schema validation | Done |
+| Severity and location uncertainty separated in code and UI | Done |
+| Critical-cue safety regression tests pass | Done (CI gate) |
+| Each assessment links to evidence, rule version, source event | Done |
+| Human overrides create immutable audit entries | Done |
+| Replay deterministic under pinned inputs | Done (reproducibility check) |
+| Evaluation reports include baselines, denominators, limitations | Done |
+| No real caller data in public artefacts | Done (synthetic only; enforced) |
+| Standards claims mapped to specific documents and limited | Done (source register) |
+| README with architecture, quick start, demo, limitations, benchmark commands | Done |
+| Independent technical or domain feedback recorded | **External** — none obtained yet |
+| Pinned EIDO edition and source-to-canonical mapping documented | Done |
+| Official source records immutable, AI assessments separate | Done |
+| Integration tests for version rejection, idempotency, source preservation, inference-failure isolation | Done |
+| Claimed interoperability scoped to verified schemas and tests | Done |
+| Platform can be disabled without disrupting an external NG911 workflow | Done by construction (import-only, no writeback) |
+
+## Open questions (§18)
+
+| # | Question | Answer / status |
+|---|---|---|
+| 1 | What exists in the latest revision? | This matrix |
+| 2 | Framework and package manager | FastAPI + uv (backend), React + npm (dashboard) |
+| 3 | Persistence | PostgreSQL append-only store; in-memory for tests and demos |
+| 4 | Did the scorer conflate location with urgency? | Yes, in the TypeScript scorer; fixed in DDL-011 and designed out in DDL-013 |
+| 5 | NENA editions | EIDO NENA-STA-021.1b pinned; i3 and GIS Data Model not pinned |
+| 6 | Authoritative P0–P4 definitions and reviewers | Project-defined research rubric (labelling guide); **needs practitioner review** |
+| 7 | Independent annotators | **Open** |
+| 8 | Repository licence compatible with dependencies and reused artefacts | **Open**: the repository has no licence file yet; the owner should choose one. NENA's EIDO schema is not redistributed because it has none |
+| 9 | Data retention for hosted demos | Synthetic only; see the threat model |
+| 10 | Results replicable by an external reviewer without private infrastructure | Yes: every report regenerates from committed data with one command; B2 needs an API key |
