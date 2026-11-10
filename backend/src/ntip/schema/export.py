@@ -22,6 +22,7 @@ from ntip.schema.advisory import Assessment
 from ntip.schema.audit import AuditEvent
 from ntip.schema.base import SCHEMA_VERSION
 from ntip.schema.canonical import Incident
+from ntip.schema.replay import ReplayRun
 from ntip.schema.review import HumanReview
 from ntip.schema.source import SourceEvent
 
@@ -34,6 +35,7 @@ CONTRACTS: dict[str, type[BaseModel]] = {
     "assessment": Assessment,
     "human-review": HumanReview,
     "audit-event": AuditEvent,
+    "replay-run": ReplayRun,
 }
 
 SCHEMA_DIR = Path(__file__).resolve().parents[3] / "schemas" / f"v{SCHEMA_VERSION.split('.')[0]}"

@@ -12,7 +12,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
-SCHEMA_VERSION = "2.0.0"
+SCHEMA_VERSION = "2.1.0"
 
 
 class SchemaModel(BaseModel):
