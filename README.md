@@ -321,6 +321,7 @@ ng911-triage-intelligence/
     ingestion-api/            Express REST API, store abstraction (in-memory ↔ PostgreSQL)
   apps/
     dashboard/                React 18 + Vite — queue, detail panel, replay tab
+  backend/                    Python backend (in progress, replaces services/* — see DDL-012)
   data/
     fixtures/                 23 hand-labeled incident fixtures
   docs/
