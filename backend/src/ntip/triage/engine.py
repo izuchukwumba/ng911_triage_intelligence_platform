@@ -32,7 +32,7 @@ from ntip.schema.canonical import (
 from ntip.triage.ruleset import SEVERITY_ORDER, Ruleset, load_ruleset
 
 ENGINE_ID = "triage-engine"
-ENGINE_VERSION = "1.1.0"
+ENGINE_VERSION = "1.2.0"
 ASSESSOR = Extractor(kind=ExtractorKind.RULE, extractor_id=ENGINE_ID, version=ENGINE_VERSION)
 
 # Review policies live in code and are versioned with the engine. Their ids
@@ -42,6 +42,7 @@ POLICY_CONFLICT = "P-REVIEW-002"
 POLICY_POSSIBLE_PRANK = "P-REVIEW-003"
 POLICY_WEAK_CLASSIFICATION = "P-REVIEW-004"
 POLICY_LOCATION = "P-REVIEW-005"
+POLICY_MODEL_ONLY_SERIOUS_CUE = "P-REVIEW-006"
 
 _SERIOUS = {SeverityBand.HIGH, SeverityBand.CRITICAL}
 
@@ -72,6 +73,9 @@ def assess(
     # Cues reported as having happened earlier; only rules that ask for
     # historical cues look at these.
     past: dict[str, list[str]] = defaultdict(list)
+    model_extracted = {
+        o.observation_id for o in incident.observations if o.extractor.kind is ExtractorKind.MODEL
+    }
     for obs in incident.observations:
         if obs.polarity is Polarity.NEGATED:
             continue
@@ -106,6 +110,15 @@ def assess(
             severity = rule.severity
         # A serious cue the caller was unsure about is kept at full weight and
         # sent to a human to confirm, rather than discounted.
+        used = [oid for code in rule.all_of for oid in cues[code]]
+        if rule.severity in _SERIOUS and used and set(used) <= model_extracted:
+            # Only a model saw this: keep its weight, but a human must confirm.
+            actions.add(ReviewAction.CONFIRM_CRITICAL_REPORT)
+            reasons.append(
+                _policy(
+                    POLICY_MODEL_ONLY_SERIOUS_CUE, "MODEL_ONLY_SERIOUS_CUE", observation_ids=used
+                )
+            )
         uncertain = rule.temporality == "current" and not all(c in certain for c in rule.all_of)
         if rule.severity in _SERIOUS and uncertain:
             actions.add(ReviewAction.CONFIRM_CRITICAL_REPORT)
