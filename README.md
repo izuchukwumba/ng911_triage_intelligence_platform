@@ -137,7 +137,8 @@ data/interop/eido/      Synthetic EIDO fixtures
 docs/                   Design, architecture, decisions, safety, evaluation, ML, standards
 infra/docker/           Compose stack
 .github/workflows/      CI: backend (with PostgreSQL and the safety gate), dashboard,
-                        container smoke test, dependency and secret scanning
+                        container smoke test, dependency and secret scanning; release
 ```
 
-Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributing: [CONTRIBUTING.md](CONTRIBUTING.md). Changes: [CHANGELOG.md](CHANGELOG.md);
+releases and their notes: [docs/releases](docs/releases/README.md).

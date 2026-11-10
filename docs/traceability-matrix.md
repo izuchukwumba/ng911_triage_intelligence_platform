@@ -100,7 +100,7 @@ Last updated: 2026-11-10.
 | Threat model and controls (§13) | Done | [threat-model.md](safety/threat-model.md); remaining limits listed there |
 | CI: lint, types, tests, PostgreSQL, safety gate, contract freshness, containers, dependency and secret scanning (§14.2) | Done | `.github/workflows/ci.yml` |
 | Load tests under concurrency (§14.1) | Done | `ntip.evaluation.load` (correctness checks, memory and PostgreSQL); found and fixed two concurrency bugs (DDL-016) |
-| Release tags and changelog (§14.3) | Not done | — |
+| Release tags and changelog (§14.3) | Done | [CHANGELOG.md](../CHANGELOG.md), [release notes](releases/) with schema compatibility, component versions, results, limitations and demo; the `Release` workflow re-verifies the tagged commit and attaches its test and evaluation reports (with its SHA); `tests/test_release.py` |
 
 ## Definition of done (§20)
 
