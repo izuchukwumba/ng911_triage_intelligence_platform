@@ -1,108 +1,92 @@
-const BASE = '';  // proxied through Vite to http://localhost:3001
+// Typed client for the research backend's /v1 API.
+// All types come from src/api/schema.ts, generated from backend/openapi.json
+// (`npm run gen:api`); do not hand-write response shapes here.
 
-export interface IncidentRecord {
-  incident_id: string;
-  received_at: string;
-  source_type: string;
-  raw_input: { text: string };
-  incident: {
-    domain: string;
-    subtype: string;
-    summary: string;
-    severity_indicators: string[];
-    victim_count_estimate: number | null;
-    confidence: number;
-  };
-  location: {
-    address_text: string | null;
-    lat: number | null;
-    lng: number | null;
-    location_confidence: number;
-    dispatchable_location_score: number;
-    validation_notes: string[];
-  };
-  caller_context: {
-    caller_id_hash: string | null;
-    language_hint: string | null;
-    background_noise_level: string | null;
-    caller_stress_level: string | null;
-  };
-  triage: {
-    priority_score: number | null;
-    priority_tier: string | null;
-    reason_codes: string[];
-  };
-  audit: {
-    schema_version: string;
-    parser_version: string | null;
-    scoring_version: string | null;
-    processed_at: string | null;
-  };
-}
+import type { components } from './schema';
 
-export interface ScoreBreakdown {
-  reason_code: string;
-  weight: number;
-  description: string;
-}
+type Schemas = components['schemas'];
 
-export interface IncidentPage {
-  total: number;
-  limit: number;
-  offset: number;
-  incidents: IncidentRecord[];
-}
+export type IncidentSummary = Schemas['IncidentSummaryOut'];
+export type IncidentPage = Schemas['IncidentPage'];
+export type IncidentDetail = Schemas['IncidentDetail'];
+export type Incident = Schemas['Incident'];
+export type Observation = Schemas['Observation'];
+export type LocationCandidate = Schemas['LocationCandidate'];
+export type Assessment = Schemas['Assessment'];
+export type RuleFiring = Schemas['RuleFiring'];
+export type HumanReview = Schemas['HumanReview'];
+export type AuditEvent = Schemas['AuditEvent'];
+export type IngestOut = Schemas['IngestOut'];
+export type ReviewIn = Schemas['ReviewIn'];
+export type Priority = Schemas['AdvisoryPriority'];
+export type ReviewAction = Schemas['ReviewAction'];
 
-export interface IngestResponse {
-  incident: IncidentRecord;
-  score_breakdown: ScoreBreakdown[];
-}
+// Same-origin in development (Vite proxies /v1 and /health to the backend).
+const BASE = import.meta.env.VITE_API_BASE ?? '';
 
-export interface ReplayDiff {
-  priority_tier_changed: boolean;
-  score_delta: number;
-  reason_codes_added: string[];
-  reason_codes_removed: string[];
-}
-
-export interface ReplayResponse {
-  original: IncidentRecord;
-  replayed: IncidentRecord;
-  score_breakdown: ScoreBreakdown[];
-  diff: ReplayDiff;
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: string,
+    message: string,
+    readonly correlationId: string | null,
+  ) {
+    super(message);
+  }
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
     ...init,
+    headers: { 'Content-Type': 'application/json', ...init?.headers },
   });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res.json() as Promise<T>;
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as
+      | { error?: { code?: string; message?: string } }
+      | null;
+    throw new ApiError(
+      res.status,
+      body?.error?.code ?? 'http_error',
+      body?.error?.message ?? res.statusText,
+      res.headers.get('X-Correlation-ID'),
+    );
+  }
+  return (await res.json()) as T;
+}
+
+function post<T>(path: string, body: unknown, headers?: Record<string, string>) {
+  return request<T>(path, { method: 'POST', body: JSON.stringify(body), headers });
 }
 
 export const api = {
-  listIncidents(params: { limit?: number; offset?: number; domain?: string; priority_tier?: string } = {}) {
-    const qs = new URLSearchParams();
-    if (params.limit)         qs.set('limit', String(params.limit));
-    if (params.offset)        qs.set('offset', String(params.offset));
-    if (params.domain)        qs.set('domain', params.domain);
-    if (params.priority_tier) qs.set('priority_tier', params.priority_tier);
-    return request<IncidentPage>(`/incidents?${qs}`);
+  listIncidents(limit = 100, offset = 0) {
+    return request<IncidentPage>(`/v1/incidents?limit=${limit}&offset=${offset}`);
   },
-
   getIncident(id: string) {
-    return request<IncidentRecord>(`/incidents/${id}`);
+    return request<IncidentDetail>(`/v1/incidents/${encodeURIComponent(id)}`);
   },
-
+  getEvents(id: string) {
+    return request<Schemas['AuditTrail']>(`/v1/incidents/${encodeURIComponent(id)}/events`);
+  },
   ingest(text: string) {
-    return request<IngestResponse>('/ingest', {
-      method: 'POST',
-      body: JSON.stringify({ text }),
-    });
+    // A fresh key per submission makes accidental double-submits harmless.
+    return post<IngestOut>(
+      '/v1/incidents',
+      { text, synthetic: true },
+      { 'Idempotency-Key': crypto.randomUUID() },
+    );
   },
-
-  replay(id: string) {
-    return request<ReplayResponse>(`/replay/${id}`, { method: 'POST' });
+  addMessage(id: string, text: string) {
+    return post<IngestOut>(
+      `/v1/incidents/${encodeURIComponent(id)}/messages`,
+      { text, synthetic: true },
+      { 'Idempotency-Key': crypto.randomUUID() },
+    );
+  },
+  review(id: string, body: ReviewIn) {
+    return post<HumanReview>(`/v1/incidents/${encodeURIComponent(id)}/reviews`, body);
+  },
+  ready() {
+    return request<{ status: string }>('/health/ready');
   },
 };

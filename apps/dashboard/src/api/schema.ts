@@ -189,7 +189,7 @@ export interface components {
             assessment_id: string;
             assessor: components["schemas"]["Extractor"];
             /** Failure Reason */
-            failure_reason?: string | null;
+            failure_reason: string | null;
             /** Incident Id */
             incident_id: string;
             location_quality: components["schemas"]["LocationQuality"];
@@ -200,11 +200,11 @@ export interface components {
              */
             priority_scheme: "research-v1";
             /** Reasons */
-            reasons?: components["schemas"]["RuleFiring"][];
+            reasons: components["schemas"]["RuleFiring"][];
             /** Requires Human Review */
             requires_human_review: boolean;
             /** Review Actions */
-            review_actions?: components["schemas"]["ReviewAction"][];
+            review_actions: components["schemas"]["ReviewAction"][];
             /** Ruleset Version */
             ruleset_version: string;
             /**
@@ -229,7 +229,7 @@ export interface components {
         AuditEvent: {
             actor: components["schemas"]["Actor"];
             /** Component Version */
-            component_version?: string | null;
+            component_version: string | null;
             /** Correlation Id */
             correlation_id: string;
             /** Event Id */
@@ -267,24 +267,24 @@ export interface components {
         /** CivicAddress */
         CivicAddress: {
             /** Floor */
-            floor?: string | null;
+            floor: string | null;
             /** House Number */
-            house_number?: string | null;
+            house_number: string | null;
             /** Landmark */
-            landmark?: string | null;
+            landmark: string | null;
             /** Locality */
-            locality?: string | null;
+            locality: string | null;
             /** Postal Code */
-            postal_code?: string | null;
+            postal_code: string | null;
             /** Region */
-            region?: string | null;
+            region: string | null;
             /** Street */
-            street?: string | null;
+            street: string | null;
             /** Unit */
-            unit?: string | null;
+            unit: string | null;
         };
         /** Classification */
-        Classification: {
+        "Classification-Input": {
             domain: components["schemas"]["IncidentDomain"];
             /** Heuristic Confidence */
             heuristic_confidence?: number | null;
@@ -292,6 +292,16 @@ export interface components {
             status: components["schemas"]["ClassificationStatus"];
             /** Subtype */
             subtype?: string | null;
+        };
+        /** Classification */
+        "Classification-Output": {
+            domain: components["schemas"]["IncidentDomain"];
+            /** Heuristic Confidence */
+            heuristic_confidence: number | null;
+            /** @default provisional */
+            status: components["schemas"]["ClassificationStatus"];
+            /** Subtype */
+            subtype: string | null;
         };
         /**
          * ClassificationStatus
@@ -304,14 +314,14 @@ export interface components {
          */
         Conflict: {
             /** Code */
-            code?: string | null;
+            code: string | null;
             /** Conflict Id */
             conflict_id: string;
             kind: components["schemas"]["ConflictKind"];
             /** Location Ids */
-            location_ids?: string[];
+            location_ids: string[];
             /** Observation Ids */
-            observation_ids?: string[];
+            observation_ids: string[];
         };
         /**
          * ConflictKind
@@ -330,7 +340,7 @@ export interface components {
             /** Lng */
             lng: number;
             /** Uncertainty M */
-            uncertainty_m?: number | null;
+            uncertainty_m: number | null;
         };
         /**
          * Evidence
@@ -371,12 +381,12 @@ export interface components {
         /** Fact[int] */
         Fact_int_: {
             /** Candidates */
-            candidates?: number[];
+            candidates: number[];
             /** Evidence */
-            evidence?: components["schemas"]["Evidence"][];
+            evidence: components["schemas"]["Evidence"][];
             status: components["schemas"]["FactStatus"];
             /** Value */
-            value?: number | null;
+            value: number | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -387,13 +397,13 @@ export interface components {
         HumanReview: {
             /** Assessment Id */
             assessment_id: string;
-            corrected_classification?: components["schemas"]["Classification"] | null;
+            corrected_classification: components["schemas"]["Classification-Output"] | null;
             decision: components["schemas"]["ReviewDecision"];
             /** Incident Id */
             incident_id: string;
-            override_priority?: components["schemas"]["AdvisoryPriority"] | null;
+            override_priority: components["schemas"]["AdvisoryPriority"] | null;
             /** Reason */
-            reason?: string | null;
+            reason: string | null;
             /** Review Id */
             review_id: string;
             /**
@@ -414,9 +424,9 @@ export interface components {
          * @description The canonical interpretation of one or more source events.
          */
         Incident: {
-            classification: components["schemas"]["Classification"];
+            classification: components["schemas"]["Classification-Output"];
             /** Conflicts */
-            conflicts?: components["schemas"]["Conflict"][];
+            conflicts: components["schemas"]["Conflict"][];
             /**
              * Derived At
              * Format: date-time
@@ -425,11 +435,11 @@ export interface components {
             /** Incident Id */
             incident_id: string;
             /** Language */
-            language?: string | null;
+            language: string | null;
             /** Locations */
-            locations?: components["schemas"]["LocationCandidate"][];
+            locations: components["schemas"]["LocationCandidate"][];
             /** Observations */
-            observations?: components["schemas"]["Observation"][];
+            observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
              * @default 2.0.0
@@ -437,7 +447,7 @@ export interface components {
             schema_version: string;
             /** Source Event Ids */
             source_event_ids: string[];
-            victim_count?: components["schemas"]["Fact_int_"];
+            victim_count: components["schemas"]["Fact_int_"];
         };
         /** IncidentDetail */
         IncidentDetail: {
@@ -524,28 +534,28 @@ export interface components {
         };
         /** LocationCandidate */
         LocationCandidate: {
-            civic_address?: components["schemas"]["CivicAddress"] | null;
-            coordinates?: components["schemas"]["Coordinates"] | null;
-            evidence?: components["schemas"]["Evidence"] | null;
+            civic_address: components["schemas"]["CivicAddress"] | null;
+            coordinates: components["schemas"]["Coordinates"] | null;
+            evidence: components["schemas"]["Evidence"] | null;
             extractor: components["schemas"]["Extractor"];
             /** Location Id */
             location_id: string;
             /** Missing Fields */
-            missing_fields?: string[];
+            missing_fields: string[];
             /** Raw Text */
-            raw_text?: string | null;
+            raw_text: string | null;
             role: components["schemas"]["LocationRole"];
             /** @default unverified */
             validation: components["schemas"]["LocationValidation"];
             /** Validation Source */
-            validation_source?: string | null;
+            validation_source: string | null;
         };
         /** LocationQuality */
         LocationQuality: {
             /** Conflicting Location Ids */
-            conflicting_location_ids?: string[];
+            conflicting_location_ids: string[];
             /** Missing Fields */
-            missing_fields?: string[];
+            missing_fields: string[];
             status: components["schemas"]["LocationQualityStatus"];
         };
         /**
@@ -585,7 +595,7 @@ export interface components {
             evidence: components["schemas"]["Evidence"];
             extractor: components["schemas"]["Extractor"];
             /** Heuristic Confidence */
-            heuristic_confidence?: number | null;
+            heuristic_confidence: number | null;
             /** Observation Id */
             observation_id: string;
             polarity: components["schemas"]["Polarity"];
@@ -623,7 +633,7 @@ export interface components {
         ReviewIn: {
             /** Assessment Id */
             assessment_id: string;
-            corrected_classification?: components["schemas"]["Classification"] | null;
+            corrected_classification?: components["schemas"]["Classification-Input"] | null;
             decision: components["schemas"]["ReviewDecision"];
             override_priority?: components["schemas"]["AdvisoryPriority"] | null;
             /** Reason */
@@ -637,9 +647,9 @@ export interface components {
          */
         RuleFiring: {
             /** Location Ids */
-            location_ids?: string[];
+            location_ids: string[];
             /** Observation Ids */
-            observation_ids?: string[];
+            observation_ids: string[];
             /** Reason Code */
             reason_code: string;
             /** Rule Id */
@@ -672,7 +682,7 @@ export interface components {
             source_event_id: string;
             source_type: components["schemas"]["SourceType"];
             /** Supersedes */
-            supersedes?: string | null;
+            supersedes: string | null;
             /** Synthetic */
             synthetic: boolean;
             /** Text */
