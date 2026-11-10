@@ -1,0 +1,305 @@
+{
+  "manifest": {
+    "system": "B0-rules",
+    "git_commit": "706afcf8ed26c37aed14470a70f2c539961664ab",
+    "dataset": {
+      "path": "data/eval/curated.jsonl",
+      "digest": "sha256:efe6e09839147de8fdecc7b9d7f2441a1439fbc4e38782747f027d8d7698283c",
+      "splits": [
+        "dev",
+        "regression"
+      ]
+    },
+    "parser": "rules-parser-1.2.0",
+    "engine": "triage-engine-1.1.0",
+    "ruleset": {
+      "name": "research-1.1.0",
+      "digest": "sha256:8f94610df1e285ca6c0c84e28e17ac80759f7bda03e50c716a09756a6406bf72"
+    },
+    "schema_version": "2.0.0",
+    "python": "3.12.10",
+    "lockfile_digest": "sha256:f3a97a72ddc4ebb0b90f1fd11a3eb7f03d4f9dc26fa973056de6714bcacb466f",
+    "seed": 20261109,
+    "bootstrap": "percentile, 2000 resamples, 95%"
+  },
+  "metrics": {
+    "cases": 30,
+    "cue_extraction": {
+      "micro": {
+        "tp": 34,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.9714,
+        "recall": 1.0,
+        "f1": 0.9855,
+        "f1_ci95": [
+          0.9455,
+          1.0
+        ]
+      },
+      "per_code": {
+        "ACTIVE_BLEEDING": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "ACTIVE_VIOLENCE": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "BREATHING_DIFFICULTY": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "CARDIAC_SYMPTOMS": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "CHILD_INVOLVED": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "FIRE_REPORTED": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "FIRE_SPREADING": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "INJURY_REPORTED": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "NOT_BREATHING": {
+          "tp": 8,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "OCCUPANTS_TRAPPED": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "SMOKE_REPORTED": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "UNABLE_TO_GET_UP": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "UNCONSCIOUS": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "WEAPON_PRESENT": {
+          "tp": 3,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571
+        }
+      },
+      "denied_or_past_cues_treated_as_live": 0
+    },
+    "critical_cue_sensitivity": {
+      "value": 1.0,
+      "numerator": 15,
+      "denominator": 15,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "critical_undertriage": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 13,
+      "ci95": [
+        0.0,
+        0
+      ],
+      "cases": []
+    },
+    "priority_exact": {
+      "value": 0.8667,
+      "numerator": 26,
+      "denominator": 30,
+      "ci95": [
+        0.7333,
+        0.9667
+      ]
+    },
+    "undertriage": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 30,
+      "ci95": [
+        0.0,
+        0
+      ]
+    },
+    "overtriage": {
+      "value": 0.1333,
+      "numerator": 4,
+      "denominator": 30,
+      "ci95": [
+        0.0333,
+        0.2667
+      ]
+    },
+    "severity_exact": {
+      "value": 0.8667,
+      "numerator": 26,
+      "denominator": 30,
+      "ci95": [
+        0.7333,
+        0.9667
+      ]
+    },
+    "domain_accuracy": {
+      "value": 0.9667,
+      "numerator": 29,
+      "denominator": 30,
+      "ci95": [
+        0.9,
+        1.0
+      ]
+    },
+    "location_accuracy": {
+      "value": 1.0,
+      "numerator": 30,
+      "denominator": 30,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "victim_count_accuracy": {
+      "value": 1.0,
+      "numerator": 30,
+      "denominator": 30,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "priority_confusion": {
+      "P0": {
+        "P0": 13,
+        "P1": 0,
+        "P2": 0,
+        "P3": 0,
+        "P4": 0,
+        "none": 0
+      },
+      "P1": {
+        "P0": 0,
+        "P1": 3,
+        "P2": 0,
+        "P3": 0,
+        "P4": 0,
+        "none": 0
+      },
+      "P2": {
+        "P0": 0,
+        "P1": 1,
+        "P2": 4,
+        "P3": 0,
+        "P4": 0,
+        "none": 0
+      },
+      "P3": {
+        "P0": 0,
+        "P1": 0,
+        "P2": 0,
+        "P3": 5,
+        "P4": 0,
+        "none": 0
+      },
+      "P4": {
+        "P0": 0,
+        "P1": 1,
+        "P2": 1,
+        "P3": 1,
+        "P4": 1,
+        "none": 0
+      },
+      "none": {
+        "P0": 0,
+        "P1": 0,
+        "P2": 0,
+        "P3": 0,
+        "P4": 0,
+        "none": 0
+      }
+    },
+    "failures": {
+      "fx-021": [
+        "priority P1 != P2"
+      ],
+      "fx-022": [
+        "spurious cues ['WEAPON_PRESENT']",
+        "priority P1 != P4"
+      ],
+      "cu-103": [
+        "priority P3 != P4"
+      ],
+      "cu-119": [
+        "priority P2 != P4",
+        "domain unknown != ems"
+      ]
+    }
+  }
+}
