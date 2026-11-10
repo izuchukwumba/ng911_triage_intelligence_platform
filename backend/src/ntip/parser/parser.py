@@ -27,7 +27,7 @@ from ntip.schema.canonical import (
 from ntip.schema.source import SourceEvent
 
 PARSER_ID = "rules-parser"
-PARSER_VERSION = "1.2.0"
+PARSER_VERSION = "1.3.0"
 EXTRACTOR = Extractor(kind=ExtractorKind.RULE, extractor_id=PARSER_ID, version=PARSER_VERSION)
 
 
