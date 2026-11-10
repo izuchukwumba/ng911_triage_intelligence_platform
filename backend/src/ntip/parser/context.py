@@ -27,6 +27,10 @@ _NEGATION = re.compile(
 _PSEUDO_NEGATION = re.compile(r"^\s*(?:stop\w*|only|doubt|just|quite)\b")
 # "not sure" / "not certain" express uncertainty, handled below.
 _UNCERTAIN_NEGATION = re.compile(r"^\s*(?:sure|certain)\b")
+# Negation scope ends at a comma or a coordinating "and": in "no smoke, my
+# mother fell" the fall is not negated. When unsure, erring towards affirming a
+# cue is the safe direction; a wrongly negated cue can hide an emergency.
+_SCOPE_END = re.compile(r"[,:]|(?<![\w'])(?:and|y)(?![\w'])")
 
 _UNCERTAINTY = re.compile(
     r"(?<![\w'])(?:i think|i thought|i guess|i believe|maybe|might|possibly|probably"
@@ -66,8 +70,8 @@ class CueContext:
 def _is_negated(prefix: str) -> bool:
     for m in _NEGATION.finditer(prefix):
         rest = prefix[m.end() :]
-        if m.group(0) == "no" and rest.startswith(","):
-            continue  # interjection: "No, he's bleeding"
+        if _SCOPE_END.search(rest):
+            continue  # also covers the interjection "No, he's bleeding"
         if _PSEUDO_NEGATION.match(rest) or _UNCERTAIN_NEGATION.match(rest):
             continue
         return True

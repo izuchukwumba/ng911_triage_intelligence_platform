@@ -35,6 +35,8 @@ class TestPolarity:
             ("No, he is bleeding badly.", "bleeding"),  # interjection
             ("He had a gun. No injuries so far.", "gun"),  # negation in another sentence
             ("He is conscious but bleeding.", "bleeding"),
+            ("There is no smoke, my mother fell.", "fell"),  # scope ends at a comma
+            ("No fire and he is bleeding.", "bleeding"),  # scope ends at "and"
         ],
     )
     def test_affirmed(self, text: str, cue: str) -> None:
