@@ -32,7 +32,7 @@ from ntip.schema.canonical import (
 from ntip.triage.ruleset import SEVERITY_ORDER, Ruleset, load_ruleset
 
 ENGINE_ID = "triage-engine"
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"
 ASSESSOR = Extractor(kind=ExtractorKind.RULE, extractor_id=ENGINE_ID, version=ENGINE_VERSION)
 
 # Review policies live in code and are versioned with the engine. Their ids
@@ -69,8 +69,15 @@ def assess(
     # historical or hypothetical. Second-hand reports still count.
     supporting: dict[str, list[str]] = defaultdict(list)
     certain: set[str] = set()
+    # Cues reported as having happened earlier; only rules that ask for
+    # historical cues look at these.
+    past: dict[str, list[str]] = defaultdict(list)
     for obs in incident.observations:
-        if obs.temporality is not Temporality.CURRENT or obs.polarity is Polarity.NEGATED:
+        if obs.polarity is Polarity.NEGATED:
+            continue
+        if obs.temporality is Temporality.HISTORICAL:
+            past[obs.code].append(obs.observation_id)
+        if obs.temporality is not Temporality.CURRENT:
             continue
         supporting[obs.code].append(obs.observation_id)
         if obs.polarity is Polarity.AFFIRMED:
@@ -82,14 +89,15 @@ def assess(
     escalations = []
 
     for rule in ruleset.rules:
-        if not all(code in supporting for code in rule.all_of):
+        cues = past if rule.temporality == "historical" else supporting
+        if not all(code in cues for code in rule.all_of):
             continue
         reasons.append(
             RuleFiring(
                 rule_id=rule.id,
                 rule_version=rule.version,
                 reason_code=rule.reason_code,
-                observation_ids=[oid for code in rule.all_of for oid in supporting[code]],
+                observation_ids=[oid for code in rule.all_of for oid in cues[code]],
             )
         )
         if rule.effect == "escalate":
@@ -98,7 +106,8 @@ def assess(
             severity = rule.severity
         # A serious cue the caller was unsure about is kept at full weight and
         # sent to a human to confirm, rather than discounted.
-        if rule.severity in _SERIOUS and not all(code in certain for code in rule.all_of):
+        uncertain = rule.temporality == "current" and not all(c in certain for c in rule.all_of)
+        if rule.severity in _SERIOUS and uncertain:
             actions.add(ReviewAction.CONFIRM_CRITICAL_REPORT)
             reasons.append(
                 _policy(

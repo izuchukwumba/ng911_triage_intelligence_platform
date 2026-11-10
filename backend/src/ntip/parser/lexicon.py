@@ -147,6 +147,19 @@ OBSERVATION_CUES: dict[str, dict[str, list[str]]] = {
         ],
         "es": ["herido", "herida", "heridos", "fractura"],
     },
+    "UNABLE_TO_GET_UP": {
+        "en": [
+            "can't get up",
+            "cannot get up",
+            "can not get up",
+            "unable to get up",
+            "can't stand up",
+            "can't stand",
+            "can't move",
+            "stuck on the floor",
+        ],
+        "es": ["no se puede levantar", "no puede levantarse", "no se puede mover"],
+    },
     "WEAPON_PRESENT": {
         "en": [
             "gun",

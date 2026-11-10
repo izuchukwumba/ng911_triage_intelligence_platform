@@ -15,6 +15,7 @@ from ntip.schema.canonical import Incident
 from ntip.schema.source import SourceEvent
 from ntip.triage.engine import assess as assess_incident
 from ntip.triage.engine import failed_assessment
+from ntip.triage.ruleset import load_ruleset
 
 AT = datetime(2026, 11, 9, 12, 0, tzinfo=UTC)
 
@@ -63,6 +64,27 @@ class TestSeverity:
         assert triage("Five people injured in a crash on Route 9.").severity_band == "elevated"
         assert triage("Smoke at 12 Oak Street, kids inside the house.").severity_band == "high"
 
+    def test_person_unable_to_get_up_is_elevated(self) -> None:
+        result = triage("My grandmother fell and can't get up. 5 Elm Road.")
+        assert (result.severity_band, result.advisory_priority) == ("elevated", "P2")
+
+    def test_recovered_critical_event_is_elevated_not_ignored(self) -> None:
+        result = triage("He was not breathing earlier but he is breathing now. 9 Pine Road.")
+        assert result.severity_band == "elevated"
+        assert any(r.rule_id == "R-HIST-001" for r in result.reasons)
+        # A past event is not a reason to ask for confirmation of a current one.
+        assert ReviewAction.CONFIRM_CRITICAL_REPORT not in result.review_actions
+
+    def test_released_ruleset_1_0_0_still_assesses_as_before(self) -> None:
+        old = assess_incident(
+            parse_text("He was not breathing earlier but he is breathing now."),
+            assessment_id="a",
+            assessed_at=AT,
+            ruleset=load_ruleset("research-1.0.0"),
+        )
+        assert old.ruleset_version == "research-1.0.0"
+        assert old.severity_band != "elevated"
+
     def test_negated_and_historical_cues_do_not_fire(self) -> None:
         assert triage("There is no fire and no smoke here.").severity_band == "undetermined"
         assert triage("He was bleeding yesterday, he is fine now.").severity_band != "high"
@@ -75,7 +97,7 @@ class TestSeverity:
         result = triage("He is not breathing at 12 Oak Street.")
         firing = next(r for r in result.reasons if r.rule_id == "R-RESP-001")
         assert firing.rule_version == "1.0.0"
-        assert result.ruleset_version == "research-1.0.0"
+        assert result.ruleset_version == "research-1.1.0"
 
 
 class TestSafetyInvariants:
