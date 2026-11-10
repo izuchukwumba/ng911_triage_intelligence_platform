@@ -1,0 +1,330 @@
+{
+  "manifest": {
+    "system": "B0-rules",
+    "git_commit": "601797198e8b8f9022fa08e49f7fbc13a7c6d31d",
+    "dataset": {
+      "path": "data/eval/curated.jsonl",
+      "digest": "sha256:e581a2280a2579b226cf3d12f973af456fab4ddae2183b2e0cef8c931fdbcbfc",
+      "splits": [
+        "dev",
+        "regression"
+      ]
+    },
+    "parser": "rules-parser-1.0.0",
+    "engine": "triage-engine-1.0.0",
+    "ruleset": {
+      "name": "research-1.0.0",
+      "digest": "sha256:8f2637172d4e395686b22e54b40e38e97c3a1b9b8a98ea824bbddfa839a29c87"
+    },
+    "schema_version": "2.0.0",
+    "python": "3.12.10",
+    "lockfile_digest": "sha256:f3a97a72ddc4ebb0b90f1fd11a3eb7f03d4f9dc26fa973056de6714bcacb466f",
+    "seed": 20261109,
+    "bootstrap": "percentile, 2000 resamples, 95%"
+  },
+  "metrics": {
+    "cases": 30,
+    "cue_extraction": {
+      "micro": {
+        "tp": 29,
+        "fp": 2,
+        "fn": 4,
+        "precision": 0.9355,
+        "recall": 0.8788,
+        "f1": 0.9062,
+        "f1_ci95": [
+          0.7869,
+          0.9756
+        ]
+      },
+      "per_code": {
+        "ACTIVE_BLEEDING": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "ACTIVE_VIOLENCE": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "BREATHING_DIFFICULTY": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "CARDIAC_SYMPTOMS": {
+          "tp": 2,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.6667,
+          "recall": 1.0,
+          "f1": 0.8
+        },
+        "CHILD_INVOLVED": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "FIRE_REPORTED": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "FIRE_SPREADING": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "INJURY_REPORTED": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1.0,
+          "recall": 0.3333,
+          "f1": 0.5
+        },
+        "NOT_BREATHING": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1.0,
+          "recall": 0.875,
+          "f1": 0.9333
+        },
+        "OCCUPANTS_TRAPPED": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "SMOKE_REPORTED": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "UNCONSCIOUS": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1.0,
+          "recall": 0.8333,
+          "f1": 0.9091
+        },
+        "WEAPON_PRESENT": {
+          "tp": 3,
+          "fp": 1,
+          "fn": 0,
+          "precision": 0.75,
+          "recall": 1.0,
+          "f1": 0.8571
+        }
+      },
+      "denied_or_past_cues_treated_as_live": 1
+    },
+    "critical_cue_sensitivity": {
+      "value": 0.8667,
+      "numerator": 13,
+      "denominator": 15,
+      "ci95": [
+        0.6667,
+        1.0
+      ]
+    },
+    "critical_undertriage": {
+      "value": 0.0769,
+      "numerator": 1,
+      "denominator": 13,
+      "ci95": [
+        0.0,
+        0.2308
+      ],
+      "cases": [
+        "cu-126"
+      ]
+    },
+    "priority_exact": {
+      "value": 0.6667,
+      "numerator": 20,
+      "denominator": 30,
+      "ci95": [
+        0.5,
+        0.8333
+      ]
+    },
+    "undertriage": {
+      "value": 0.1,
+      "numerator": 3,
+      "denominator": 30,
+      "ci95": [
+        0.0,
+        0.2333
+      ]
+    },
+    "overtriage": {
+      "value": 0.2333,
+      "numerator": 7,
+      "denominator": 30,
+      "ci95": [
+        0.1,
+        0.4
+      ]
+    },
+    "severity_exact": {
+      "value": 0.6667,
+      "numerator": 20,
+      "denominator": 30,
+      "ci95": [
+        0.5,
+        0.8333
+      ]
+    },
+    "domain_accuracy": {
+      "value": 0.8333,
+      "numerator": 25,
+      "denominator": 30,
+      "ci95": [
+        0.7,
+        0.9667
+      ]
+    },
+    "location_accuracy": {
+      "value": 1.0,
+      "numerator": 30,
+      "denominator": 30,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "victim_count_accuracy": {
+      "value": 1.0,
+      "numerator": 30,
+      "denominator": 30,
+      "ci95": [
+        1.0,
+        1.0
+      ]
+    },
+    "priority_confusion": {
+      "P0": {
+        "P0": 12,
+        "P1": 0,
+        "P2": 1,
+        "P3": 0,
+        "P4": 0,
+        "none": 0
+      },
+      "P1": {
+        "P0": 0,
+        "P1": 3,
+        "P2": 0,
+        "P3": 0,
+        "P4": 0,
+        "none": 0
+      },
+      "P2": {
+        "P0": 0,
+        "P1": 1,
+        "P2": 2,
+        "P3": 2,
+        "P4": 0,
+        "none": 0
+      },
+      "P3": {
+        "P0": 0,
+        "P1": 0,
+        "P2": 3,
+        "P3": 2,
+        "P4": 0,
+        "none": 0
+      },
+      "P4": {
+        "P0": 0,
+        "P1": 2,
+        "P2": 0,
+        "P3": 1,
+        "P4": 1,
+        "none": 0
+      },
+      "none": {
+        "P0": 0,
+        "P1": 0,
+        "P2": 0,
+        "P3": 0,
+        "P4": 0,
+        "none": 0
+      }
+    },
+    "failures": {
+      "fx-008": [
+        "missed cues ['INJURY_REPORTED']",
+        "priority P3 != P2"
+      ],
+      "fx-012": [
+        "missed cues ['INJURY_REPORTED']"
+      ],
+      "fx-013": [
+        "domain unknown != other"
+      ],
+      "fx-017": [
+        "priority P2 != P3",
+        "domain unknown != ems"
+      ],
+      "fx-021": [
+        "priority P1 != P2"
+      ],
+      "fx-022": [
+        "spurious cues ['WEAPON_PRESENT']",
+        "priority P1 != P4"
+      ],
+      "cu-103": [
+        "priority P3 != P4"
+      ],
+      "cu-104": [
+        "priority P3 != P2"
+      ],
+      "cu-116": [
+        "priority P2 != P3",
+        "domain unknown != ems"
+      ],
+      "cu-119": [
+        "spurious cues ['CARDIAC_SYMPTOMS']",
+        "denied/past cues treated as live ['CARDIAC_SYMPTOMS']",
+        "priority P1 != P4"
+      ],
+      "cu-120": [
+        "priority P2 != P3",
+        "domain unknown != police"
+      ],
+      "cu-126": [
+        "missed cues ['NOT_BREATHING', 'UNCONSCIOUS']",
+        "priority P2 != P0",
+        "domain unknown != ems"
+      ]
+    }
+  }
+}
