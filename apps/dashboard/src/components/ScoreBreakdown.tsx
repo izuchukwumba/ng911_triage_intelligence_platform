@@ -169,6 +169,7 @@ export function ScoreBreakdownPanel({ breakdown, totalScore }: Props) {
   const base       = breakdown.filter((b) => b.reason_code === 'DOMAIN_BASE');
   const indicators = breakdown.filter((b) => b.reason_code !== 'DOMAIN_BASE' && b.weight > 0);
   const penalties  = breakdown.filter((b) => b.weight < 0);
+  const flags      = breakdown.filter((b) => b.reason_code !== 'DOMAIN_BASE' && b.weight === 0);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -194,6 +195,13 @@ export function ScoreBreakdownPanel({ breakdown, totalScore }: Props) {
         <>
           <SectionLabel label="Penalties" />
           {penalties.map((item) => <BreakdownRow key={item.reason_code} item={item} maxMagnitude={maxMagnitude} />)}
+        </>
+      )}
+
+      {flags.length > 0 && (
+        <>
+          <SectionLabel label="Verification Flags — no effect on priority" />
+          {flags.map((item) => <BreakdownRow key={item.reason_code} item={item} maxMagnitude={maxMagnitude} />)}
         </>
       )}
 
