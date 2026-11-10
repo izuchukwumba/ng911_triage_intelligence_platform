@@ -1,0 +1,122 @@
+from datetime import UTC, datetime, timedelta
+
+import pytest
+
+from ntip.parser.parser import parse
+from ntip.schema.audit import Actor, ActorKind, AuditEvent, AuditEventType
+from ntip.schema.base import sha256_digest
+from ntip.schema.review import HumanReview, ReviewDecision
+from ntip.schema.source import SourceEvent
+from ntip.store import DuplicateRecord, EventStore, IdempotencyClaim
+from ntip.triage.engine import assess
+
+T0 = datetime(2026, 11, 9, 12, 0, tzinfo=UTC)
+
+
+def source(incident_id: str, n: int, text: str, minutes: int = 0) -> SourceEvent:
+    return SourceEvent.from_text(
+        source_event_id=f"{incident_id}_evt_{n}",
+        incident_id=incident_id,
+        received_at=T0 + timedelta(minutes=minutes),
+        text=text,
+    )
+
+
+def audit(incident_id: str, n: int, kind: AuditEventType, subject: str) -> AuditEvent:
+    return AuditEvent(
+        event_id=f"{incident_id}_ae_{n}",
+        incident_id=incident_id,
+        occurred_at=T0,
+        event_type=kind,
+        actor=Actor(kind=ActorKind.SERVICE, actor_id="pipeline"),
+        correlation_id="req_1",
+        subject_id=subject,
+        subject_digest=sha256_digest(subject),
+    )
+
+
+def ingest(store: EventStore, incident_id: str, text: str, minutes: int = 0) -> None:
+    src = source(incident_id, 1, text, minutes)
+    incident = parse([src], derived_at=src.received_at)
+    assessment = assess(incident, assessment_id=f"{incident_id}_a1", assessed_at=src.received_at)
+    store.append(
+        [
+            src,
+            incident,
+            assessment,
+            audit(incident_id, 1, AuditEventType.SOURCE_RECEIVED, src.source_event_id),
+            audit(incident_id, 2, AuditEventType.TRIAGE_ASSESSED, assessment.assessment_id),
+        ]
+    )
+
+
+def test_round_trips_every_record_type(store: EventStore) -> None:
+    ingest(store, "inc_1", "He is not breathing at 12 Oak Street.")
+    review = HumanReview(
+        review_id="rev_1",
+        incident_id="inc_1",
+        assessment_id="inc_1_a1",
+        reviewer_id="op_1",
+        reviewed_at=T0,
+        decision=ReviewDecision.CONFIRM,
+    )
+    store.append([review])
+
+    [src] = store.source_events("inc_1")
+    assert src.text == "He is not breathing at 12 Oak Street."
+    assert store.incident_versions("inc_1")[0].observations
+    assert store.assessments("inc_1")[0].severity_band == "critical"
+    assert store.assessment("inc_1_a1") == store.assessments("inc_1")[0]
+    assert store.reviews("inc_1") == [review]
+    assert [e.event_type for e in store.audit_events("inc_1")] == [
+        "source.received",
+        "triage.assessed",
+    ]
+
+
+def test_duplicate_identity_rejects_the_whole_batch(store: EventStore) -> None:
+    ingest(store, "inc_1", "Fire at 12 Oak Street.")
+    fresh = source("inc_1", 2, "It is spreading.")
+    duplicate = source("inc_1", 1, "Fire at 12 Oak Street.")
+    with pytest.raises(DuplicateRecord):
+        store.append([fresh, duplicate])
+    # Nothing from the failed batch was written.
+    assert len(store.source_events("inc_1")) == 1
+
+
+def test_records_come_back_in_append_order(store: EventStore) -> None:
+    ingest(store, "inc_1", "Smoke at 12 Oak Street.")
+    store.append([source("inc_1", 2, "Now there are flames."), source("inc_1", 3, "Trapped.")])
+    assert [s.source_event_id for s in store.source_events("inc_1")] == [
+        "inc_1_evt_1",
+        "inc_1_evt_2",
+        "inc_1_evt_3",
+    ]
+
+
+def test_idempotency_claims(store: EventStore) -> None:
+    claim = IdempotencyClaim(
+        key="req-123", request_digest=sha256_digest("body"), incident_id="inc_1", claimed_at=T0
+    )
+    store.append([claim])
+    assert store.idempotency_claim("req-123") == claim
+    assert store.idempotency_claim("other") is None
+    with pytest.raises(DuplicateRecord):
+        store.append([claim])
+
+
+def test_list_incidents_newest_first_with_latest_assessment(store: EventStore) -> None:
+    ingest(store, "inc_old", "Fire at 12 Oak Street.", minutes=0)
+    ingest(store, "inc_new", "He is not breathing at 5 Elm Road.", minutes=5)
+    total, page = store.list_incidents(limit=10, offset=0)
+    assert total == 2
+    assert [s.incident_id for s in page] == ["inc_new", "inc_old"]
+    assert page[0].latest_assessment is not None
+    assert page[0].latest_assessment.advisory_priority == "P0"
+
+    total, page = store.list_incidents(limit=1, offset=1)
+    assert (total, [s.incident_id for s in page]) == (2, ["inc_old"])
+
+
+def test_ping(store: EventStore) -> None:
+    assert store.ping()
