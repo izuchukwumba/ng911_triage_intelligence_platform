@@ -1624,6 +1624,11 @@
       },
       "LiveResponse": {
         "properties": {
+          "mode": {
+            "const": "simulation",
+            "title": "Mode",
+            "type": "string"
+          },
           "status": {
             "const": "ok",
             "title": "Status",
@@ -1636,7 +1641,8 @@
         },
         "required": [
           "status",
-          "version"
+          "version",
+          "mode"
         ],
         "title": "LiveResponse",
         "type": "object"
@@ -2975,6 +2981,56 @@
           }
         },
         "summary": "Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/metrics": {
+      "get": {
+        "description": "Process metrics in the Prometheus text format (scrape with a viewer token).",
+        "operationId": "get_metrics_metrics_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Metrics",
         "tags": [
           "health"
         ]

@@ -13,6 +13,8 @@ router = APIRouter(prefix="/health", tags=["health"])
 class LiveResponse(BaseModel):
     status: Literal["ok"]
     version: str
+    # Always "simulation": the platform has no other mode.
+    mode: Literal["simulation"]
 
 
 class ReadyResponse(BaseModel):
@@ -25,7 +27,7 @@ class ReadyResponse(BaseModel):
 @router.get("/live")
 def live() -> LiveResponse:
     """The process is running and can serve requests."""
-    return LiveResponse(status="ok", version=__version__)
+    return LiveResponse(status="ok", version=__version__, mode="simulation")
 
 
 @router.get("/ready")

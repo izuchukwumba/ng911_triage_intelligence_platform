@@ -6,6 +6,7 @@ generated). Errors are returned as ``{"error": {"code", "message",
 """
 
 import logging
+import time
 import uuid
 from collections.abc import Awaitable, Callable
 
@@ -15,6 +16,7 @@ from fastapi.responses import JSONResponse
 
 from ntip.api.auth import Forbidden, Unauthenticated
 from ntip.api.ratelimit import RateLimiter, client_key
+from ntip.observability import Metrics, correlation
 from ntip.pipeline import IdempotencyConflict
 from ntip.replay import UnknownRuleset
 from ntip.store import UnknownIncident
@@ -22,6 +24,7 @@ from ntip.store import UnknownIncident
 log = logging.getLogger(__name__)
 
 HEADER = "X-Correlation-ID"
+MODE_HEADER = "X-NTIP-Mode"
 
 
 def correlation_id(request: Request) -> str:
@@ -63,13 +66,33 @@ def install(app: FastAPI) -> None:
         supplied = request.headers.get(HEADER, "")
         valid = 0 < len(supplied) <= 128 and supplied.replace("-", "").replace("_", "").isalnum()
         request.state.correlation_id = supplied if valid else f"req_{uuid.uuid4().hex}"
+        token = correlation.set(request.state.correlation_id)
+        started = time.perf_counter()
         try:
-            response = await call_next(request)
-        except Exception:
-            log.exception("unhandled error (correlation id %s)", request.state.correlation_id)
-            return _error(request, 500, "internal_error", "Internal error.")
-        response.headers[HEADER] = request.state.correlation_id
-        return response
+            try:
+                response = await call_next(request)
+            except Exception:
+                log.exception("unhandled error", extra={"event": "unhandled_error"})
+                response = _error(request, 500, "internal_error", "Internal error.")
+            response.headers[HEADER] = request.state.correlation_id
+            response.headers[MODE_HEADER] = request.app.state.deployment_mode
+            _record(request, response.status_code, time.perf_counter() - started)
+            return response
+        finally:
+            correlation.reset(token)
+
+    def _record(request: Request, status: int, elapsed_s: float) -> None:
+        # The route template ("/v1/incidents/{incident_id}"), never the raw
+        # path, so identifiers and query strings stay out of metrics and logs.
+        route = getattr(request.scope.get("route"), "path", "unmatched")
+        metrics: Metrics = request.app.state.metrics
+        metrics.inc("ntip_http_requests_total", method=request.method, route=route,
+                    status=str(status))  # fmt: skip
+        metrics.observe("ntip_http_request_duration_seconds", elapsed_s, route=route)
+        if not route.startswith("/health"):
+            log.info("request", extra={"event": "request", "method": request.method,
+                     "route": route, "status": status,
+                     "duration_ms": round(elapsed_s * 1000, 1)})  # fmt: skip
 
     @app.exception_handler(RequestValidationError)
     async def _invalid(request: Request, exc: RequestValidationError) -> JSONResponse:

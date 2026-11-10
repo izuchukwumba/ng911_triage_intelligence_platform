@@ -9,9 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from ntip import __version__
 from ntip.api import errors
 from ntip.api.ratelimit import RateLimiter
-from ntip.api.routes import evaluation, health, incidents, interop, replay
+from ntip.api.routes import evaluation, health, incidents, interop, metrics, replay
+from ntip.api.routes.metrics import create_metrics
 from ntip.api.settings import Settings
 from ntip.interop.gateway import EidoGateway
+from ntip.observability import configure_logging
 from ntip.pipeline import Pipeline
 from ntip.store import EventStore
 
@@ -22,7 +24,11 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
     A factory (rather than a module-level app) keeps tests isolated: each test
     can build a fresh app with its own store.
     """
-    settings = settings or Settings.from_env()
+    if settings is None:
+        settings = Settings.from_env()
+        # Logging is process-wide: configure it only for a server built from
+        # the environment, not for apps built in tests or other code.
+        configure_logging(settings.log_format, settings.log_level)
     # A store passed in belongs to the caller; one built here is closed here.
     owned: EventStore | None = None
     if store is None:
@@ -54,6 +60,8 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
     app.state.eido_gateway = EidoGateway(app.state.pipeline)
     app.state.interop_tokens = settings.interop_tokens
     app.state.eval_data_dir = settings.eval_data_dir
+    app.state.deployment_mode = settings.deployment_mode
+    app.state.metrics = create_metrics()
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -67,4 +75,5 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
     app.include_router(replay.router)
     app.include_router(interop.router)
     app.include_router(evaluation.router)
+    app.include_router(metrics.router)
     return app

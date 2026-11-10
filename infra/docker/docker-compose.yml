@@ -56,6 +56,8 @@ services:
       # ntip, is used by the migrate service alone.
       NTIP_DATABASE_URL: postgresql://ntip_api:${NTIP_API_DB_PASSWORD:-ntip-api-dev-only}@postgres:5432/ntip
       NTIP_CORS_ORIGINS: http://localhost:8080
+      # The only mode there is; stated explicitly (design v1.2, section 13.2).
+      NTIP_DEPLOYMENT_MODE: simulation
       # token:principal:role (viewer | operator | analyst | admin). Development
       # tokens only; override NTIP_API_TOKENS for anything shared.
       NTIP_API_TOKENS: ${NTIP_API_TOKENS:-dev-operator:operator_1:operator,dev-analyst:analyst_1:analyst,dev-viewer:viewer_1:viewer}

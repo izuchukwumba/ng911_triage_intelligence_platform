@@ -11,7 +11,7 @@ def test_live_reports_ok_and_version() -> None:
     response = client.get("/health/live")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "version": __version__}
+    assert response.json() == {"status": "ok", "version": __version__, "mode": "simulation"}
 
 
 def test_ready_checks_the_event_store() -> None:
