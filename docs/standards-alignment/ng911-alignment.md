@@ -18,7 +18,8 @@ Next Generation 911 is the transition of US emergency communications from analog
 
 - SIP/i3 call routing, ESInet or any NG911 Core Services functional element
 - Location Validation Function (LVF) or Emergency Call Routing Function (ECRF)
-- NENA-STA-024 EIDO conveyance
+- NENA-STA-024 EIDO conveyance beyond a subscriber that validates messages
+  against NENA's published schema (no notifier, push or dereference roles)
 - Any connection to a live PSAP, CAD or emergency network
 - Any automated dispatch action
 

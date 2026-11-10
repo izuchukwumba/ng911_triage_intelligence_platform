@@ -6,7 +6,7 @@ any mismatch is an error, never a warning. Verified files are cached as JSON
 ``~/.cache/ntip/eido/<commit>``. The cache is local and is never committed:
 the upstream repository publishes no licence.
 
-    python -m ntip.interop.eido.fetch     # prefetch and verify
+    python -m ntip.interop.eido.fetch     # prefetch and verify (EIDO and conveyance)
 """
 
 import hashlib
@@ -15,7 +15,7 @@ import os
 import urllib.parse
 import urllib.request
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import yaml
 
@@ -26,7 +26,22 @@ class SchemaUnavailable(Exception):
     """The pinned schema could not be obtained or did not verify."""
 
 
-def cache_dir(profile: EidoProfile = PROFILE) -> Path:
+class PinnedFiles(Protocol):
+    """Schema files pinned to a commit of a GitHub repository, each by sha256.
+
+    The EIDO profile is one; the NENA-STA-024 conveyance profile is another.
+    """
+
+    @property
+    def commit(self) -> str: ...
+
+    @property
+    def files(self) -> dict[str, str]: ...
+
+    def raw_url(self, path: str) -> str: ...
+
+
+def cache_dir(profile: PinnedFiles = PROFILE) -> Path:
     root = os.environ.get("NTIP_EIDO_CACHE")
     base = Path(root) if root else Path.home() / ".cache" / "ntip" / "eido"
     return base / profile.commit
@@ -42,7 +57,7 @@ def _download(url: str, timeout_s: float = 30.0) -> bytes:
         raise SchemaUnavailable(f"could not download {url}: {err}") from None
 
 
-def _verified(path: str, expected: str, profile: EidoProfile) -> bytes:
+def _verified(path: str, expected: str, profile: PinnedFiles) -> bytes:
     target = cache_dir(profile) / "raw" / path
     data = target.read_bytes() if target.exists() else _download(profile.raw_url(path))
     actual = hashlib.sha256(data).hexdigest()
@@ -54,7 +69,7 @@ def _verified(path: str, expected: str, profile: EidoProfile) -> bytes:
     return data
 
 
-def load_documents(profile: EidoProfile = PROFILE) -> dict[str, Any]:
+def load_documents(profile: PinnedFiles = PROFILE) -> dict[str, Any]:
     """Every pinned schema document, keyed by its repository path."""
     documents: dict[str, Any] = {}
     for path, digest in profile.files.items():
@@ -76,10 +91,15 @@ def load_sample(profile: EidoProfile = PROFILE) -> Any:
 
 
 def main() -> int:
+    from ntip.interop.conveyance.profile import CONVEYANCE_PROFILE
+
     documents = load_documents()
     load_sample()
     print(f"{PROFILE.standard_edition} @ {PROFILE.commit[:12]}: {len(documents)} files verified")
-    print(f"cache: {cache_dir()}")
+    conveyance = load_documents(CONVEYANCE_PROFILE)
+    print(f"{CONVEYANCE_PROFILE.description} @ {CONVEYANCE_PROFILE.commit[:12]}: "
+          f"{len(conveyance)} file verified")  # fmt: skip
+    print(f"cache: {cache_dir().parent}")
     return 0
 
 

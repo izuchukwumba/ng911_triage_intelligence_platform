@@ -35,9 +35,39 @@ Additionally, NENA's own published sample validates against the pinned schema
 - Receipt and incident are written in two steps; a crash between them could
   leave an incident without its receipt. Processing is at-least-once
   (design v1.2, §5.3); no exactly-once guarantee is claimed.
-- No NENA-STA-024 conveyance, no acknowledgements beyond the HTTP response,
-  no writeback to any external system (by design, §3B.1).
+- NENA-STA-024 conveyance is limited to the subscriber role (see below); no
+  writeback to any external system (by design, §3B.1).
 
 A passing suite supports a *limited* statement: the gateway validates and
 imports EIDO instances of one pinned edition as described above. It is not
 third-party certification and not NG911 conformance (ADR-INT-005).
+
+## NENA-STA-024 conveyance (subscriber role)
+
+`python -m ntip.interop.conveyance` connects to an authorised notifier over
+`wss://`, subscribes to EIDOs and feeds each one through the gateway above,
+under the subscription's tenant. Tested in `tests/interop/test_conveyance.py`:
+
+| Behaviour | Test |
+|---|---|
+| Subscribe, renew and unsubscribe requests validate against NENA's pinned message schema | `test_subscribe_request_is_valid_and_asks_for_new_eidos`, `test_renewal_before_expiry_and_unsubscribe` |
+| Each event is ingested and acknowledged (`eventResponse` 200) | `test_an_event_is_ingested_and_acknowledged` |
+| A resent notification gets the same acknowledgement, without processing it again | `test_a_resent_notification_is_answered_without_reprocessing` |
+| A rejected EIDO is acknowledged with 400 and its receipt kept; valid EIDOs in the same event are processed | `test_an_invalid_eido_is_rejected_but_kept` |
+| Events for another subscription get 481 | `test_events_for_another_subscription_get_481` |
+| Messages that fail the schema are never processed | `test_an_invalid_message_is_never_processed` |
+| Terminate ends the subscription; a refused subscription fails | `test_terminate_ends_the_subscription`, `test_a_refused_subscription_fails` |
+| Over a real WebSocket: bearer token in the handshake, reconnect and re-subscribe after a drop | `test_end_to_end_over_a_websocket_with_reconnect` |
+| Plain `ws://` is refused unless explicitly waived | `test_plain_ws_is_refused_unless_waived` |
+
+Finding: the published `subscriberMessage` and `notifierMessage` unions are
+`oneOf` lists whose branches each make their single property optional, so
+every message matches every branch and strict `oneOf` validation rejects all
+of them. The subscriber validates each message against the schema of its
+one top-level key instead.
+
+Not covered: the notifier, push (`requestForService`, ...) and discovery
+roles, `qualFilter`, rate negotiation, any WebSocket subprotocol the
+standard's text may require, and dereferencing EIDOs by URL (deliberately
+never done).
+
