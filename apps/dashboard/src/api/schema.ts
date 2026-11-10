@@ -357,7 +357,7 @@ export interface components {
             ruleset_version: string;
             /**
              * Schema Version
-             * @default 2.5.0
+             * @default 2.6.0
              */
             schema_version: string;
             severity_band: components["schemas"]["SeverityBand"];
@@ -392,7 +392,7 @@ export interface components {
             occurred_at: string;
             /**
              * Schema Version
-             * @default 2.5.0
+             * @default 2.6.0
              */
             schema_version: string;
             /** Subject Digest */
@@ -584,7 +584,7 @@ export interface components {
             reviewer_id: string;
             /**
              * Schema Version
-             * @default 2.5.0
+             * @default 2.6.0
              */
             schema_version: string;
         };
@@ -612,7 +612,7 @@ export interface components {
             observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
-             * @default 2.5.0
+             * @default 2.6.0
              */
             schema_version: string;
             /** Source Event Ids */
@@ -802,6 +802,7 @@ export interface components {
             /** Raw Text */
             raw_text: string | null;
             role: components["schemas"]["LocationRole"];
+            supplied_by: components["schemas"]["SuppliedReference"] | null;
             /** @default unverified */
             validation: components["schemas"]["LocationValidation"];
             /** Validation Source */
@@ -963,7 +964,7 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @default 2.5.0
+             * @default 2.6.0
              */
             schema_version: string;
             summary: components["schemas"]["ReplaySummary"];
@@ -1053,7 +1054,7 @@ export interface components {
             received_at: string;
             /**
              * Schema Version
-             * @default 2.5.0
+             * @default 2.6.0
              */
             schema_version: string;
             /** Source Event Id */
@@ -1061,6 +1062,8 @@ export interface components {
             source_type: components["schemas"]["SourceType"];
             /** Supersedes */
             supersedes: string | null;
+            /** Supplied Locations */
+            supplied_locations: components["schemas"]["SuppliedLocation"][];
             /** Synthetic */
             synthetic: boolean;
             /**
@@ -1086,6 +1089,32 @@ export interface components {
          * @enum {string}
          */
         SourceType: "synthetic_transcript" | "structured_test_event" | "eido_import";
+        /**
+         * SuppliedLocation
+         * @description A location an upstream system supplied in structured form (2.6.0).
+         *
+         *     For example a PIDF-LO civic address or point in an EIDO. It is recorded as
+         *     received: supplied is not the same as validated, and it is never merged
+         *     with what a caller said.
+         */
+        SuppliedLocation: {
+            civic_address: components["schemas"]["CivicAddress"] | null;
+            coordinates: components["schemas"]["Coordinates"] | null;
+            /** Description */
+            description: string | null;
+            /** Origin */
+            origin: string;
+        };
+        /**
+         * SuppliedReference
+         * @description Where a structured, upstream-supplied location came from (2.6.0).
+         */
+        SuppliedReference: {
+            /** Origin */
+            origin: string;
+            /** Source Event Id */
+            source_event_id: string;
+        };
         /**
          * Temporality
          * @enum {string}

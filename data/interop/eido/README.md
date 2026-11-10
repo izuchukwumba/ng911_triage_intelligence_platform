@@ -15,3 +15,5 @@ licence; the tests fetch it from the pinned commit instead.
 | `conflicting-location.json` | Contradictory addresses keep urgency and request verification |
 | `unknown-optional-field.json` | An unknown optional field is preserved and flagged, not discarded |
 | `unsupported-version.json` | Explicit rejection of an unsupported edition |
+| `pidf-civic.json`, `pidf-civic-rev2.json` | A PIDF-LO civic address that agrees with the narrative; then a revision that only moves the location |
+| `pidf-mixed.json` | A supplied address contradicting the narrative, a circle, a reference URL and an unsafe PIDF-LO document |

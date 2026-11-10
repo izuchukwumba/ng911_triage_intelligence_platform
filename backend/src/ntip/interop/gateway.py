@@ -11,8 +11,10 @@ Responsibilities, in order (design v1.2, section 3B.3):
    a conflict.
 5. Revisions are new events, never rewrites. A revision older than one
    already processed is kept but not reprocessed (no silent rollback).
-6. Only notes not seen in earlier revisions become new narrative, so a
-   revision that resends the whole incident does not duplicate it.
+6. Only notes and locations not seen in earlier revisions are processed, so
+   a revision that resends the whole incident does not duplicate it. A
+   revision that only changes a location still reaches the incident, with a
+   bracketed marker as its text (the parser finds nothing in it).
 7. The advisory assessment is produced by the normal pipeline and stays
    separate from the EIDO, which is never modified (ADR-INT-002).
 
@@ -25,7 +27,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from ntip.interop.eido.adapter import map_eido
+from ntip.interop.eido.adapter import MappedLocation, map_eido
 from ntip.interop.eido.profile import ADAPTER_VERSION, PROFILE, EidoProfile
 from ntip.interop.eido.validate import validate
 from ntip.interop.receipts import InteropReceipt, ReceiptStatus
@@ -34,6 +36,7 @@ from ntip.schema.base import sha256_digest
 from ntip.schema.source import SourceType
 
 MAX_PAYLOAD_BYTES = 512_000
+LOCATION_ONLY_TEXT = "[EIDO revision: location update, no new notes]"
 _PROCESSED = {ReceiptStatus.ACCEPTED, ReceiptStatus.ACCEPTED_NO_NARRATIVE}
 
 
@@ -68,6 +71,10 @@ def _notes(payload: str) -> set[tuple[str, str]]:
         (str(n.get("$id")), sha256_digest(str(n.get("notesActionComments", "")).strip()))
         for n in eido.get("notesComponent", [])
     }
+
+
+def _location_keys(payload: str) -> set[tuple[str, str]]:
+    return {loc.key for loc in map_eido(json.loads(payload)).locations}
 
 
 class EidoGateway:
@@ -154,14 +161,20 @@ class EidoGateway:
         for r in processed:
             seen |= _notes(r.payload)
         new_notes = [n for n in mapping.notes if (n.note_id, sha256_digest(n.text)) not in seen]
-        if not new_notes:
+        seen_locations: set[tuple[str, str]] = set()
+        for r in processed:
+            seen_locations |= _location_keys(r.payload)
+        new_locations: list[MappedLocation] = [
+            loc for loc in mapping.locations if loc.key not in seen_locations
+        ]
+        if not new_notes and not new_locations:
             return self._store(
                 self._receipt(raw, tenant_id, ReceiptStatus.ACCEPTED_NO_NARRATIVE, **fields)
             )
 
         existing = next((r.incident_id for r in earlier if r.incident_id), None)
         result = self.pipeline.ingest(
-            "\n".join(n.text for n in new_notes),
+            "\n".join(n.text for n in new_notes) or LOCATION_ONLY_TEXT,
             incident_id=existing,
             # One external incident always maps to the same platform incident,
             # and the same id from another tenant maps to a different one.
@@ -169,6 +182,7 @@ class EidoGateway:
             source_type=SourceType.EIDO_IMPORT,
             correlation_id=correlation_id,
             tenant_id=tenant_id,
+            supplied_locations=[loc.supplied for loc in new_locations],
         )
         accepted = self._receipt(
             raw,

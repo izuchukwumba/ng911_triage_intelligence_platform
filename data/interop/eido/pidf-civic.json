@@ -1,0 +1,45 @@
+{
+  "$id": "urn:emergency:uid:incidentid:synthetic-0010:synthetic.example",
+  "lastUpdateTimeStamp": "2026-11-10T13:00:00Z",
+  "updatedByAgencyReference": {
+    "$ref": "psap.synthetic.example"
+  },
+  "eidoVersion": "1.0",
+  "issuingElementIdentification": "cad.synthetic.example",
+  "agencyComponent": [
+    {
+      "$id": "psap.synthetic.example",
+      "lastUpdateTimeStamp": "2026-11-10T13:00:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "agencyRoleDescriptionRegistryText": [
+        "Owner"
+      ],
+      "agencyType": [
+        "psap"
+      ]
+    }
+  ],
+  "notesComponent": [
+    {
+      "$id": "note-1",
+      "lastUpdateTimeStamp": "2026-11-10T13:00:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "notesActionComments": "Man unconscious at 123 Main Street."
+    }
+  ],
+  "locationComponent": [
+    {
+      "$id": "loc-1",
+      "lastUpdateTimeStamp": "2026-11-10T13:00:00Z",
+      "updatedByAgencyReference": {
+        "$ref": "psap.synthetic.example"
+      },
+      "locationTypeDescriptionRegistryText": "Incident",
+      "locationByValue": "<presence xmlns=\"urn:ietf:params:xml:ns:pidf\" xmlns:gp=\"urn:ietf:params:xml:ns:pidf:geopriv10\" xmlns:ca=\"urn:ietf:params:xml:ns:pidf:geopriv10:civicAddr\" entity=\"pres:caller@synthetic.example\"><tuple id=\"t1\"><status><gp:geopriv><gp:location-info><ca:civicAddress><ca:country>US</ca:country><ca:A1>IL</ca:A1><ca:A3>Springfield</ca:A3><ca:RD>Main</ca:RD><ca:STS>St</ca:STS><ca:HNO>123</ca:HNO><ca:PC>62701</ca:PC></ca:civicAddress></gp:location-info></gp:geopriv></status></tuple></presence>"
+    }
+  ]
+}
