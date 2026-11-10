@@ -11,7 +11,14 @@ from ntip.schema.canonical import Incident
 from ntip.schema.replay import ReplayRun
 from ntip.schema.review import HumanReview
 from ntip.schema.source import SourceEvent
-from ntip.store.base import DuplicateRecord, IdempotencyClaim, IncidentSummary, Record
+from ntip.store.base import (
+    ConcurrentModification,
+    DuplicateRecord,
+    Expectation,
+    IdempotencyClaim,
+    IncidentSummary,
+    Record,
+)
 
 
 def _identity(record: Record) -> tuple[str, ...]:
@@ -19,8 +26,8 @@ def _identity(record: Record) -> tuple[str, ...]:
         case SourceEvent():
             return ("source", record.source_event_id)
         case Incident():
-            # Each derivation is a new version, identified by its inputs and time.
-            return ("incident", record.incident_id, record.derived_at.isoformat())
+            # Version n is the interpretation of the first n source events.
+            return ("incident", record.incident_id, str(len(record.source_event_ids)))
         case Assessment():
             return ("assessment", record.assessment_id)
         case HumanReview():
@@ -43,8 +50,19 @@ class InMemoryEventStore:
         self._records: list[Record] = []
         self._identities: set[tuple[str, ...]] = set()
 
-    def append(self, records: Sequence[Record]) -> None:
+    def append(self, records: Sequence[Record], *, expect: Expectation | None = None) -> None:
         with self._lock:
+            if expect is not None:
+                current = sum(
+                    1
+                    for r in self._records
+                    if isinstance(r, SourceEvent) and r.incident_id == expect.incident_id
+                )
+                if current != expect.source_events:
+                    raise ConcurrentModification(
+                        f"{expect.incident_id}: {current} source events, "
+                        f"expected {expect.source_events}"
+                    )
             identities = [_identity(r) for r in records]
             clash = [i for i in identities if i in self._identities]
             if clash or len(set(identities)) != len(identities):

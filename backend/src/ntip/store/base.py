@@ -55,6 +55,23 @@ class DuplicateRecord(StoreError):
     """A record with this identity already exists; the batch was not written."""
 
 
+class ConcurrentModification(StoreError):
+    """The incident changed since it was read; the batch was not written."""
+
+
+@dataclass(frozen=True)
+class Expectation:
+    """A precondition checked atomically with a write (optimistic concurrency).
+
+    The batch is written only if the incident still has exactly
+    ``source_events`` source events, i.e. nobody else added a message between
+    reading the conversation and writing the result derived from it.
+    """
+
+    incident_id: str
+    source_events: int
+
+
 class UnknownIncident(StoreError):
     pass
 
@@ -67,8 +84,12 @@ class IncidentSummary:
 
 
 class EventStore(Protocol):
-    def append(self, records: Sequence[Record]) -> None:
-        """Write all records or none. Raises DuplicateRecord on an identity clash."""
+    def append(self, records: Sequence[Record], *, expect: Expectation | None = None) -> None:
+        """Write all records or none.
+
+        Raises DuplicateRecord on an identity clash and ConcurrentModification
+        when ``expect`` no longer holds.
+        """
 
     def idempotency_claim(self, key: str) -> IdempotencyClaim | None: ...
 

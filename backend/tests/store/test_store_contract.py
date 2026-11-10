@@ -185,3 +185,15 @@ def test_interop_receipts_round_trip_scoped_by_tenant(store: EventStore) -> None
     store.append([receipt("r1", "tenant-a"), receipt("r2", "tenant-b")])
     assert store.interop_receipt("r1") == receipt("r1", "tenant-a")
     assert [r.receipt_id for r in store.interop_receipts("tenant-a", "urn:x")] == ["r1"]
+
+
+def test_expectation_rejects_a_stale_write(store: EventStore) -> None:
+    from ntip.store import ConcurrentModification, Expectation
+
+    ingest(store, "inc_1", "Smoke at 12 Oak Street.")
+    first = source("inc_1", 2, "It is spreading.")
+    store.append([first], expect=Expectation("inc_1", 1))
+    stale = source("inc_1", 3, "People are trapped.")
+    with pytest.raises(ConcurrentModification):
+        store.append([stale], expect=Expectation("inc_1", 1))  # read before `first` was written
+    assert len(store.source_events("inc_1")) == 2

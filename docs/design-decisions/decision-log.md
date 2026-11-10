@@ -266,3 +266,16 @@ The threat model listed the unauthenticated research API as the main gap before 
 
 **Limits:** tokens are static (no expiry or rotation), and incidents are not partitioned by tenant.
 
+---
+
+## DDL-016: Optimistic concurrency control per incident
+
+**Decision:** Every ingest writes with an expectation on how many messages the incident had when the conversation was read; the store checks it atomically (PostgreSQL: per-incident advisory transaction lock) and the pipeline re-reads and retries on a mismatch. Incident versions are numbered by message count, not identified by derivation time.
+
+**Rationale:** The concurrency load test showed that simultaneous follow-up messages to one incident could (a) collide on the incident-version key and drop a caller's message, or (b) each be interpreted without the other, leaving the current assessment blind to part of the conversation, e.g. a report that people are trapped. Both are safety failures. Optimistic control keeps the common case lock-free, works across processes, and guarantees that every stored version and assessment covers the whole conversation.
+
+**Alternatives considered:**
+- *An in-process lock per incident:* simpler, but does not hold across multiple API processes.
+- *Serialising all writes:* correct but throttles unrelated incidents.
+
+**Trade-off:** heavy contention on one incident costs retries (bounded at 20 attempts; the caller gets an error rather than a silently partial result if they run out).

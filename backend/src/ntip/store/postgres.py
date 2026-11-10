@@ -15,7 +15,14 @@ from ntip.schema.canonical import Incident
 from ntip.schema.replay import ReplayRun
 from ntip.schema.review import HumanReview
 from ntip.schema.source import SourceEvent
-from ntip.store.base import DuplicateRecord, IdempotencyClaim, IncidentSummary, Record
+from ntip.store.base import (
+    ConcurrentModification,
+    DuplicateRecord,
+    Expectation,
+    IdempotencyClaim,
+    IncidentSummary,
+    Record,
+)
 
 
 def _doc(record: Record) -> tuple[Jsonb, str]:
@@ -35,9 +42,16 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
             )  # fmt: skip
         case Incident():
             cur.execute(
-                "INSERT INTO incident_versions (incident_id, derived_at, schema_version, payload,"
-                " payload_digest) VALUES (%s, %s, %s, %s, %s)",
-                (record.incident_id, record.derived_at, record.schema_version, payload, digest),
+                "INSERT INTO incident_versions (incident_id, version, derived_at, schema_version,"
+                " payload, payload_digest) VALUES (%s, %s, %s, %s, %s, %s)",
+                (
+                    record.incident_id,
+                    len(record.source_event_ids),
+                    record.derived_at,
+                    record.schema_version,
+                    payload,
+                    digest,
+                ),
             )
         case Assessment():
             cur.execute(
@@ -95,9 +109,26 @@ class PostgresEventStore:
     def _connect(self) -> psycopg.Connection[Any]:
         return psycopg.connect(self._url)
 
-    def append(self, records: Sequence[Record]) -> None:
+    def append(self, records: Sequence[Record], *, expect: Expectation | None = None) -> None:
         try:
             with self._connect() as conn, conn.cursor() as cur:
+                if expect is not None:
+                    # Serialise writers of one incident for the rest of this
+                    # transaction, then check nobody added a message meanwhile.
+                    cur.execute(
+                        "SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))",
+                        (expect.incident_id,),
+                    )
+                    row = cur.execute(
+                        "SELECT count(*) FROM source_events WHERE incident_id = %s",
+                        (expect.incident_id,),
+                    ).fetchone()
+                    current = row[0] if row else 0
+                    if current != expect.source_events:
+                        raise ConcurrentModification(
+                            f"{expect.incident_id}: {current} source events, "
+                            f"expected {expect.source_events}"
+                        )
                 for record in records:
                     _insert(cur, record)
         except psycopg.errors.UniqueViolation as err:
