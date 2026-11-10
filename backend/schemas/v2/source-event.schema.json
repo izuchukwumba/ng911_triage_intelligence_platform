@@ -1,5 +1,149 @@
 {
   "$defs": {
+    "CivicAddress": {
+      "additionalProperties": false,
+      "properties": {
+        "floor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Floor"
+        },
+        "house_number": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "House Number"
+        },
+        "landmark": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Landmark"
+        },
+        "locality": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locality"
+        },
+        "postal_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Postal Code"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "street": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Street"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "title": "CivicAddress",
+      "type": "object"
+    },
+    "Coordinates": {
+      "additionalProperties": false,
+      "properties": {
+        "crs": {
+          "default": "EPSG:4326",
+          "title": "Crs",
+          "type": "string"
+        },
+        "lat": {
+          "maximum": 90,
+          "minimum": -90,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 180,
+          "minimum": -180,
+          "title": "Lng",
+          "type": "number"
+        },
+        "uncertainty_m": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty M"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "Coordinates",
+      "type": "object"
+    },
     "SourceType": {
       "enum": [
         "synthetic_transcript",
@@ -8,9 +152,61 @@
       ],
       "title": "SourceType",
       "type": "string"
+    },
+    "SuppliedLocation": {
+      "additionalProperties": false,
+      "description": "A location an upstream system supplied in structured form (2.6.0).\n\nFor example a PIDF-LO civic address or point in an EIDO. It is recorded as\nreceived: supplied is not the same as validated, and it is never merged\nwith what a caller said.",
+      "properties": {
+        "civic_address": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CivicAddress"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "coordinates": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Coordinates"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "description": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "origin": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Origin",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin"
+      ],
+      "title": "SuppliedLocation",
+      "type": "object"
     }
   },
-  "$id": "https://ntip.local/schemas/v2.5.0/source-event.schema.json",
+  "$id": "https://ntip.local/schemas/v2.6.0/source-event.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -32,7 +228,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "2.5.0",
+      "default": "2.6.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -60,6 +256,14 @@
       ],
       "default": null,
       "title": "Supersedes"
+    },
+    "supplied_locations": {
+      "items": {
+        "$ref": "#/$defs/SuppliedLocation"
+      },
+      "maxItems": 20,
+      "title": "Supplied Locations",
+      "type": "array"
     },
     "synthetic": {
       "title": "Synthetic",
@@ -91,5 +295,5 @@
   ],
   "title": "SourceEvent",
   "type": "object",
-  "x-schema-version": "2.5.0"
+  "x-schema-version": "2.6.0"
 }

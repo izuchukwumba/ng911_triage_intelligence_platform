@@ -560,6 +560,17 @@
         "role": {
           "$ref": "#/$defs/LocationRole"
         },
+        "supplied_by": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SuppliedReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "validation": {
           "$ref": "#/$defs/LocationValidation",
           "default": "unverified"
@@ -694,6 +705,31 @@
       "title": "SourceSpan",
       "type": "object"
     },
+    "SuppliedReference": {
+      "additionalProperties": false,
+      "description": "Where a structured, upstream-supplied location came from (2.6.0).",
+      "properties": {
+        "origin": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Origin",
+          "type": "string"
+        },
+        "source_event_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Source Event Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_event_id",
+        "origin"
+      ],
+      "title": "SuppliedReference",
+      "type": "object"
+    },
     "Temporality": {
       "enum": [
         "current",
@@ -704,7 +740,7 @@
       "type": "string"
     }
   },
-  "$id": "https://ntip.local/schemas/v2.5.0/incident.schema.json",
+  "$id": "https://ntip.local/schemas/v2.6.0/incident.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "The canonical interpretation of one or more source events.",
@@ -769,7 +805,7 @@
       "type": "array"
     },
     "schema_version": {
-      "default": "2.5.0",
+      "default": "2.6.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -796,5 +832,5 @@
   ],
   "title": "Incident",
   "type": "object",
-  "x-schema-version": "2.5.0"
+  "x-schema-version": "2.6.0"
 }

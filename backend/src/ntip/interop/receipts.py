@@ -38,6 +38,8 @@ class FieldMapping(SchemaModel):
     transformation_version: str
     target: str | None
     status: MappingStatus
+    # Why a field was not mapped, when there is more to say (2.6.0).
+    note: str | None = None
 
 
 class InteropReceipt(SchemaModel):

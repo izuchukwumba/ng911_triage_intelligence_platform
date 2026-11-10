@@ -12,7 +12,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
-SCHEMA_VERSION = "2.5.0"
+SCHEMA_VERSION = "2.6.0"
 
 #: Tenant of records written before tenants existed, and of single-tenant use.
 DEFAULT_TENANT = "default"
@@ -72,6 +72,24 @@ class Evidence(SchemaModel):
     source_event_id: Identifier
     span: SourceSpan
     text: str = Field(min_length=1)
+
+
+class CivicAddress(SchemaModel):
+    house_number: str | None = None
+    street: str | None = None
+    unit: str | None = None
+    floor: str | None = None
+    locality: str | None = None
+    region: str | None = None
+    postal_code: str | None = None
+    landmark: str | None = None
+
+
+class Coordinates(SchemaModel):
+    lat: float = Field(ge=-90, le=90)
+    lng: float = Field(ge=-180, le=180)
+    crs: str = "EPSG:4326"
+    uncertainty_m: float | None = Field(default=None, gt=0)
 
 
 class FactStatus(StrEnum):

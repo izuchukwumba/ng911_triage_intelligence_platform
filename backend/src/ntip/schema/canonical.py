@@ -14,6 +14,8 @@ from pydantic import Field, model_validator
 
 from ntip.schema.base import (
     SCHEMA_VERSION,
+    CivicAddress,
+    Coordinates,
     Evidence,
     Fact,
     FactStatus,
@@ -106,22 +108,12 @@ _EXTERNALLY_VALIDATED = {
 }
 
 
-class CivicAddress(SchemaModel):
-    house_number: str | None = None
-    street: str | None = None
-    unit: str | None = None
-    floor: str | None = None
-    locality: str | None = None
-    region: str | None = None
-    postal_code: str | None = None
-    landmark: str | None = None
+class SuppliedReference(SchemaModel):
+    """Where a structured, upstream-supplied location came from (2.6.0)."""
 
-
-class Coordinates(SchemaModel):
-    lat: float = Field(ge=-90, le=90)
-    lng: float = Field(ge=-180, le=180)
-    crs: str = "EPSG:4326"
-    uncertainty_m: float | None = Field(default=None, gt=0)
+    source_event_id: Identifier
+    # Where the location was in the original payload, e.g. an EIDO JSON pointer.
+    origin: str = Field(min_length=1, max_length=512)
 
 
 class LocationCandidate(SchemaModel):
@@ -131,6 +123,8 @@ class LocationCandidate(SchemaModel):
     civic_address: CivicAddress | None = None
     coordinates: Coordinates | None = None
     evidence: Evidence | None = None
+    # Set for a location received in structured form rather than spoken.
+    supplied_by: SuppliedReference | None = None
     extractor: Extractor
     validation: LocationValidation = LocationValidation.UNVERIFIED
     validation_source: str | None = None
