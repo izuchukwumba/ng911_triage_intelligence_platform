@@ -50,5 +50,8 @@ def test_every_table_grants_the_role_exactly_select_and_insert(postgres_url: str
         granted: dict[str, set[str]] = {table: set() for (table,) in tables}
     for table, privilege in rows:
         granted[table].add(privilege)
-    expected = {t: {"SELECT", "INSERT"} for t in EVENT_TABLES} | {"schema_migrations": set()}
+    expected = {t: {"SELECT", "INSERT"} for t in EVENT_TABLES} | {
+        "schema_migrations": set(),
+        "erasures": {"SELECT"},  # visible, never written by the application
+    }
     assert granted == expected
