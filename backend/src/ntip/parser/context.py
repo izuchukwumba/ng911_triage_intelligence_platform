@@ -48,6 +48,11 @@ _HISTORICAL = re.compile(
 _QUESTION_IF = "".join(
     f"(?<!{w} )" for w in ("sure", "know", "tell", "check", "see", "wonder", "ask")
 )
+# Words that put a cue back in the present even if the clause also mentions
+# the past: "started convulsing a minute ago and is *still* convulsing".
+_STILL_CURRENT = re.compile(
+    r"(?<![\w'])(?:still|right now|currently|at the moment|keeps|todav[ií]a|sigue)(?![\w'])"
+)
 _HYPOTHETICAL = re.compile(
     rf"(?<![\w'])(?:{_QUESTION_IF}if|in case|what if|unless|worried (?:that|he|she|it|they)"
     r"|afraid (?:that|he|she|it|they)|could start|might start|si)(?![\w'])"
@@ -111,7 +116,7 @@ def analyse(text: str, match: Match) -> CueContext:
     conditional = _MODAL.search(before_in_clause) and _CONDITION.search(after_in_clause)
     if _HYPOTHETICAL.search(before_in_clause) or conditional:
         temporality = Temporality.HYPOTHETICAL
-    elif _HISTORICAL.search(whole_clause):
+    elif _HISTORICAL.search(whole_clause) and not _STILL_CURRENT.search(whole_clause):
         temporality = Temporality.HISTORICAL
     else:
         temporality = Temporality.CURRENT

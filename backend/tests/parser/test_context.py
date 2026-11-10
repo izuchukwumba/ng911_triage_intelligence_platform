@@ -64,6 +64,10 @@ class TestTemporality:
         text = "He was not breathing earlier but is now."
         assert context(text, "not breathing").temporality is Temporality.HISTORICAL
 
+    def test_still_keeps_a_cue_current_despite_a_past_marker(self) -> None:
+        text = "He started convulsing a minute ago and is still convulsing."
+        assert context(text, "convulsing").temporality is Temporality.CURRENT
+
     def test_historical_cue_before_the_match(self) -> None:
         assert context("Yesterday there was a fire here.", "fire").temporality is (
             Temporality.HISTORICAL
