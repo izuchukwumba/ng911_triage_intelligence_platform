@@ -99,7 +99,7 @@ Last updated: 2026-11-10.
 | Rate limiting (§5.3, §13.2) | Done (per process) | `ntip/api/ratelimit.py`, `tests/api/test_rate_limit.py` |
 | Threat model and controls (§13) | Done | [threat-model.md](safety/threat-model.md); remaining limits listed there |
 | CI: lint, types, tests, PostgreSQL, safety gate, contract freshness, containers, dependency and secret scanning (§14.2) | Done | `.github/workflows/ci.yml` |
-| Load tests under concurrency (§14.1) | Not done | Only single-request latency |
+| Load tests under concurrency (§14.1) | Done | `ntip.evaluation.load` (correctness checks, memory and PostgreSQL); found and fixed two concurrency bugs (DDL-016) |
 | Release tags and changelog (§14.3) | Not done | — |
 
 ## Definition of done (§20)

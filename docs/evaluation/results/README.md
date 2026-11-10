@@ -134,3 +134,20 @@ PostgreSQL and a networked inference service, whose time is bounded separately
 by the 2 s inference timeout; the model is optional and can never block
 ingestion (§3B.1, RQ-INT4).
 
+## Concurrency (load test)
+
+`python -m ntip.evaluation.load --workers 16 --incidents 200 --follow-ups 3`
+sends three simultaneous follow-ups per incident to stress same-incident
+contention, then checks that every message, assessment and audit event is
+present and that each incident's latest version covers every message.
+
+| Store | Requests | Errors | Inconsistencies | Throughput | p50 / p95 |
+|---|---|---|---|---|---|
+| memory, before DDL-016 | 800 | 124 (lost messages) | 125 | — | — |
+| memory, after | 800 | 0 | 0 | ~480/s | 13 ms / 90 ms |
+| PostgreSQL, before DDL-016 | 400 | 0 | 100 (stale versions) | — | — |
+| PostgreSQL, after | 400 | 0 | 0 | ~17/s | 0.7 s / 1.7 s |
+
+The PostgreSQL figures reflect a new connection per store call under
+deliberately extreme contention; they are a correctness baseline, not a
+performance target.

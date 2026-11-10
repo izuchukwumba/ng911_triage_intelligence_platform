@@ -31,6 +31,7 @@ mutation, and CI gates changes.
 | S15 | Transcript text is data, never instructions (§3A.6.7) | Rules parser only extracts; B2 delimits the transcript and states it is data; outputs are schema-constrained and verified | `test_int_009_instructions_in_the_narrative_are_not_executed`, `test_transcript_is_delimited_as_data` |
 | S16 | Invalid or unauthorised external input is never processed (ADR-INT-003) | Gateway: profile check, size limit, version rejection, schema quarantine, fail-closed auth | `test_int_002_*`, `test_int_003_*`, `test_int_010b_interop_fails_closed` |
 | S17 | No critical call is silently under-triaged by a change (§14.2) | CI gate: zero critical under-triage on the curated regression split | `python -m ntip.evaluation --split regression --gate` (CI step) |
+| S18 | Concurrent messages for one incident are never lost or half-processed | Optimistic concurrency: writes carry an expected message count, checked atomically (PostgreSQL advisory lock); the pipeline re-reads and retries | `test_concurrent_follow_ups_are_all_kept_and_assessed_together`, `test_expectation_rejects_a_stale_write`, `test_postgres_load_run_is_consistent` |
 
 ## Residual risks (accepted for a research prototype)
 
