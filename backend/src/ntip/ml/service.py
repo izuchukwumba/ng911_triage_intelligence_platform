@@ -4,10 +4,11 @@ Runs separately from the platform API and holds no state: it receives an
 InferenceRequest and returns an InferenceResponse. Transcript text is treated
 strictly as data to extract from, never as instructions.
 
-    NTIP_MODEL=b0-rules-as-model uvicorn ntip.ml.service:create_inference_app --factory --port 8100
+    NTIP_MODEL=b1-tfidf-logreg uvicorn ntip.ml.service:create_inference_app --factory --port 8100
 """
 
 import os
+from collections.abc import Callable
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -15,7 +16,18 @@ from pydantic import BaseModel
 from ntip.ml.contract import CONTRACT_VERSION, InferenceRequest, InferenceResponse
 from ntip.ml.extractors import ModelExtractor, RulesAsModel
 
-MODELS: dict[str, type] = {"b0-rules-as-model": RulesAsModel}
+
+def _b1() -> ModelExtractor:
+    from ntip.ml.b1 import B1Model  # needs the "ml" extra (scikit-learn)
+
+    return B1Model()
+
+
+# Factories, so heavy model dependencies are only imported when selected.
+MODELS: dict[str, Callable[[], ModelExtractor]] = {
+    "b0-rules-as-model": RulesAsModel,
+    "b1-tfidf-logreg": _b1,
+}
 
 
 class ModelInfo(BaseModel):
@@ -28,8 +40,7 @@ def load_model(name: str | None = None) -> ModelExtractor:
     name = name or os.environ.get("NTIP_MODEL", "b0-rules-as-model")
     if name not in MODELS:
         raise ValueError(f"unknown model {name!r}; available: {sorted(MODELS)}")
-    model: ModelExtractor = MODELS[name]()
-    return model
+    return MODELS[name]()
 
 
 def create_inference_app(model: ModelExtractor | None = None) -> FastAPI:
