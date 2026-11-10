@@ -15,11 +15,10 @@ export function PriorityBadge({ priority, size = 'sm', caption }: Props) {
   if (size === 'lg') {
     return (
       <div
-        aria-label={`Priority ${priority ?? 'none'}: ${label}`}
         style={{ padding: '10px 16px', borderRadius: '8px', border: `1.5px solid ${color}`, textAlign: 'center', minWidth: '104px' }}
       >
         <div style={{ fontFamily: 'var(--mono)', fontSize: '26px', fontWeight: 800, color, lineHeight: 1 }}>
-          {priority ?? '—'}
+          <span className="visually-hidden">Priority </span>{priority ?? '—'}
         </div>
         <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginTop: '5px' }}>
           {label}
@@ -31,11 +30,12 @@ export function PriorityBadge({ priority, size = 'sm', caption }: Props) {
 
   return (
     <span
-      aria-label={`Priority ${priority ?? 'none'}: ${label}`}
       style={{ display: 'inline-flex', gap: '6px', alignItems: 'center', padding: '2px 8px', borderRadius: '4px', border: `1px solid ${color}`, color, fontFamily: 'var(--mono)', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}
     >
-      {priority ?? '—'}
-      <span style={{ fontSize: '10px', opacity: 0.8 }}>{label}</span>
+      <span className="visually-hidden">Priority </span>
+      {priority ?? '—'}{' '}
+      {/* Full colour, not faded: small text needs 4.5:1 contrast (WCAG 1.4.3). */}
+      <span style={{ fontSize: '10px' }}>{label}</span>
     </span>
   );
 }
