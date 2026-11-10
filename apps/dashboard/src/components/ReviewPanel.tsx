@@ -37,7 +37,9 @@ export function ReviewPanel({ incidentId, assessment, onReviewed }: Props) {
     try {
       await api.review(incidentId, {
         assessment_id: assessment.assessment_id,
-        reviewer_id: reviewer,
+        // Used only when the server runs without authentication; otherwise the
+        // reviewer is whoever the access token belongs to.
+        reviewer_id: reviewer || null,
         decision,
         reason: reason.trim() || null,
         override_priority: decision === 'override_priority' ? priority : null,
@@ -77,7 +79,8 @@ export function ReviewPanel({ incidentId, assessment, onReviewed }: Props) {
         <textarea className="input" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} required={needsReason} />
       </label>
       <label style={{ fontSize: '13px' }}>
-        Reviewer id <input className="input" value={reviewer} onChange={(e) => setReviewer(e.target.value)} required pattern="[A-Za-z0-9_.:-]+" />
+        Reviewer id <span className="muted">(only used when the server has authentication off)</span>{' '}
+        <input className="input" value={reviewer} onChange={(e) => setReviewer(e.target.value)} pattern="[A-Za-z0-9_.:-]*" />
       </label>
       {error && <span role="alert" style={{ color: 'var(--p0)', fontSize: '12px' }}>{error}</span>}
       <button type="submit" className="btn btn-primary" disabled={saving} style={{ justifySelf: 'start' }}>
