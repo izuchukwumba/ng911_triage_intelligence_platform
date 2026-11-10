@@ -48,13 +48,13 @@ jobs:
 
       # NENA's EIDO schema is fetched from a pinned commit and verified by
       # sha256 (it is not vendored: the upstream repository has no licence).
-      - name: Cache the pinned EIDO schema
+      - name: Cache the pinned NENA schemas
         uses: actions/cache@v4
         with:
           path: ~/.cache/ntip/eido
-          key: eido-${{ hashFiles('backend/src/ntip/interop/eido/profile.py') }}
+          key: nena-${{ hashFiles('backend/src/ntip/interop/eido/profile.py', 'backend/src/ntip/interop/conveyance/profile.py') }}
 
-      - name: Fetch and verify the pinned EIDO schema
+      - name: Fetch and verify the pinned NENA schemas
         run: uv run python -m ntip.interop.eido.fetch
 
       - name: Lint

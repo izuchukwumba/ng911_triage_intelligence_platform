@@ -4,5 +4,8 @@
 useDefault = true
 
 [[allowlists]]
-description = "sha256 digests of NENA's public EIDO schema files, pinned for verification; not secrets"
-paths = ['''^backend/src/ntip/interop/eido/profile\.py$''']
+description = "sha256 digests of NENA's public schema files, pinned for verification; not secrets"
+paths = [
+  '''^backend/src/ntip/interop/eido/profile\.py$''',
+  '''^backend/src/ntip/interop/conveyance/profile\.py$''',
+]
