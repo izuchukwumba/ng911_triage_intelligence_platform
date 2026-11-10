@@ -31,10 +31,11 @@ pip install -e ".[dev]"
 ## Run
 
 ```sh
-uvicorn ntip.api:create_app --factory --reload
+NTIP_AUTH_DISABLED=1 uvicorn ntip.api:create_app --factory --reload   # local demo, no auth
+NTIP_API_TOKENS=dev:me:admin uvicorn ntip.api:create_app --factory --reload
 ```
 
-Without configuration the API uses an in-memory event store (lost on restart).
+Without a database URL the API uses an in-memory event store (lost on restart).
 To persist to PostgreSQL:
 
 ```sh
@@ -47,6 +48,9 @@ python -m ntip.store.migrate "$NTIP_DATABASE_URL" --down 0000   # roll back (dev
 |---|---|---|
 | `NTIP_DATABASE_URL` | unset (in-memory) | PostgreSQL event store |
 | `NTIP_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated dashboard origins |
+| `NTIP_API_TOKENS` | none | `token:principal:role,...`; roles `viewer`, `operator` (+ingest, review), `analyst` (+replay), `admin` |
+| `NTIP_AUTH_DISABLED` | unset | `1` runs without authentication, for an isolated local demo only. Without tokens or this flag the server refuses to start |
+| `NTIP_INTEROP_TOKENS` | none | `token:tenant,...` for the EIDO gateway; unset disables interop |
 
 ### API (`/v1`)
 

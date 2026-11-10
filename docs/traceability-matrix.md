@@ -52,7 +52,7 @@ Last updated: 2026-11-10.
 | Phase V: external engineering and practitioner review | External | — |
 | Mapping beyond notes (locations, persons, PIDF-LO) | Not done | Preserved as unmapped; see interop gaps |
 | NENA-STA-024 conveyance | Not done | Endpoint is project-defined |
-| Tenant isolation (INT-010) | Partial | Interop receipts are tenant-scoped; the research `/v1` incidents API has no authentication |
+| Tenant isolation (INT-010) | Partial | Interop receipts are tenant-scoped; `/v1` requires authentication with roles, but incidents are not partitioned by tenant |
 
 ## Parser, triage and location (§6, §7, §8)
 
@@ -95,7 +95,8 @@ Last updated: 2026-11-10.
 | Requirement | Status | Evidence |
 |---|---|---|
 | Seeded generator with perturbations, generator-intended labels (§12) | Done | `ntip.generator` |
-| Threat model and controls (§13) | Done / Partial | [threat-model.md](safety/threat-model.md): API authentication and rate limiting outstanding |
+| Authentication and role-based access (§2.3, §13.2) | Done | `ntip/api/auth.py`, `tests/api/test_auth.py`; DDL-015 |
+| Threat model and controls (§13) | Done / Partial | [threat-model.md](safety/threat-model.md): rate limiting outstanding |
 | CI: lint, types, tests, PostgreSQL, safety gate, contract freshness, containers, dependency and secret scanning (§14.2) | Done | `.github/workflows/ci.yml` |
 | Load tests under concurrency (§14.1) | Not done | Only single-request latency |
 | Release tags and changelog (§14.3) | Not done | — |
