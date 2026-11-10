@@ -81,3 +81,39 @@ Fixes for the generated-set gaps above ("still", "overdosed", "atrapadas").
 The remaining generated critical miss is a misspelled cue, the expected limit
 of exact phrase matching. Neither test split was re-run.
 
+## ML comparison: B0 vs B1 vs hybrid (milestones ML-3 / ML-4)
+
+Reports: [curated test](compare-curated-test.md),
+[curated dev + regression](compare-curated-dev-regression.md),
+[generated test](compare-generated-test.md). B1 (`b1-tfidf-logreg`, see the
+[model card](../../ml/model-card-b1.md)) was trained only on the generated
+dev + regression splits, so none of these cases were seen in training.
+
+| | Curated test (20) | Curated dev+reg (30) | Generated test (210) |
+|---|---|---|---|
+| Critical under-triage: B0 → hybrid | 2/9 → **0/9** | 0/13 → 0/13 | 0/47 → 0/47 |
+| Critical-cue sensitivity: B0 / hybrid | 0.857 / 0.857 | 1.000 / 1.000 | 1.000 / 1.000 |
+| Cue precision: B0 → hybrid | 1.00 → 0.79 | 0.97 → 0.71 | 0.98 → 0.87 |
+| Over-triage: B0 → hybrid | 0.10 → 0.20 | 0.13 → 0.17 | 0.12 → 0.22 |
+| B1-only cue recall | 0.63 | 0.56 | 0.27 |
+
+**ML-4 gate ("no increase in critical-cue false negatives on a frozen test
+set"): met** on all three sets. On the curated test split, hybrid fusion
+removes both critical under-triages B0 makes, at the cost of more
+over-triage and lower precision, which the review workflow absorbs (every
+model-only serious cue requires human confirmation).
+
+Other findings:
+
+- **B1 alone is not usable:** recall collapses on scenario families it never
+  saw (0.27 on generated test). Fusion, not replacement, is what helps.
+- **Abstention matters:** lowering B1's candidate threshold to the abstention
+  threshold reduces precision and raises over-triage on every set.
+- **B1 is not calibrated:** ECE 0.07–0.10. Its scores are reported as
+  uncalibrated; selective risk is low at 50% coverage (≤ 0.011).
+- **B1 has no negation or tense model:** hybrid lets 1–2 denied or past cues
+  through as live. The rules remain the reference for negation.
+
+These are synthetic-benchmark results with author- or generator-intended
+labels; they are not evidence of real-world performance.
+

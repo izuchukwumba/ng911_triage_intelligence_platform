@@ -21,7 +21,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from ntip.ml.contract import Abstention, Candidate, InferenceRequest, InferenceResponse
+from ntip.ml.contract import (
+    Abstention,
+    Candidate,
+    InferenceMessage,
+    InferenceRequest,
+    InferenceResponse,
+)
 from ntip.parser.text import Segment, clause_around
 from ntip.schema.base import SourceSpan, sha256_digest
 from ntip.schema.canonical import Polarity
@@ -93,7 +99,11 @@ def _trim(text: str, seg: Segment) -> SourceSpan:
 class B1Model:
     model_id = MODEL_ID
 
-    def __init__(self, training: TrainingSet | None = None) -> None:
+    def __init__(
+        self, training: TrainingSet | None = None, *, candidate_at: float = CANDIDATE_AT
+    ) -> None:
+        # candidate_at is overridable only for ablations; the default is pre-declared.
+        self.candidate_at = candidate_at
         import sklearn
         from sklearn.feature_extraction.text import TfidfVectorizer
         from sklearn.linear_model import LogisticRegression
@@ -142,15 +152,24 @@ class B1Model:
         probabilities = self.pipeline.predict_proba(texts)
         return [dict(zip(self.codes, map(float, row), strict=True)) for row in probabilities]
 
+    def _clause_scores(
+        self, messages: list[InferenceMessage]
+    ) -> tuple[list[tuple[InferenceMessage, SourceSpan]], list[dict[str, float]]]:
+        clauses = [(m, _trim(m.text, seg)) for m in messages for seg in _clauses(m.text)]
+        texts = [m.text[s.start : s.end] for m, s in clauses]
+        return clauses, (self.scores(texts) if texts else [])
+
+    def cue_scores(self, messages: list[InferenceMessage]) -> dict[str, float]:
+        """Each cue's score for a conversation: its best clause (used for calibration)."""
+        _, clause_scores = self._clause_scores(messages)
+        return {c: max((s[c] for s in clause_scores), default=0.0) for c in self.codes}
+
     def infer(self, request: InferenceRequest) -> InferenceResponse:
         started = time.perf_counter()
         # Cues are local, so a cue's score is its best clause score (max
         # pooling); scoring the whole conversation at once dilutes a short cue
         # in a long call.
-        clauses = [(m, _trim(m.text, seg)) for m in request.messages for seg in _clauses(m.text)]
-        clause_scores = (
-            self.scores([m.text[s.start : s.end] for m, s in clauses]) if clauses else []
-        )
+        clauses, clause_scores = self._clause_scores(request.messages)
 
         candidates: list[Candidate] = []
         abstentions: list[Abstention] = []
@@ -159,7 +178,7 @@ class B1Model:
                 break
             best = max(range(len(clauses)), key=lambda i: clause_scores[i][code])
             score = clause_scores[best][code]
-            if score >= CANDIDATE_AT:
+            if score >= self.candidate_at:
                 message, span = clauses[best]
                 candidates.append(
                     Candidate(
