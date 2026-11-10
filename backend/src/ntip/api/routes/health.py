@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request, Response, status
 from pydantic import BaseModel
 
 from ntip import __version__
@@ -17,8 +17,8 @@ class LiveResponse(BaseModel):
 
 class ReadyResponse(BaseModel):
     status: Literal["ready", "not_ready"]
-    # One entry per dependency (database, model service, ...). Empty until the
-    # backend has dependencies to check.
+    # One entry per dependency the backend needs (event store, later the
+    # model service).
     checks: dict[str, bool]
 
 
@@ -29,8 +29,10 @@ def live() -> LiveResponse:
 
 
 @router.get("/ready")
-def ready() -> ReadyResponse:
-    """Every dependency the backend needs is reachable."""
-    checks: dict[str, bool] = {}
-    status: Literal["ready", "not_ready"] = "ready" if all(checks.values()) else "not_ready"
-    return ReadyResponse(status=status, checks=checks)
+def ready(request: Request, response: Response) -> ReadyResponse:
+    """Every dependency the backend needs is reachable (503 otherwise)."""
+    checks = {"event_store": request.app.state.pipeline.store.ping()}
+    ok = all(checks.values())
+    if not ok:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    return ReadyResponse(status="ready" if ok else "not_ready", checks=checks)
