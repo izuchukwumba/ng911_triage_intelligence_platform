@@ -176,6 +176,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/interop/eido/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ingest Eido */
+        post: operations["ingest_eido_v1_interop_eido_ingest_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/interop/receipts/{receipt_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Receipt */
+        get: operations["get_receipt_v1_interop_receipts__receipt_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/interop/receipts/{receipt_id}/payload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Receipt Payload
+         * @description The original payload, unchanged (design v1.2, INT-011).
+         */
+        get: operations["get_receipt_payload_v1_interop_receipts__receipt_id__payload_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/replay-runs": {
         parameters: {
             query?: never;
@@ -297,7 +351,7 @@ export interface components {
             ruleset_version: string;
             /**
              * Schema Version
-             * @default 2.2.0
+             * @default 2.3.0
              */
             schema_version: string;
             severity_band: components["schemas"]["SeverityBand"];
@@ -332,7 +386,7 @@ export interface components {
             occurred_at: string;
             /**
              * Schema Version
-             * @default 2.2.0
+             * @default 2.3.0
              */
             schema_version: string;
             /** Subject Digest */
@@ -524,7 +578,7 @@ export interface components {
             reviewer_id: string;
             /**
              * Schema Version
-             * @default 2.2.0
+             * @default 2.3.0
              */
             schema_version: string;
         };
@@ -552,7 +606,7 @@ export interface components {
             observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
-             * @default 2.2.0
+             * @default 2.3.0
              */
             schema_version: string;
             /** Source Event Ids */
@@ -903,7 +957,7 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @default 2.2.0
+             * @default 2.3.0
              */
             schema_version: string;
             summary: components["schemas"]["ReplaySummary"];
@@ -988,7 +1042,7 @@ export interface components {
             received_at: string;
             /**
              * Schema Version
-             * @default 2.2.0
+             * @default 2.3.0
              */
             schema_version: string;
             /** Source Event Id */
@@ -1015,7 +1069,7 @@ export interface components {
          * SourceType
          * @enum {string}
          */
-        SourceType: "synthetic_transcript" | "structured_test_event";
+        SourceType: "synthetic_transcript" | "structured_test_event" | "eido_import";
         /**
          * Temporality
          * @enum {string}
@@ -1333,6 +1387,105 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HumanReview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ingest_eido_v1_interop_eido_ingest_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+                "x-interop-profile"?: string | null;
+                "content-type"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_receipt_v1_interop_receipts__receipt_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                receipt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_receipt_payload_v1_interop_receipts__receipt_id__payload_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                receipt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

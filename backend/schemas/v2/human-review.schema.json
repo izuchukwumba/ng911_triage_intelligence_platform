@@ -87,7 +87,7 @@
       "type": "string"
     }
   },
-  "$id": "https://ntip.local/schemas/v2.2.0/human-review.schema.json",
+  "$id": "https://ntip.local/schemas/v2.3.0/human-review.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
@@ -163,7 +163,7 @@
       "type": "string"
     },
     "schema_version": {
-      "default": "2.2.0",
+      "default": "2.3.0",
       "title": "Schema Version",
       "type": "string"
     }
@@ -178,5 +178,5 @@
   ],
   "title": "HumanReview",
   "type": "object",
-  "x-schema-version": "2.2.0"
+  "x-schema-version": "2.3.0"
 }
