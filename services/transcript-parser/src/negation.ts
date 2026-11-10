@@ -15,7 +15,7 @@ const NEGATION_WORDS = new Set([
   'not', 'no', "isn't", "aren't", "wasn't", "weren't",
   "doesn't", "don't", "didn't", "haven't", "hasn't", "hadn't",
   "won't", "wouldn't", "can't", "cannot", "couldn't",
-  "needn't", "never", "without', 'denies", 'deny', 'denied',
+  "needn't", 'never', 'without', 'denies', 'deny', 'denied',
   'negative', 'ruled out', 'no sign of', 'no evidence of',
 ]);
 
