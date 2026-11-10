@@ -136,6 +136,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/incidents/{incident_id}/model-outputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Model Outputs
+         * @description Exact model requests and responses recorded for this incident (design 3A.9).
+         */
+        get: operations["get_model_outputs_v1_incidents__incident_id__model_outputs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/incidents/{incident_id}/reviews": {
         parameters: {
             query?: never;
@@ -218,6 +238,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * Abstention
+         * @description The model declines to decide about a code (design v1.2, section 3A.1).
+         */
+        Abstention: {
+            /** Code */
+            code: string;
+            /** Reason */
+            reason: string;
+        };
         /** Actor */
         Actor: {
             /** Actor Id */
@@ -321,6 +351,27 @@ export interface components {
             events: components["schemas"]["AuditEvent"][];
             /** Incident Id */
             incident_id: string;
+        };
+        /** Candidate */
+        Candidate: {
+            /** Code */
+            code: string;
+            /** Confidence */
+            confidence: number;
+            /** Evidence Text */
+            evidence_text: string;
+            polarity: components["schemas"]["Polarity"];
+            /** Source Event Id */
+            source_event_id: string;
+            span: components["schemas"]["SourceSpan"];
+            /**
+             * Status
+             * @default unverified_model_hypothesis
+             * @constant
+             */
+            status: "unverified_model_hypothesis";
+            /** @default current */
+            temporality: components["schemas"]["Temporality"];
         };
         /** CivicAddress */
         CivicAddress: {
@@ -587,12 +638,62 @@ export interface components {
             rejected_candidates: number;
             status: components["schemas"]["InferenceStatus"];
         };
+        /** InferenceMessage */
+        InferenceMessage: {
+            /** Source Event Id */
+            source_event_id: string;
+            /** Text */
+            text: string;
+        };
         /**
          * InferenceMode
          * @description How model output is used (design v1.2, section 3A.3).
          * @enum {string}
          */
         InferenceMode: "rules_only" | "ml_shadow" | "hybrid_review";
+        /** InferenceRequest */
+        InferenceRequest: {
+            /**
+             * Contract Version
+             * @default 1.0.0
+             * @constant
+             */
+            contract_version: "1.0.0";
+            /** Incident Id */
+            incident_id: string;
+            /** Language Hint */
+            language_hint: string | null;
+            /** Messages */
+            messages: components["schemas"]["InferenceMessage"][];
+            /** Request Id */
+            request_id: string;
+        };
+        /** InferenceResponse */
+        InferenceResponse: {
+            /** Abstentions */
+            abstentions: components["schemas"]["Abstention"][];
+            /**
+             * Calibrated
+             * @default false
+             */
+            calibrated: boolean;
+            /** Candidates */
+            candidates: components["schemas"]["Candidate"][];
+            /**
+             * Contract Version
+             * @default 1.0.0
+             * @constant
+             */
+            contract_version: "1.0.0";
+            /** Model Id */
+            model_id: string;
+            /** Model Version */
+            model_version: string;
+            /** Request Id */
+            request_id: string;
+            /** Runtime Ms */
+            runtime_ms: number;
+        };
         /**
          * InferenceStatus
          * @enum {string}
@@ -681,6 +782,30 @@ export interface components {
             synthetic: true;
             /** Text */
             text: string;
+        };
+        /**
+         * ModelOutput
+         * @description The exact request and response of one model call, kept for audit.
+         *
+         *     Generative or retrained models are not guaranteed to reproduce their
+         *     output, so replay of a model-assisted incident uses this recorded output
+         *     rather than calling the model again (design v1.2, section 3A.9).
+         */
+        ModelOutput: {
+            /** Error */
+            error: string | null;
+            /** Incident Id */
+            incident_id: string;
+            mode: components["schemas"]["InferenceMode"];
+            /** Output Id */
+            output_id: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            request: components["schemas"]["InferenceRequest"];
+            response: components["schemas"]["InferenceResponse"] | null;
         };
         /** Observation */
         Observation: {
@@ -1142,6 +1267,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IngestOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_model_outputs_v1_incidents__incident_id__model_outputs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                incident_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelOutput"][];
                 };
             };
             /** @description Validation Error */
