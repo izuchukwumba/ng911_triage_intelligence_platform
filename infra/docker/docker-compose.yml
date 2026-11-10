@@ -51,6 +51,9 @@ services:
     environment:
       NTIP_DATABASE_URL: postgresql://ntip:${POSTGRES_PASSWORD:-ntip-dev-only}@postgres:5432/ntip
       NTIP_CORS_ORIGINS: http://localhost:8080
+      # token:principal:role (viewer | operator | analyst | admin). Development
+      # tokens only; override NTIP_API_TOKENS for anything shared.
+      NTIP_API_TOKENS: ${NTIP_API_TOKENS:-dev-operator:operator_1:operator,dev-analyst:analyst_1:analyst,dev-viewer:viewer_1:viewer}
       # rules_only (default) | ml_shadow | hybrid_review  (design v1.2, 3A.3)
       NTIP_INFERENCE_MODE: ${NTIP_INFERENCE_MODE:-rules_only}
       NTIP_INFERENCE_URL: http://inference:8100
