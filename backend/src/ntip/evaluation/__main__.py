@@ -34,7 +34,9 @@ def main() -> int:
 
     if args.out:
         args.out.mkdir(parents=True, exist_ok=True)
-        stem = f"b0-{'-'.join(splits)}"
+        # Versioned names keep earlier baselines next to new results.
+        m = result["manifest"]
+        stem = f"b0-{m['parser'].rsplit('-', 1)[-1]}-{m['ruleset']['name']}-{'-'.join(splits)}"
         (args.out / f"{stem}.json").write_text(
             json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n"
         )
