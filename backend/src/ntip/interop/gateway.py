@@ -168,6 +168,7 @@ class EidoGateway:
             new_incident_id=None if existing else _incident_id(tenant_id, mapping.eido_id),
             source_type=SourceType.EIDO_IMPORT,
             correlation_id=correlation_id,
+            tenant_id=tenant_id,
         )
         accepted = self._receipt(
             raw,
