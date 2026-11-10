@@ -78,6 +78,7 @@ jobs:
       - name: Published contracts are current
         run: |
           uv run python -m ntip.schema.export --check
+          uv run python -m ntip.schema.samples --check
           uv run python -m ntip.api.openapi --check
 
   dashboard:

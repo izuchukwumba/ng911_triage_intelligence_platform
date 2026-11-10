@@ -20,6 +20,7 @@ Last updated: 2026-11-10.
 | Layered records: source, canonical, advisory, review, audit (§4.1, §3B.4) | Done | `ntip/schema/*` |
 | `unknown` / `not_reported` / `negated` / `conflicting` never collapsed (§4.3) | Done | `Fact[T]`; safety case S9 |
 | Breaking changes bump the major version with old schemas kept (§4.4) | Done | schema 2.0.0 under `schemas/v2`, v1 retained |
+| Published sample payloads; new optional fields backward-compatible only after compatibility tests (§4.3, §4.4) | Done | `python -m ntip.schema.samples` publishes pipeline-generated samples per schema version (`schemas/v2/examples`); `tests/test_schema_compatibility.py` checks every published sample against the current models and JSON Schemas, and that documents without the fields added since 2.0.0 stay valid and unchanged |
 
 ## ML layer (§3A)
 

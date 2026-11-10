@@ -31,7 +31,8 @@ Without it they are skipped locally; CI always runs them.
 cd backend
 ruff check . && ruff format --check . && mypy && pytest
 python -m ntip.evaluation --split regression --gate     # safety gate
-python -m ntip.schema.export --check && python -m ntip.api.openapi --check
+python -m ntip.schema.export --check && python -m ntip.schema.samples --check
+python -m ntip.api.openapi --check
 cd ../apps/dashboard
 npm run gen:api && git diff --exit-code -- src/api/schema.ts && npm run build
 npx playwright install chromium   # once
@@ -47,8 +48,11 @@ npm run test:a11y                 # axe (WCAG 2.1 A/AA) and keyboard checks on e
   ruleset file with a new version and pinning its digest.
 - **Schemas are versioned.** Additive changes bump the minor version; breaking
   changes bump the major version and publish under a new `schemas/vN/`. After
-  any model change, regenerate the JSON Schema files, `openapi.json` and the
-  dashboard types.
+  any model change, regenerate the JSON Schema files, the samples
+  (`python -m ntip.schema.samples`), `openapi.json` and the dashboard types.
+  Never edit samples of earlier versions: every later version must accept
+  them. A minor version that adds a field also records it in
+  `ADDED_AFTER_2_0` in `tests/test_schema_compatibility.py`.
 - **Evaluation discipline.** Tune only on `dev` and `regression` splits. Never
   change the parser, rules or models in response to `test` failures. Report
   results with counts and intervals, including failures.
