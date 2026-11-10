@@ -1,0 +1,40 @@
+{
+  "ruleset_id": "research",
+  "version": "1.0.0",
+  "priority_scheme": "research-v1",
+  "description": "First Python ruleset. Severity comes only from reported conditions; location quality, uncertainty, conflicts and prank cues change review actions, never severity. Research labels, not a dispatch protocol.",
+  "priority_by_severity": {
+    "critical": "P0",
+    "high": "P1",
+    "elevated": "P2",
+    "standard": "P3",
+    "low": "P4",
+    "undetermined": "P2"
+  },
+  "confirm_classification_below": 0.5,
+  "rules": [
+    {"id": "R-RESP-001", "version": "1.0.0", "description": "Caller reports the person is not breathing or has no pulse", "all_of": ["NOT_BREATHING"], "severity": "critical", "reason_code": "NOT_BREATHING_REPORTED"},
+    {"id": "R-CONS-001", "version": "1.0.0", "description": "Caller reports the person is unconscious or unresponsive", "all_of": ["UNCONSCIOUS"], "severity": "critical", "reason_code": "UNCONSCIOUS_REPORTED"},
+    {"id": "R-FIRE-002", "version": "1.0.0", "description": "People reported trapped", "all_of": ["OCCUPANTS_TRAPPED"], "severity": "critical", "reason_code": "OCCUPANTS_TRAPPED"},
+    {"id": "R-VIOL-002", "version": "1.0.0", "description": "Weapon reported together with active bleeding", "all_of": ["WEAPON_PRESENT", "ACTIVE_BLEEDING"], "severity": "critical", "reason_code": "WEAPON_WITH_BLEEDING"},
+
+    {"id": "R-BLEED-001", "version": "1.0.0", "description": "Active bleeding reported", "all_of": ["ACTIVE_BLEEDING"], "severity": "high", "reason_code": "ACTIVE_BLEEDING_REPORTED"},
+    {"id": "R-VIOL-001", "version": "1.0.0", "description": "Weapon reported", "all_of": ["WEAPON_PRESENT"], "severity": "high", "reason_code": "WEAPON_REPORTED"},
+    {"id": "R-VIOL-003", "version": "1.0.0", "description": "Ongoing violence reported", "all_of": ["ACTIVE_VIOLENCE"], "severity": "high", "reason_code": "ACTIVE_VIOLENCE_REPORTED"},
+    {"id": "R-CARD-001", "version": "1.0.0", "description": "Possible cardiac symptoms reported", "all_of": ["CARDIAC_SYMPTOMS"], "severity": "high", "reason_code": "CARDIAC_SYMPTOMS_REPORTED"},
+    {"id": "R-RESP-002", "version": "1.0.0", "description": "Breathing difficulty reported", "all_of": ["BREATHING_DIFFICULTY"], "severity": "high", "reason_code": "BREATHING_DIFFICULTY_REPORTED"},
+    {"id": "R-NEURO-001", "version": "1.0.0", "description": "Seizure reported", "all_of": ["SEIZURE"], "severity": "high", "reason_code": "SEIZURE_REPORTED"},
+    {"id": "R-NEURO-002", "version": "1.0.0", "description": "Possible stroke symptoms reported", "all_of": ["STROKE_SYMPTOMS"], "severity": "high", "reason_code": "STROKE_SYMPTOMS_REPORTED"},
+    {"id": "R-TOX-001", "version": "1.0.0", "description": "Possible overdose reported", "all_of": ["OVERDOSE"], "severity": "high", "reason_code": "OVERDOSE_REPORTED"},
+    {"id": "R-FIRE-003", "version": "1.0.0", "description": "Fire reported as spreading", "all_of": ["FIRE_SPREADING"], "severity": "high", "reason_code": "FIRE_SPREADING_REPORTED"},
+    {"id": "R-FIRE-004", "version": "1.0.0", "description": "Explosion reported", "all_of": ["EXPLOSION_REPORTED"], "severity": "high", "reason_code": "EXPLOSION_REPORTED"},
+    {"id": "R-HAZ-001", "version": "1.0.0", "description": "Hazardous environment reported (gas, chemical, carbon monoxide)", "all_of": ["HAZARDOUS_ENVIRONMENT"], "severity": "high", "reason_code": "HAZARDOUS_ENVIRONMENT_REPORTED"},
+
+    {"id": "R-FIRE-001", "version": "1.0.0", "description": "Fire reported", "all_of": ["FIRE_REPORTED"], "severity": "elevated", "reason_code": "FIRE_REPORTED"},
+    {"id": "R-FIRE-005", "version": "1.0.0", "description": "Smoke reported", "all_of": ["SMOKE_REPORTED"], "severity": "elevated", "reason_code": "SMOKE_REPORTED"},
+    {"id": "R-INJ-001", "version": "1.0.0", "description": "Injury reported", "all_of": ["INJURY_REPORTED"], "severity": "standard", "reason_code": "INJURY_REPORTED"},
+
+    {"id": "R-SCALE-001", "version": "1.0.0", "description": "Multiple victims reported: one band more severe", "all_of": ["MULTIPLE_VICTIMS"], "severity": "elevated", "effect": "escalate", "reason_code": "MULTIPLE_VICTIMS_REPORTED"},
+    {"id": "R-VULN-001", "version": "1.0.0", "description": "Child involved: one band more severe", "all_of": ["CHILD_INVOLVED"], "severity": "standard", "effect": "escalate", "reason_code": "CHILD_INVOLVED"}
+  ]
+}
