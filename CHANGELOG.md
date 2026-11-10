@@ -12,6 +12,13 @@ release version identifies the platform as a whole.
 
 ## [Unreleased]
 
+### Added
+
+- **Stream replay** (`python -m ntip.stream`): replays timed message
+  streams, from files or stored traffic, in order on a simulated clock. It
+  reports the queue after each message and each incident's time to P0, and
+  compares a candidate ruleset step by step (design v1.2, section 10.2).
+
 ## [0.1.0] - 2026-11-10
 
 First tagged release: a research prototype that implements the technical

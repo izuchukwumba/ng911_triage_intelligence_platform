@@ -1,0 +1,266 @@
+{
+  "baseline": {
+    "ruleset": "research-1.1.0",
+    "engine_version": "1.2.0",
+    "messages": 7,
+    "steps": [
+      {
+        "offset_s": 0.0,
+        "incident": "A",
+        "advisory_priority": "P2",
+        "severity_band": "elevated",
+        "reason_codes": [
+          "SMOKE_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A"
+        ]
+      },
+      {
+        "offset_s": 20.0,
+        "incident": "B",
+        "advisory_priority": "P2",
+        "severity_band": "elevated",
+        "reason_codes": [
+          "UNABLE_TO_GET_UP",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "offset_s": 45.0,
+        "incident": "A",
+        "advisory_priority": "P0",
+        "severity_band": "critical",
+        "reason_codes": [
+          "OCCUPANTS_TRAPPED",
+          "UNCERTAIN_SERIOUS_CUE",
+          "FIRE_REPORTED",
+          "SMOKE_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "offset_s": 60.0,
+        "incident": "C",
+        "advisory_priority": "P2",
+        "severity_band": "undetermined",
+        "reason_codes": [
+          "CLASSIFICATION_UNCERTAIN",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      {
+        "offset_s": 90.0,
+        "incident": "B",
+        "advisory_priority": "P0",
+        "severity_band": "critical",
+        "reason_codes": [
+          "NOT_BREATHING_REPORTED",
+          "UNABLE_TO_GET_UP",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      {
+        "offset_s": 130.0,
+        "incident": "D",
+        "advisory_priority": "P1",
+        "severity_band": "high",
+        "reason_codes": [
+          "WEAPON_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B",
+          "D",
+          "C"
+        ]
+      },
+      {
+        "offset_s": 150.0,
+        "incident": "C",
+        "advisory_priority": "P4",
+        "severity_band": "low",
+        "reason_codes": [
+          "POSSIBLE_PRANK_REPORTED",
+          "CLASSIFICATION_UNCERTAIN",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B",
+          "D",
+          "C"
+        ]
+      }
+    ],
+    "time_to_p0_s": {
+      "A": 45.0,
+      "B": 70.0,
+      "C": null,
+      "D": null
+    },
+    "final_queue": [
+      "A",
+      "B",
+      "D",
+      "C"
+    ]
+  },
+  "candidate": {
+    "ruleset": "research-1.0.0",
+    "engine_version": "1.2.0",
+    "messages": 7,
+    "steps": [
+      {
+        "offset_s": 0.0,
+        "incident": "A",
+        "advisory_priority": "P2",
+        "severity_band": "elevated",
+        "reason_codes": [
+          "SMOKE_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A"
+        ]
+      },
+      {
+        "offset_s": 20.0,
+        "incident": "B",
+        "advisory_priority": "P3",
+        "severity_band": "standard",
+        "reason_codes": [
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "offset_s": 45.0,
+        "incident": "A",
+        "advisory_priority": "P0",
+        "severity_band": "critical",
+        "reason_codes": [
+          "OCCUPANTS_TRAPPED",
+          "UNCERTAIN_SERIOUS_CUE",
+          "FIRE_REPORTED",
+          "SMOKE_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "offset_s": 60.0,
+        "incident": "C",
+        "advisory_priority": "P2",
+        "severity_band": "undetermined",
+        "reason_codes": [
+          "CLASSIFICATION_UNCERTAIN",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "C",
+          "B"
+        ]
+      },
+      {
+        "offset_s": 90.0,
+        "incident": "B",
+        "advisory_priority": "P0",
+        "severity_band": "critical",
+        "reason_codes": [
+          "NOT_BREATHING_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      {
+        "offset_s": 130.0,
+        "incident": "D",
+        "advisory_priority": "P1",
+        "severity_band": "high",
+        "reason_codes": [
+          "WEAPON_REPORTED",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B",
+          "D",
+          "C"
+        ]
+      },
+      {
+        "offset_s": 150.0,
+        "incident": "C",
+        "advisory_priority": "P4",
+        "severity_band": "low",
+        "reason_codes": [
+          "POSSIBLE_PRANK_REPORTED",
+          "CLASSIFICATION_UNCERTAIN",
+          "LOCATION_REQUIRES_VERIFICATION"
+        ],
+        "queue": [
+          "A",
+          "B",
+          "D",
+          "C"
+        ]
+      }
+    ],
+    "time_to_p0_s": {
+      "A": 45.0,
+      "B": 70.0,
+      "C": null,
+      "D": null
+    },
+    "final_queue": [
+      "A",
+      "B",
+      "D",
+      "C"
+    ]
+  },
+  "differences": [
+    {
+      "step": 2,
+      "offset_s": 20.0,
+      "incident": "B",
+      "baseline": "P2",
+      "candidate": "P3",
+      "lowers_priority": true
+    }
+  ],
+  "time_to_p0_changes": {},
+  "interpretation": "Illustrative difference only; not a validated improvement."
+}
