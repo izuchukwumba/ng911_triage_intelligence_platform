@@ -67,10 +67,16 @@ jobs:
         run: uv run mypy
 
       - name: Test
-        run: uv run pytest
+        run: |
+          set -o pipefail
+          uv run pytest | tee "$RUNNER_TEMP/pytest.txt"
+          { echo "### Backend tests"; tail -n 1 "$RUNNER_TEMP/pytest.txt"; } >> "$GITHUB_STEP_SUMMARY"
 
+      # The full report is attached to the run's summary (design v1.2, 14.2).
       - name: Evaluate B0 on dev + regression
-        run: uv run python -m ntip.evaluation --split dev --split regression
+        run: |
+          set -o pipefail
+          uv run python -m ntip.evaluation --split dev --split regression | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Safety gate (no critical under-triage on the regression split)
         run: uv run python -m ntip.evaluation --split regression --gate
@@ -107,8 +113,8 @@ jobs:
       - name: Type check and build
         run: npm run build
 
-  accessibility:
-    name: Dashboard accessibility (axe + keyboard)
+  e2e:
+    name: Dashboard end to end and accessibility
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -136,10 +142,11 @@ jobs:
           npx playwright install --with-deps chromium
 
       # Starts an in-memory backend (authentication disabled, test machine
-      # only) and the dashboard, then checks every screen.
-      - name: axe (WCAG 2.1 A/AA) and keyboard checks
+      # only) and the dashboard: the full operator workflow, then axe (WCAG
+      # 2.1 A/AA) and keyboard checks on every screen.
+      - name: End-to-end workflow, axe and keyboard checks
         working-directory: apps/dashboard
-        run: npm run test:a11y
+        run: npm run test:e2e
 
       - name: Report on failure
         if: failure()

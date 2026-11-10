@@ -36,7 +36,7 @@ python -m ntip.api.openapi --check
 cd ../apps/dashboard
 npm run gen:api && git diff --exit-code -- src/api/schema.ts && npm run build
 npx playwright install chromium   # once
-npm run test:a11y                 # axe (WCAG 2.1 A/AA) and keyboard checks on every screen
+npm run test:e2e                  # operator workflow end to end; axe (WCAG 2.1 A/AA) and keyboard checks
 ```
 
 ## Rules of the road

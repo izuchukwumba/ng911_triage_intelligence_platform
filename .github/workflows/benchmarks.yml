@@ -1,0 +1,79 @@
+name: Benchmarks
+
+# Expensive suites run on a schedule, not on every pull request (design v1.2,
+# section 14.2): processing latency and the concurrency load test against
+# PostgreSQL. Results go to the run summary and an artifact.
+on:
+  schedule:
+    - cron: "17 4 * * 1"  # Mondays 04:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmarks:
+    name: Latency and concurrency load
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      OUT: ${{ runner.temp }}/benchmarks
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Install (from lockfile)
+        run: uv sync --locked --extra ml
+
+      - name: Processing latency
+        run: |
+          mkdir -p "$OUT"
+          uv run python -m ntip.evaluation.latency --repeat 20 --out "$OUT"
+          { echo "### Processing latency (GitHub-hosted runner)"; echo '```json';
+            cat "$OUT/latency.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Concurrency load (in memory)
+        run: |
+          set -o pipefail
+          uv run python -m ntip.evaluation.load --workers 16 --incidents 200 --follow-ups 3 \
+            | tee "$OUT/load-memory.json"
+
+      - name: Concurrency load (PostgreSQL)
+        run: |
+          set -o pipefail
+          uv run python -m ntip.evaluation.load --workers 16 --incidents 100 --follow-ups 3 \
+            --database-url postgresql://postgres:postgres@localhost:5432/postgres \
+            | tee "$OUT/load-postgres.json"
+
+      - name: Summary
+        if: always()
+        run: |
+          for f in "$OUT"/load-*.json; do
+            { echo "### $(basename "$f" .json)"; echo '```json'; cat "$f"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmarks
+          path: ${{ runner.temp }}/benchmarks
+          retention-days: 90

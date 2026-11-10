@@ -64,6 +64,11 @@ release version identifies the platform as a whole.
   by retention period, with everything derived from them, and leaves content-free
   tombstones. The application still cannot delete anything.
 
+- **End-to-end workflow test** (Playwright, real API): ingest, evidence, override
+  with a reason, audit attribution, replay and the evaluation report.
+- **CI run summaries** now show test results and the evaluation report, and a
+  **weekly benchmark workflow** measures latency and PostgreSQL load.
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.
