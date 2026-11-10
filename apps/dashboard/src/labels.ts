@@ -30,6 +30,7 @@ export const STATE_LABELS: Record<string, string> = {
   awaiting_review: 'Awaiting review',
   reviewed: 'Reviewed',
   processing_failed: 'Processing failed',
+  closed: 'Closed',
 };
 
 export const LOCATION_QUALITY_LABELS: Record<string, string> = {

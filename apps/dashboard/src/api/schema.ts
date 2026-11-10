@@ -351,7 +351,7 @@ export interface components {
             ruleset_version: string;
             /**
              * Schema Version
-             * @default 2.3.0
+             * @default 2.4.0
              */
             schema_version: string;
             severity_band: components["schemas"]["SeverityBand"];
@@ -386,7 +386,7 @@ export interface components {
             occurred_at: string;
             /**
              * Schema Version
-             * @default 2.3.0
+             * @default 2.4.0
              */
             schema_version: string;
             /** Subject Digest */
@@ -398,7 +398,7 @@ export interface components {
          * AuditEventType
          * @enum {string}
          */
-        AuditEventType: "source.received" | "incident.parsed" | "location.assessed" | "triage.assessed" | "processing.failed" | "incident.reviewed" | "triage.overridden" | "incident.replayed" | "evaluation.completed";
+        AuditEventType: "source.received" | "incident.parsed" | "location.assessed" | "triage.assessed" | "processing.failed" | "incident.reviewed" | "triage.overridden" | "incident.closed" | "incident.replayed" | "evaluation.completed";
         /** AuditTrail */
         AuditTrail: {
             /** Events */
@@ -578,7 +578,7 @@ export interface components {
             reviewer_id: string;
             /**
              * Schema Version
-             * @default 2.3.0
+             * @default 2.4.0
              */
             schema_version: string;
         };
@@ -606,7 +606,7 @@ export interface components {
             observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
-             * @default 2.3.0
+             * @default 2.4.0
              */
             schema_version: string;
             /** Source Event Ids */
@@ -647,7 +647,7 @@ export interface components {
          * @description Review state machine (design v1.2, section 11.3).
          * @enum {string}
          */
-        IncidentState: "awaiting_review" | "reviewed" | "processing_failed";
+        IncidentState: "awaiting_review" | "reviewed" | "processing_failed" | "closed";
         /** IncidentSummaryOut */
         IncidentSummaryOut: {
             advisory_priority: components["schemas"]["AdvisoryPriority"] | null;
@@ -957,7 +957,7 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @default 2.3.0
+             * @default 2.4.0
              */
             schema_version: string;
             summary: components["schemas"]["ReplaySummary"];
@@ -986,7 +986,7 @@ export interface components {
          * ReviewDecision
          * @enum {string}
          */
-        ReviewDecision: "confirm" | "correct_classification" | "override_priority" | "escalate" | "note";
+        ReviewDecision: "confirm" | "correct_classification" | "override_priority" | "escalate" | "note" | "close";
         /** ReviewIn */
         ReviewIn: {
             /** Assessment Id */
@@ -1042,7 +1042,7 @@ export interface components {
             received_at: string;
             /**
              * Schema Version
-             * @default 2.3.0
+             * @default 2.4.0
              */
             schema_version: string;
             /** Source Event Id */

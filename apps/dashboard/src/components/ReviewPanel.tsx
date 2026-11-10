@@ -16,6 +16,7 @@ const DECISIONS: { value: Decision; label: string }[] = [
   { value: 'override_priority', label: 'Override priority' },
   { value: 'escalate', label: 'Escalate' },
   { value: 'note', label: 'Add note' },
+  { value: 'close', label: 'Close incident' },
 ];
 
 // Records a human decision. The machine assessment is never changed: the
@@ -28,7 +29,8 @@ export function ReviewPanel({ incidentId, assessment, onReviewed }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const needsReason = decision !== 'confirm' && decision !== 'escalate';
+  // Mirrors the backend: overrides and notes need a reason; closing does not.
+  const needsReason = decision === 'override_priority' || decision === 'note';
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();

@@ -18,6 +18,7 @@ class AuditEventType(StrEnum):
     PROCESSING_FAILED = "processing.failed"
     INCIDENT_REVIEWED = "incident.reviewed"
     TRIAGE_OVERRIDDEN = "triage.overridden"
+    INCIDENT_CLOSED = "incident.closed"
     INCIDENT_REPLAYED = "incident.replayed"
     EVALUATION_COMPLETED = "evaluation.completed"
 

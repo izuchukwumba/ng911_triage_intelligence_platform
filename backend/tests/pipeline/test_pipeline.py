@@ -164,3 +164,46 @@ class TestReviewAndView:
     def test_unknown_incident(self) -> None:
         with pytest.raises(UnknownIncident):
             make_pipeline().view("inc_missing")
+
+
+class TestClosure:
+    def test_closing_an_incident(self) -> None:
+        pipeline = make_pipeline()
+        result = pipeline.ingest("I twisted my ankle at 99 Cedar Lane.")
+        pipeline.review(
+            result.incident_id,
+            assessment_id=result.assessment.assessment_id,
+            reviewer_id="op_7",
+            decision=ReviewDecision.CLOSE,
+        )
+        assert pipeline.view(result.incident_id).state is IncidentState.CLOSED
+        assert pipeline.store.audit_events(result.incident_id)[-1].event_type == "incident.closed"
+
+    def test_a_new_message_reopens_a_closed_incident(self) -> None:
+        pipeline = make_pipeline()
+        result = pipeline.ingest("Smoke at 12 Oak Street.")
+        pipeline.review(
+            result.incident_id,
+            assessment_id=result.assessment.assessment_id,
+            reviewer_id="op_7",
+            decision=ReviewDecision.CLOSE,
+        )
+        pipeline.ingest("Now people are trapped inside.", incident_id=result.incident_id)
+        view = pipeline.view(result.incident_id)
+        assert view.state is IncidentState.AWAITING_REVIEW
+        assert view.assessment.severity_band == "critical"
+
+    def test_a_failed_incident_can_be_closed_after_manual_handling(self) -> None:
+        def broken(*_: Any, **__: Any) -> Incident:
+            raise RuntimeError("boom")
+
+        pipeline = make_pipeline(parser=broken)
+        result = pipeline.ingest("anything")
+        pipeline.review(
+            result.incident_id,
+            assessment_id=result.assessment.assessment_id,
+            reviewer_id="op_7",
+            decision=ReviewDecision.CLOSE,
+            reason="Handled manually from the transcript",
+        )
+        assert pipeline.view(result.incident_id).state is IncidentState.CLOSED

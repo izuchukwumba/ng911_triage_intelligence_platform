@@ -22,6 +22,9 @@ class ReviewDecision(StrEnum):
     OVERRIDE_PRIORITY = "override_priority"
     ESCALATE = "escalate"
     NOTE = "note"
+    # The operator has finished with the incident (design v1.2, 11.3). A new
+    # message reopens it, because the new assessment has not been reviewed.
+    CLOSE = "close"
 
 
 class HumanReview(SchemaModel):
