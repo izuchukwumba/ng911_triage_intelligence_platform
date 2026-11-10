@@ -3,6 +3,8 @@
 The ``postgres_url`` fixture lives in the root conftest.
 """
 
+from collections.abc import Iterator
+
 import pytest
 
 from ntip.store import EventStore, InMemoryEventStore
@@ -11,9 +13,12 @@ from ntip.store.postgres import PostgresEventStore
 
 
 @pytest.fixture(params=["memory", "postgres"])
-def store(request: pytest.FixtureRequest) -> EventStore:
+def store(request: pytest.FixtureRequest) -> Iterator[EventStore]:
     if request.param == "memory":
-        return InMemoryEventStore()
+        yield InMemoryEventStore()
+        return
     url = request.getfixturevalue("postgres_url")
     upgrade(url)
-    return PostgresEventStore(url)
+    pg = PostgresEventStore(url)
+    yield pg
+    pg.close()

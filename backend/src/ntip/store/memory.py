@@ -136,3 +136,6 @@ class InMemoryEventStore:
 
     def ping(self) -> bool:
         return True
+
+    def close(self) -> None:
+        pass

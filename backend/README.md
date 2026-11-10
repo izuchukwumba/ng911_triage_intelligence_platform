@@ -47,6 +47,7 @@ python -m ntip.store.migrate "$NTIP_DATABASE_URL" --down 0000   # roll back (dev
 | Variable | Default | Purpose |
 |---|---|---|
 | `NTIP_DATABASE_URL` | unset (in-memory) | PostgreSQL event store |
+| `NTIP_DATABASE_POOL_SIZE` | `10` | Maximum connections in the event store's pool, per API process |
 | `NTIP_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated dashboard origins |
 | `NTIP_API_TOKENS` | none | `token:principal:role,...`; roles `viewer`, `operator` (+ingest, review), `analyst` (+replay), `admin` |
 | `NTIP_AUTH_DISABLED` | unset | `1` runs without authentication, for an isolated local demo only. Without tokens or this flag the server refuses to start |

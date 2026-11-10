@@ -1,5 +1,8 @@
 """FastAPI application factory."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -20,7 +23,19 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
     can build a fresh app with its own store.
     """
     settings = settings or Settings.from_env()
+    # A store passed in belongs to the caller; one built here is closed here.
+    owned: EventStore | None = None
+    if store is None:
+        store = owned = settings.build_store()
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        yield
+        if owned is not None:
+            owned.close()
+
     app = FastAPI(
+        lifespan=lifespan,
         title="NG911 Triage Intelligence Platform (research)",
         version=__version__,
         description=(
@@ -29,7 +44,7 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
         ),
     )
     app.state.pipeline = Pipeline(
-        store=store or settings.build_store(),
+        store=store,
         inference_mode=settings.inference_mode,
         extractor=settings.build_extractor(),
     )

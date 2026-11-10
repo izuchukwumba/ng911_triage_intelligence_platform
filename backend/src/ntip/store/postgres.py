@@ -5,6 +5,7 @@ from typing import Any
 
 import psycopg
 from psycopg.types.json import Jsonb
+from psycopg_pool import ConnectionPool
 
 from ntip.interop.receipts import InteropReceipt
 from ntip.ml.contract import ModelOutput
@@ -102,12 +103,30 @@ def _insert(cur: psycopg.Cursor[Any], record: Record) -> None:
             )
 
 
-class PostgresEventStore:
-    def __init__(self, url: str) -> None:
-        self._url = url
+#: How long a readiness check waits for a connection before reporting not ready.
+PING_TIMEOUT_S = 2.0
 
-    def _connect(self) -> psycopg.Connection[Any]:
-        return psycopg.connect(self._url)
+
+class PostgresEventStore:
+    """Event store on PostgreSQL, over a pool of connections.
+
+    Each operation borrows a connection for one transaction (committed on
+    success, rolled back on error) and returns it to the pool, so requests do
+    not pay for a new connection each time. Call ``close()`` when done.
+    """
+
+    def __init__(self, url: str, *, pool_size: int = 10) -> None:
+        # The pool connects in the background: an unreachable database does not
+        # stop the API from starting, it makes readiness checks fail instead.
+        self._pool = ConnectionPool(
+            url, min_size=1, max_size=pool_size, open=True, name="ntip-event-store"
+        )
+
+    def _connect(self, timeout: float | None = None) -> Any:
+        return self._pool.connection(timeout=timeout)
+
+    def close(self) -> None:
+        self._pool.close()
 
     def append(self, records: Sequence[Record], *, expect: Expectation | None = None) -> None:
         try:
@@ -242,7 +261,7 @@ class PostgresEventStore:
 
     def ping(self) -> bool:
         try:
-            with self._connect() as conn:
+            with self._connect(timeout=PING_TIMEOUT_S) as conn:
                 conn.execute("SELECT 1")
             return True
         except psycopg.Error:

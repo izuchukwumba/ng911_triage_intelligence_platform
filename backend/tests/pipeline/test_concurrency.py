@@ -33,5 +33,9 @@ def test_postgres_load_run_is_consistent(postgres_url: str) -> None:
     from ntip.store.postgres import PostgresEventStore
 
     upgrade(postgres_url)
-    result = run(PostgresEventStore(postgres_url), workers=8, incidents=10, follow_ups=3)
+    store = PostgresEventStore(postgres_url)
+    try:
+        result = run(store, workers=8, incidents=10, follow_ups=3)
+    finally:
+        store.close()
     assert (result["errors"], result["consistency_problems"]) == (0, 0)

@@ -13,6 +13,8 @@ from ntip.store import EventStore, InMemoryEventStore
 class Settings:
     # PostgreSQL URL for the event store. Unset -> in-memory store (demo only).
     database_url: str | None = None
+    # Maximum PostgreSQL connections held by the event store's pool.
+    database_pool_size: int = 10
     # Browser origins allowed to call the API (the dashboard in development).
     cors_origins: list[str] = field(default_factory=lambda: ["http://localhost:5173"])
     # Model use (design v1.2, 3A.3). rules_only needs no inference service.
@@ -43,6 +45,7 @@ class Settings:
             rate_limit_per_minute=int(os.environ.get("NTIP_RATE_LIMIT_PER_MINUTE", "600")),
             auth_disabled=auth_disabled and not api_tokens,
             database_url=os.environ.get("NTIP_DATABASE_URL") or None,
+            database_pool_size=int(os.environ.get("NTIP_DATABASE_POOL_SIZE", "10")),
             cors_origins=[o.strip() for o in origins.split(",")] if origins else cls().cors_origins,
             inference_mode=InferenceMode(os.environ.get("NTIP_INFERENCE_MODE", "rules_only")),
             inference_url=os.environ.get("NTIP_INFERENCE_URL") or None,
@@ -60,7 +63,7 @@ class Settings:
             return InMemoryEventStore()
         from ntip.store.postgres import PostgresEventStore
 
-        return PostgresEventStore(self.database_url)
+        return PostgresEventStore(self.database_url, pool_size=self.database_pool_size)
 
 
 def _parse_tokens(raw: str) -> dict[str, str]:
