@@ -75,6 +75,8 @@ Last updated: 2026-11-10.
 |---|---|---|
 | `/v1` endpoints, 202 ingest, idempotency, structured errors, correlation ids (§5.2–5.3) | Done | `ntip/api/*` |
 | Live and ready health checks (§5.2) | Done | `/health/live`, `/health/ready` |
+| Structured logs, metrics and trace correlation ids (§13.3) | Done | JSON logs with correlation ids, never transcript text or tracebacks (`ntip/observability.py`); Prometheus `/metrics` (requests and latency by route template, assessment outcomes and model status, interop receipts, build info); `tests/api/test_observability.py`, container smoke test |
+| Explicit simulation-only deployment flag (§13.2) | Done | `NTIP_DEPLOYMENT_MODE` (only `simulation`; anything else refuses to start), `X-NTIP-Mode` on every response |
 | Append-only events enforced by the database (§9.2) | Done | Triggers on every table; safety case S12 |
 | Restricted database role (§9.2) | Done | Migration 0006 (`ntip_app`); contract tests run as the role; `tests/store/test_postgres_app_role.py`; compose backend connects as `ntip_api` |
 | Replay: reproducibility and version comparison (§10.1–10.4) | Done | `POST /v1/replay-runs`; dashboard Replay tab |

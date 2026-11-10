@@ -52,6 +52,13 @@ release version identifies the platform as a whole.
   that every published sample, including those reconstructed without the fields
   added since 2.0.0, is still accepted unchanged.
 
+- **Observability** (design v1.2, section 13.3): JSON logs carrying correlation ids
+  (never transcript text or tracebacks), and Prometheus `/metrics` (requests and
+  latency by route template, assessment outcomes and model status, interop
+  receipts, build info).
+- **Explicit simulation mode**: `NTIP_DEPLOYMENT_MODE` accepts only `simulation`,
+  and every API response says so (`X-NTIP-Mode`).
+
 ### Fixed
 
 - "Main St" and "Main Street" no longer count as a location conflict.
