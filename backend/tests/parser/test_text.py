@@ -40,3 +40,4 @@ class TestSegments:
 
     def test_last_words(self) -> None:
         assert last_words("I looked and there was NO", 3) == "there was no"
+        assert last_words("Oh. No, he is", 3) == "no, he is"
