@@ -1,18 +1,10 @@
+# Node (dashboard)
 node_modules/
 dist/
 *.js.map
-*.d.ts
-!apps/dashboard/src/vite-env.d.ts
-!*.d.ts.map
 coverage/
-.env
-.env.local
-*.log
-.DS_Store
-Thumbs.db
-data/generated/
 
-# Python
+# Python (backend)
 .venv/
 __pycache__/
 *.py[cod]
@@ -20,3 +12,15 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 *.egg-info/
+
+# Local configuration and logs
+.env
+.env.local
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ad-hoc generated data (versioned datasets live in data/eval/)
+data/generated/
