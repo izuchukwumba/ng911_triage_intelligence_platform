@@ -25,6 +25,8 @@ class Settings:
     # use), Settings has authentication off; from_env() never silently does.
     api_tokens: dict[str, Principal] = field(default_factory=dict)
     auth_disabled: bool = True
+    # Requests per client per minute; 0 disables rate limiting.
+    rate_limit_per_minute: int = 0
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -38,6 +40,7 @@ class Settings:
             )
         return cls(
             api_tokens=api_tokens,
+            rate_limit_per_minute=int(os.environ.get("NTIP_RATE_LIMIT_PER_MINUTE", "600")),
             auth_disabled=auth_disabled and not api_tokens,
             database_url=os.environ.get("NTIP_DATABASE_URL") or None,
             cors_origins=[o.strip() for o in origins.split(",")] if origins else cls().cors_origins,

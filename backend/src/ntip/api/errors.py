@@ -14,6 +14,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from ntip.api.auth import Forbidden, Unauthenticated
+from ntip.api.ratelimit import RateLimiter, client_key
 from ntip.pipeline import IdempotencyConflict
 from ntip.replay import UnknownRuleset
 from ntip.store import UnknownIncident
@@ -37,6 +38,24 @@ def _error(request: Request, status: int, code: str, message: str) -> JSONRespon
 
 
 def install(app: FastAPI) -> None:
+    @app.middleware("http")
+    async def _rate_limit(
+        request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
+        limiter: RateLimiter = request.app.state.rate_limiter
+        if limiter.enabled and not request.url.path.startswith("/health"):
+            key = client_key(
+                request.headers.get("authorization"),
+                request.client.host if request.client else None,
+            )
+            retry_after = limiter.check(key)
+            if retry_after is not None:
+                # _correlate wraps this middleware, so the correlation id is set.
+                response = _error(request, 429, "rate_limited", "Too many requests; retry later.")
+                response.headers["Retry-After"] = str(max(1, round(retry_after)))
+                return response
+        return await call_next(request)
+
     @app.middleware("http")
     async def _correlate(
         request: Request, call_next: Callable[[Request], Awaitable[Response]]

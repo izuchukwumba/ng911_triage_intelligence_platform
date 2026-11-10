@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ntip import __version__
 from ntip.api import errors
+from ntip.api.ratelimit import RateLimiter
 from ntip.api.routes import health, incidents, interop, replay
 from ntip.api.settings import Settings
 from ntip.interop.gateway import EidoGateway
@@ -32,6 +33,7 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
         inference_mode=settings.inference_mode,
         extractor=settings.build_extractor(),
     )
+    app.state.rate_limiter = RateLimiter(settings.rate_limit_per_minute)
     app.state.api_tokens = settings.api_tokens
     app.state.auth_disabled = settings.auth_disabled
     app.state.eido_gateway = EidoGateway(app.state.pipeline)

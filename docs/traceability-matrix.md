@@ -96,7 +96,8 @@ Last updated: 2026-11-10.
 |---|---|---|
 | Seeded generator with perturbations, generator-intended labels (§12) | Done | `ntip.generator` |
 | Authentication and role-based access (§2.3, §13.2) | Done | `ntip/api/auth.py`, `tests/api/test_auth.py`; DDL-015 |
-| Threat model and controls (§13) | Done / Partial | [threat-model.md](safety/threat-model.md): rate limiting outstanding |
+| Rate limiting (§5.3, §13.2) | Done (per process) | `ntip/api/ratelimit.py`, `tests/api/test_rate_limit.py` |
+| Threat model and controls (§13) | Done | [threat-model.md](safety/threat-model.md); remaining limits listed there |
 | CI: lint, types, tests, PostgreSQL, safety gate, contract freshness, containers, dependency and secret scanning (§14.2) | Done | `.github/workflows/ci.yml` |
 | Load tests under concurrency (§14.1) | Not done | Only single-request latency |
 | Release tags and changelog (§14.3) | Not done | — |
