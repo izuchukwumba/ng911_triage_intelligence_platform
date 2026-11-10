@@ -14,18 +14,18 @@ from pydantic import Field, model_validator
 
 from ntip.schema.base import (
     SCHEMA_VERSION,
+    Evidence,
     Fact,
     FactStatus,
     Identifier,
     ReasonCode,
     SchemaModel,
-    SourceSpan,
     UtcDatetime,
 )
 from ntip.schema.source import SourceEvent
 
 # ---------------------------------------------------------------------------
-# Provenance
+# Provenance (Evidence lives in ntip.schema.base and is re-exported here)
 # ---------------------------------------------------------------------------
 
 
@@ -41,14 +41,6 @@ class Extractor(SchemaModel):
     kind: ExtractorKind
     extractor_id: Identifier
     version: str = Field(min_length=1)
-
-
-class Evidence(SchemaModel):
-    """A quoted stretch of a specific source event."""
-
-    source_event_id: Identifier
-    span: SourceSpan
-    text: str = Field(min_length=1)
 
 
 # ---------------------------------------------------------------------------
@@ -262,6 +254,7 @@ class Incident(SchemaModel):
         for location in self.locations:
             if location.evidence is not None:
                 yield location.evidence
+        yield from self.victim_count.evidence
 
 
 def _require_unique(name: str, values: Iterable[str]) -> None:
