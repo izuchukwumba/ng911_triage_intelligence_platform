@@ -1,21 +1,40 @@
 """FastAPI application factory."""
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from ntip import __version__
-from ntip.api.routes import health
+from ntip.api import errors
+from ntip.api.routes import health, incidents
+from ntip.api.settings import Settings
+from ntip.pipeline import Pipeline
+from ntip.store import EventStore
 
 
-def create_app() -> FastAPI:
+def create_app(store: EventStore | None = None, settings: Settings | None = None) -> FastAPI:
     """Build the API application.
 
     A factory (rather than a module-level app) keeps tests isolated: each test
-    can build a fresh app with its own dependencies.
+    can build a fresh app with its own store.
     """
+    settings = settings or Settings.from_env()
     app = FastAPI(
         title="NG911 Triage Intelligence Platform (research)",
         version=__version__,
-        description="Simulation and research use only — not for live dispatch.",
+        description=(
+            "SIMULATION ONLY — not for live dispatch. Advisory, human-in-the-loop "
+            "research API over synthetic data."
+        ),
     )
+    app.state.pipeline = Pipeline(store=store or settings.build_store())
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_methods=["GET", "POST"],
+        allow_headers=["Content-Type", "Idempotency-Key", errors.HEADER],
+        expose_headers=[errors.HEADER, "Idempotent-Replayed"],
+    )
+    errors.install(app)
     app.include_router(health.router)
+    app.include_router(incidents.router)
     return app
