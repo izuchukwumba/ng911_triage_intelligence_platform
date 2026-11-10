@@ -14,6 +14,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from ntip.pipeline import IdempotencyConflict
+from ntip.replay import UnknownRuleset
 from ntip.store import UnknownIncident
 
 log = logging.getLogger(__name__)
@@ -60,7 +61,11 @@ def install(app: FastAPI) -> None:
 
     @app.exception_handler(UnknownIncident)
     async def _unknown(request: Request, exc: UnknownIncident) -> JSONResponse:
-        return _error(request, 404, "not_found", "Incident or assessment not found.")
+        return _error(request, 404, "not_found", "Incident, assessment or replay run not found.")
+
+    @app.exception_handler(UnknownRuleset)
+    async def _ruleset(request: Request, exc: UnknownRuleset) -> JSONResponse:
+        return _error(request, 422, "unknown_ruleset", f"No released ruleset named {exc}.")
 
     @app.exception_handler(IdempotencyConflict)
     async def _conflict(request: Request, exc: IdempotencyConflict) -> JSONResponse:

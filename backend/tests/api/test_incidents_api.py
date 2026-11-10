@@ -108,7 +108,7 @@ class TestRead:
         assert response.json() == {
             "error": {
                 "code": "not_found",
-                "message": "Incident or assessment not found.",
+                "message": "Incident, assessment or replay run not found.",
                 "correlation_id": "abc-1",
             }
         }
