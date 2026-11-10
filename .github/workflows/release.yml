@@ -31,7 +31,8 @@ jobs:
           --health-retries 10
     env:
       NTIP_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-      OUT: ${{ runner.temp }}/release
+      # The runner context is not available at job level; use the workspace.
+      OUT: ${{ github.workspace }}/release-out
     steps:
       - uses: actions/checkout@v4
 

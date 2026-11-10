@@ -31,7 +31,8 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     env:
-      OUT: ${{ runner.temp }}/benchmarks
+      # The runner context is not available at job level; use the workspace.
+      OUT: ${{ github.workspace }}/benchmarks-out
     steps:
       - uses: actions/checkout@v4
 
@@ -75,5 +76,5 @@ jobs:
         if: always()
         with:
           name: benchmarks
-          path: ${{ runner.temp }}/benchmarks
+          path: ${{ github.workspace }}/benchmarks-out
           retention-days: 90
