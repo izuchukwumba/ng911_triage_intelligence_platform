@@ -21,7 +21,9 @@ services:
       retries: 10
 
   migrate:
-    build: ../../backend
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
     command: ["python", "-m", "ntip.store.migrate", "postgresql://ntip:${POSTGRES_PASSWORD:-ntip-dev-only}@postgres:5432/ntip"]
     depends_on:
       postgres:
@@ -30,9 +32,12 @@ services:
   # Stateless model service. The backend falls back to rules-only (and marks
   # results "degraded") whenever it is slow or unavailable.
   inference:
-    build: ../../backend
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
     command: ["uvicorn", "ntip.ml.service:create_inference_app", "--factory", "--host", "0.0.0.0", "--port", "8100"]
     environment:
+      # b0-rules-as-model | b1-tfidf-logreg
       NTIP_MODEL: ${NTIP_MODEL:-b0-rules-as-model}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100/health')"]
@@ -40,7 +45,9 @@ services:
       retries: 20
 
   backend:
-    build: ../../backend
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
     environment:
       NTIP_DATABASE_URL: postgresql://ntip:${POSTGRES_PASSWORD:-ntip-dev-only}@postgres:5432/ntip
       NTIP_CORS_ORIGINS: http://localhost:8080
