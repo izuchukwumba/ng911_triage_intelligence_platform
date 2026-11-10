@@ -279,3 +279,16 @@ The threat model listed the unauthenticated research API as the main gap before 
 - *Serialising all writes:* correct but throttles unrelated incidents.
 
 **Trade-off:** heavy contention on one incident costs retries (bounded at 20 attempts; the caller gets an error rather than a silently partial result if they run out).
+
+---
+
+## DDL-017: Tenants separate incidents; other tenants see nothing
+
+**Decision:** Every source event and replay run carries a `tenant_id` (schema 2.5.0). Each API principal belongs to exactly one tenant, set with its token. EIDO imports take the tenant of the interop credential. Every incident route checks the incident's tenant and answers **404** for another tenant's incident, exactly as for one that does not exist. Lists and replays are filtered, and idempotency keys are scoped per tenant. Records written before tenants existed belong to the `default` tenant.
+
+**Rationale:** INT-010 and the threat model required isolation beyond the interop receipts. Answering 403 would confirm that an incident id exists in another organisation; 404 reveals nothing. A shared idempotency key space would let one tenant replay, and so read, another tenant's result.
+
+**Alternatives considered:**
+- *A database per tenant:* the strongest isolation, but heavy for a research platform; the column-based design can move there later without API changes.
+- *Admins see all tenants:* convenient, but it would make a single token a cross-tenant credential; rejected until there is a real need and an audit design for it.
+

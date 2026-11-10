@@ -65,7 +65,7 @@ the role existed, recreate it (`docker compose ... down --volumes`).
 | `NTIP_DATABASE_URL` | unset (in-memory) | PostgreSQL event store |
 | `NTIP_DATABASE_POOL_SIZE` | `10` | Maximum connections in the event store's pool, per API process |
 | `NTIP_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated dashboard origins |
-| `NTIP_API_TOKENS` | none | `token:principal:role,...`; roles `viewer`, `operator` (+ingest, review), `analyst` (+replay), `admin` |
+| `NTIP_API_TOKENS` | none | `token:principal:role[:tenant],...`; roles `viewer`, `operator` (+ingest, review), `analyst` (+replay), `admin`; tenant defaults to `default`. Users see only their tenant's incidents and replay runs; EIDO imports belong to the submitting interop tenant |
 | `NTIP_AUTH_DISABLED` | unset | `1` runs without authentication, for an isolated local demo only. Without tokens or this flag the server refuses to start |
 | `NTIP_RATE_LIMIT_PER_MINUTE` | `600` | Requests per client (token, else address) per minute; `0` disables. 429 with `Retry-After` when exceeded; `/health` is exempt |
 | `NTIP_INTEROP_TOKENS` | none | `token:tenant,...` for the EIDO gateway; unset disables interop |

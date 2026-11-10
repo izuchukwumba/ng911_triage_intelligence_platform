@@ -32,6 +32,7 @@ mutation, and CI gates changes.
 | S16 | Invalid or unauthorised external input is never processed (ADR-INT-003) | Gateway: profile check, size limit, version rejection, schema quarantine, fail-closed auth | `test_int_002_*`, `test_int_003_*`, `test_int_010b_interop_fails_closed` |
 | S17 | No critical call is silently under-triaged by a change (§14.2) | CI gate: zero critical under-triage on the curated regression split | `python -m ntip.evaluation --split regression --gate` (CI step) |
 | S18 | Concurrent messages for one incident are never lost or half-processed | Optimistic concurrency: writes carry an expected message count, checked atomically (PostgreSQL advisory lock); the pipeline re-reads and retries | `test_concurrent_follow_ups_are_all_kept_and_assessed_together`, `test_expectation_rejects_a_stale_write`, `test_postgres_load_run_is_consistent` |
+| S19 | One tenant never sees or changes another tenant's incidents | Tenant on every source event and replay run; every incident route checks it; lists and replays are filtered; idempotency keys are scoped | `tests/api/test_tenants.py`, `test_incidents_and_replay_runs_are_filtered_by_tenant` |
 
 ## Residual risks (accepted for a research prototype)
 
