@@ -15,7 +15,7 @@ the B2 API credential when B2 is enabled.
 
 | Threat | Control in place | Gap / next step |
 |---|---|---|
-| Malicious or oversized input | Pydantic validation with `extra="forbid"`; transcript ≤ 20,000 chars; interop payload ≤ 512 KB; EIDO schema validation and quarantine | Rate limiting is not implemented (needed before any hosted deployment) |
+| Malicious or oversized input, request floods | Pydantic validation with `extra="forbid"`; transcript ≤ 20,000 chars; interop payload ≤ 512 KB; EIDO schema validation and quarantine; per-client rate limit (default 600/min, 429 with `Retry-After`) | The rate limit is per process; a multi-process deployment needs a shared counter |
 | Prompt injection via transcripts | Rules only extract; B2 treats the transcript as delimited data, output is schema-constrained and every claim must quote the source exactly | Model-side behaviour cannot be proven; mitigated by verification and human review |
 | Model-output laundering (an unsupported claim presented as fact) | Span verification rejects ungrounded candidates; model observations are marked `model`; a serious model-only cue needs human confirmation | — |
 | Log or error leakage of transcripts | Errors never echo submitted values or stack traces; correlation ids instead | Structured logging configuration is basic |

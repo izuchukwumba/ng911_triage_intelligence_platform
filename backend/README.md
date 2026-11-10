@@ -50,6 +50,7 @@ python -m ntip.store.migrate "$NTIP_DATABASE_URL" --down 0000   # roll back (dev
 | `NTIP_CORS_ORIGINS` | `http://localhost:5173` | Comma-separated dashboard origins |
 | `NTIP_API_TOKENS` | none | `token:principal:role,...`; roles `viewer`, `operator` (+ingest, review), `analyst` (+replay), `admin` |
 | `NTIP_AUTH_DISABLED` | unset | `1` runs without authentication, for an isolated local demo only. Without tokens or this flag the server refuses to start |
+| `NTIP_RATE_LIMIT_PER_MINUTE` | `600` | Requests per client (token, else address) per minute; `0` disables. 429 with `Retry-After` when exceeded; `/health` is exempt |
 | `NTIP_INTEROP_TOKENS` | none | `token:tenant,...` for the EIDO gateway; unset disables interop |
 
 ### API (`/v1`)
