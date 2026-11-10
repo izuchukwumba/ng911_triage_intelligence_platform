@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { IncidentSummary, IngestOut } from './api/client';
 import { api, getToken, setToken } from './api/client';
+import { EvaluationView } from './components/EvaluationView';
 import { IncidentDetail } from './components/IncidentDetail';
 import { IncidentQueue } from './components/IncidentQueue';
 import { IngestPanel } from './components/IngestPanel';
@@ -16,7 +17,7 @@ export default function App() {
   const [apiStatus, setApiStatus] = useState<'ok' | 'error' | 'unauthorized' | 'unknown'>('unknown');
   // Bumped to make the detail view reload after the queue changes.
   const [revision, setRevision] = useState(0);
-  const [view, setView] = useState<'queue' | 'replay'>('queue');
+  const [view, setView] = useState<'queue' | 'replay' | 'evaluation'>('queue');
   const [token, setTokenState] = useState(getToken());
 
   const fetchIncidents = useCallback(async () => {
@@ -53,6 +54,7 @@ export default function App() {
         <nav aria-label="Views" style={{ display: 'flex', gap: '4px', marginLeft: '16px' }}>
           <button type="button" className={`tab ${view === 'queue' ? 'tab-active' : ''}`} aria-pressed={view === 'queue'} onClick={() => setView('queue')}>Queue</button>
           <button type="button" className={`tab ${view === 'replay' ? 'tab-active' : ''}`} aria-pressed={view === 'replay'} onClick={() => setView('replay')}>Replay</button>
+          <button type="button" className={`tab ${view === 'evaluation' ? 'tab-active' : ''}`} aria-pressed={view === 'evaluation'} onClick={() => setView('evaluation')}>Evaluation</button>
         </nav>
         <form
           style={{ marginLeft: 'auto', display: 'flex', gap: '6px', alignItems: 'center' }}
@@ -69,7 +71,9 @@ export default function App() {
             : apiStatus === 'error' ? '○ API unavailable' : 'connecting…'}
         </span>
       </header>
-      {view === 'replay' ? (
+      {view === 'evaluation' ? (
+        <main style={{ flex: 1, overflow: 'hidden' }}><EvaluationView /></main>
+      ) : view === 'replay' ? (
         <main style={{ flex: 1, overflow: 'hidden' }}><ReplayView /></main>
       ) : (
       <main style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
