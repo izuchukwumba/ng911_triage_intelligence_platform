@@ -54,12 +54,13 @@ mypy                # strict type check
 backend/
   src/ntip/
     api/            HTTP boundary (FastAPI app factory, routes)
+    parser/         Rules-based transcript parser (baseline B0)
     schema/         Versioned data contracts (Pydantic, source of truth)
-  schemas/v1/       Generated JSON Schema 2020-12 files (committed)
+  schemas/v1/, v2/  Generated JSON Schema 2020-12 files (committed, one dir per major)
   tests/
 ```
 
-Further modules (`parser`, `triage`, `location`, `audit`, `interop`, `ml`,
+Further modules (`triage`, `location`, `audit`, `interop`, `ml`,
 `evaluation`) are added as each part of the design is ported.
 
 ## Data contracts
@@ -86,3 +87,22 @@ After changing a model, regenerate the published JSON Schema files:
 ```sh
 python -m ntip.schema.export
 ```
+
+## Rules parser (baseline B0)
+
+`ntip.parser.parse(sources, derived_at=...)` turns one or more source events
+into a canonical `Incident`. It is deterministic and dependency-free, and is
+the baseline the ML extractors are measured against (design v1.2, section 3A.4).
+
+| Stage | Module | What it does |
+|---|---|---|
+| Matching | `text` | Word-bounded phrase matching on the original text; clause and sentence windows |
+| Context | `context` | Polarity (affirmed / negated / uncertain), temporality (current / historical / hypothetical), attribution (first- / second-hand) |
+| Lexicon | `lexicon` | English and Spanish cue phrases per observation code; domain and subtype keywords |
+| Classification | `classify` | Language detection and a provisional domain/subtype vote from non-negated cues |
+| Counts | `counts` | Victim count as a `Fact`: reported, unknown, conflicting or not reported |
+| Locations | `locations` | Every reported address, intersection, route, street or landmark, with missing components |
+| Assembly | `parser` | Builds the incident, merges counts across messages, records conflicts |
+
+The parser assigns no urgency; that is the triage engine's job.
+
