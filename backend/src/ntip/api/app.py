@@ -32,13 +32,15 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
         inference_mode=settings.inference_mode,
         extractor=settings.build_extractor(),
     )
+    app.state.api_tokens = settings.api_tokens
+    app.state.auth_disabled = settings.auth_disabled
     app.state.eido_gateway = EidoGateway(app.state.pipeline)
     app.state.interop_tokens = settings.interop_tokens
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_methods=["GET", "POST"],
-        allow_headers=["Content-Type", "Idempotency-Key", errors.HEADER],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key", errors.HEADER],
         expose_headers=[errors.HEADER, "Idempotent-Replayed"],
     )
     errors.install(app)
