@@ -154,3 +154,15 @@ pool of 10 (`NTIP_DATABASE_POOL_SIZE`) raised throughput about 18-fold on
 the same run. The workload is deliberately extreme contention (every
 incident receives simultaneous follow-ups), measured on one development
 machine; treat the figures as a regression baseline, not a capacity claim.
+
+## Stream replay
+
+[`stream-escalation-research-1.1.0-vs-1.0.0.md`](stream-escalation-research-1.1.0-vs-1.0.0.md)
+replays [`data/streams/escalation.jsonl`](../../../data/streams/escalation.jsonl)
+on a simulated clock (design v1.2, section 10.2). It shows the queue after
+each message and how long each incident took to reach P0 (A: 45 s after its
+first message, B: 70 s). Against `research-1.0.0`, one step changes: the fall
+where the person cannot get up drops from P2 to P3, because that ruleset
+predates the unable-to-get-up rule. This is an illustrative difference, not a
+validated improvement.
+
