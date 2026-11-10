@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ntip import __version__
 from ntip.api import errors
-from ntip.api.routes import health, incidents, replay
+from ntip.api.routes import health, incidents, interop, replay
 from ntip.api.settings import Settings
+from ntip.interop.gateway import EidoGateway
 from ntip.pipeline import Pipeline
 from ntip.store import EventStore
 
@@ -31,6 +32,8 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
         inference_mode=settings.inference_mode,
         extractor=settings.build_extractor(),
     )
+    app.state.eido_gateway = EidoGateway(app.state.pipeline)
+    app.state.interop_tokens = settings.interop_tokens
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -42,4 +45,5 @@ def create_app(store: EventStore | None = None, settings: Settings | None = None
     app.include_router(health.router)
     app.include_router(incidents.router)
     app.include_router(replay.router)
+    app.include_router(interop.router)
     return app

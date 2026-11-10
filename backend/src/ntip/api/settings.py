@@ -18,6 +18,8 @@ class Settings:
     inference_mode: InferenceMode = InferenceMode.RULES_ONLY
     inference_url: str | None = None
     inference_timeout_s: float = 2.0
+    # Interop credentials, token -> tenant. Empty means interop is disabled.
+    interop_tokens: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -28,6 +30,7 @@ class Settings:
             inference_mode=InferenceMode(os.environ.get("NTIP_INFERENCE_MODE", "rules_only")),
             inference_url=os.environ.get("NTIP_INFERENCE_URL") or None,
             inference_timeout_s=float(os.environ.get("NTIP_INFERENCE_TIMEOUT_S", "2.0")),
+            interop_tokens=_parse_tokens(os.environ.get("NTIP_INTEROP_TOKENS", "")),
         )
 
     def build_extractor(self) -> ModelExtractor | None:
@@ -41,3 +44,9 @@ class Settings:
         from ntip.store.postgres import PostgresEventStore
 
         return PostgresEventStore(self.database_url)
+
+
+def _parse_tokens(raw: str) -> dict[str, str]:
+    """``token:tenant,token:tenant`` -> {token: tenant}."""
+    pairs = (item.strip().split(":", 1) for item in raw.split(",") if ":" in item)
+    return {token.strip(): tenant.strip() for token, tenant in pairs if token.strip()}
