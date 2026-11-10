@@ -118,6 +118,20 @@
         "domain": {
           "$ref": "#/$defs/IncidentDomain"
         },
+        "heuristic_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heuristic Confidence"
+        },
         "status": {
           "$ref": "#/$defs/ClassificationStatus",
           "default": "provisional"
@@ -147,6 +161,69 @@
         "confirmed"
       ],
       "title": "ClassificationStatus",
+      "type": "string"
+    },
+    "Conflict": {
+      "additionalProperties": false,
+      "description": "Incompatible statements, kept side by side instead of resolved silently.",
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z][A-Z0-9_]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Code"
+        },
+        "conflict_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_.:-]+$",
+          "title": "Conflict Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ConflictKind"
+        },
+        "location_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "title": "Location Ids",
+          "type": "array"
+        },
+        "observation_ids": {
+          "items": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.:-]+$",
+            "type": "string"
+          },
+          "title": "Observation Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "conflict_id",
+        "kind"
+      ],
+      "title": "Conflict",
+      "type": "object"
+    },
+    "ConflictKind": {
+      "enum": [
+        "observation_polarity",
+        "location_mismatch"
+      ],
+      "title": "ConflictKind",
       "type": "string"
     },
     "Coordinates": {
@@ -533,13 +610,20 @@
       "type": "string"
     }
   },
-  "$id": "https://ntip.local/schemas/v1.0.0/incident.schema.json",
+  "$id": "https://ntip.local/schemas/v1.1.0/incident.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "description": "The canonical interpretation of one or more source events.",
   "properties": {
     "classification": {
       "$ref": "#/$defs/Classification"
+    },
+    "conflicts": {
+      "items": {
+        "$ref": "#/$defs/Conflict"
+      },
+      "title": "Conflicts",
+      "type": "array"
     },
     "derived_at": {
       "format": "date-time",
@@ -580,7 +664,7 @@
       "type": "array"
     },
     "schema_version": {
-      "default": "1.0.0",
+      "default": "1.1.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -607,5 +691,5 @@
   ],
   "title": "Incident",
   "type": "object",
-  "x-schema-version": "1.0.0"
+  "x-schema-version": "1.1.0"
 }

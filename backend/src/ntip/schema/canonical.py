@@ -184,6 +184,36 @@ class Classification(SchemaModel):
     domain: IncidentDomain
     subtype: str | None = None
     status: ClassificationStatus = ClassificationStatus.PROVISIONAL
+    # Heuristic and uncalibrated, like Observation.heuristic_confidence.
+    heuristic_confidence: float | None = Field(default=None, ge=0, le=1)
+
+
+class ConflictKind(StrEnum):
+    # The same cue is both affirmed and denied, e.g. "he's breathing ... he's not breathing".
+    OBSERVATION_POLARITY = "observation_polarity"
+    # Two reported locations disagree, e.g. the caller corrects the address.
+    LOCATION_MISMATCH = "location_mismatch"
+
+
+class Conflict(SchemaModel):
+    """Incompatible statements, kept side by side instead of resolved silently."""
+
+    conflict_id: Identifier
+    kind: ConflictKind
+    code: ReasonCode | None = None
+    observation_ids: list[Identifier] = Field(default_factory=list)
+    location_ids: list[Identifier] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _check(self) -> Self:
+        refs = (
+            self.observation_ids
+            if self.kind is ConflictKind.OBSERVATION_POLARITY
+            else self.location_ids
+        )
+        if len(set(refs)) < 2:
+            raise ValueError(f"a {self.kind} conflict must reference at least two items")
+        return self
 
 
 def _not_reported() -> Fact[int]:
@@ -201,18 +231,29 @@ class Incident(SchemaModel):
     observations: list[Observation] = Field(default_factory=list)
     locations: list[LocationCandidate] = Field(default_factory=list)
     victim_count: Fact[int] = Field(default_factory=_not_reported)
+    conflicts: list[Conflict] = Field(default_factory=list)
     language: str | None = None
 
     @model_validator(mode="after")
     def _check(self) -> Self:
         _require_unique("observation_id", (o.observation_id for o in self.observations))
         _require_unique("location_id", (loc.location_id for loc in self.locations))
+        _require_unique("conflict_id", (c.conflict_id for c in self.conflicts))
         known = set(self.source_event_ids)
         for evidence in self.evidence():
             if evidence.source_event_id not in known:
                 raise ValueError(
                     f"evidence cites unknown source event {evidence.source_event_id!r}"
                 )
+        observation_ids = {o.observation_id for o in self.observations}
+        location_ids = {loc.location_id for loc in self.locations}
+        for conflict in self.conflicts:
+            for ref in conflict.observation_ids:
+                if ref not in observation_ids:
+                    raise ValueError(f"conflict cites unknown observation {ref!r}")
+            for ref in conflict.location_ids:
+                if ref not in location_ids:
+                    raise ValueError(f"conflict cites unknown location {ref!r}")
         return self
 
     def evidence(self) -> Iterator[Evidence]:
