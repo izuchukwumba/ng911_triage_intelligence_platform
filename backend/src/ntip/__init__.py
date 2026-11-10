@@ -4,4 +4,4 @@ Simulation and research use only. Not certified for emergency operations and
 not a substitute for trained telecommunicators or approved dispatch protocols.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

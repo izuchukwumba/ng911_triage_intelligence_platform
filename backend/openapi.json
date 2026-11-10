@@ -3084,7 +3084,7 @@
   "info": {
     "description": "SIMULATION ONLY \u2014 not for live dispatch. Advisory, human-in-the-loop research API over synthetic data.",
     "title": "NG911 Triage Intelligence Platform (research)",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "openapi": "3.1.0",
   "paths": {
