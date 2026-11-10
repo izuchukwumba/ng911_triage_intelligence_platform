@@ -162,4 +162,4 @@ jobs:
         run: npm audit --audit-level=moderate
 
       - name: Secrets in the repository history (gitleaks)
-        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest git /repo --redact --verbose
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest git /repo --config /repo/.gitleaks.toml --redact --verbose

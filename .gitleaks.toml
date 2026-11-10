@@ -1,0 +1,8 @@
+# gitleaks configuration: the default rules plus one narrow allowlist.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "sha256 digests of NENA's public EIDO schema files, pinned for verification; not secrets"
+paths = ['''^backend/src/ntip/interop/eido/profile\.py$''']
