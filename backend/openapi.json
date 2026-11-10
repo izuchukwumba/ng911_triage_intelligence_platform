@@ -64,6 +64,20 @@
         "title": "AdvisoryPriority",
         "type": "string"
       },
+      "Agreement": {
+        "enum": [
+          "confirmed",
+          "raised",
+          "lowered",
+          "override_same",
+          "reclassified",
+          "escalated",
+          "closed",
+          "noted"
+        ],
+        "title": "Agreement",
+        "type": "string"
+      },
       "Assessment": {
         "additionalProperties": false,
         "properties": {
@@ -2520,6 +2534,40 @@
         "title": "ReviewAction",
         "type": "string"
       },
+      "ReviewComparison": {
+        "properties": {
+          "by_agreement": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Agreement",
+            "type": "object"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewedCase"
+            },
+            "title": "Cases",
+            "type": "array"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "reviewed_assessments": {
+            "title": "Reviewed Assessments",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "note",
+          "reviewed_assessments",
+          "by_agreement",
+          "cases"
+        ],
+        "title": "ReviewComparison",
+        "type": "object"
+      },
       "ReviewDecision": {
         "enum": [
           "confirm",
@@ -2595,6 +2643,104 @@
           "decision"
         ],
         "title": "ReviewIn",
+        "type": "object"
+      },
+      "ReviewedCase": {
+        "properties": {
+          "agreement": {
+            "$ref": "#/components/schemas/Agreement"
+          },
+          "assessment_id": {
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "corrected_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Corrected Domain"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "human_priority": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Human Priority"
+          },
+          "incident_id": {
+            "title": "Incident Id",
+            "type": "string"
+          },
+          "machine_priority": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Machine Priority"
+          },
+          "machine_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Machine Reasons",
+            "type": "array"
+          },
+          "machine_severity": {
+            "title": "Machine Severity",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "reviewer_id": {
+            "title": "Reviewer Id",
+            "type": "string"
+          },
+          "ruleset_version": {
+            "title": "Ruleset Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "incident_id",
+          "assessment_id",
+          "ruleset_version",
+          "machine_priority",
+          "machine_severity",
+          "machine_reasons",
+          "decision",
+          "human_priority",
+          "corrected_domain",
+          "reason",
+          "reviewer_id",
+          "agreement"
+        ],
+        "title": "ReviewedCase",
         "type": "object"
       },
       "RuleFiring": {
@@ -4108,6 +4254,56 @@
           }
         },
         "summary": "Get Replay Run",
+        "tags": [
+          "replay"
+        ]
+      }
+    },
+    "/v1/review-comparison": {
+      "get": {
+        "description": "Machine output next to the operator's decision, for every reviewed assessment\nof the caller's tenant (design v1.2, 10.2 mode 4). Not ground truth.",
+        "operationId": "get_review_comparison_v1_review_comparison_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewComparison"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Review Comparison",
         "tags": [
           "replay"
         ]

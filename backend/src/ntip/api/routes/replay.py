@@ -9,6 +9,7 @@ from ntip.api.auth import Permission, Principal, acting_as, require
 from ntip.api.errors import correlation_id
 from ntip.pipeline import Pipeline
 from ntip.replay import run_replay
+from ntip.review_replay import ReviewComparison, compare_reviews
 from ntip.schema.replay import ReplayRun
 from ntip.store import UnknownIncident
 from ntip.triage.ruleset import DEFAULT_RULESET, RELEASED
@@ -91,3 +92,12 @@ def list_rulesets() -> list[RulesetOut]:
         RulesetOut(name=name, digest=digest, default=name == DEFAULT_RULESET)
         for name, digest in RELEASED.items()
     ]
+
+
+@router.get("/review-comparison")
+def get_review_comparison(
+    request: Request, principal: Annotated[Principal, Depends(require(Permission.READ))]
+) -> ReviewComparison:
+    """Machine output next to the operator's decision, for every reviewed assessment
+    of the caller's tenant (design v1.2, 10.2 mode 4). Not ground truth."""
+    return compare_reviews(_pipeline(request).store, tenant_id=principal.tenant_id)
