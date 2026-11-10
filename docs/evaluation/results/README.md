@@ -68,3 +68,16 @@ priority agreement 0.870. Failures group into:
 Labels here are generator-intended, so these numbers are a stress test, not
 accuracy.
 
+## Parser 1.3.0 (dev + regression only)
+
+Fixes for the generated-set gaps above ("still", "overdosed", "atrapadas").
+
+| | Curated (30) | Generated (300) |
+|---|---|---|
+| Critical under-triage | 0/13 | 1/109 (was 9/109) |
+| Priority exact | 0.867 | 0.937 (was 0.870) |
+| Cue micro F1 | 0.986 | 0.989 (was 0.963) |
+
+The remaining generated critical miss is a misspelled cue, the expected limit
+of exact phrase matching. Neither test split was re-run.
+
