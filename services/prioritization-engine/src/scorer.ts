@@ -138,26 +138,26 @@ export function scoreIncident(record: IncidentRecord): ScoringResult {
     });
   }
 
-  // Apply penalty rules
-  const penalties = scoringRules.penalty_rules;
+  // Verification flags: surface uncertainty for operator review without
+  // touching the score. Missing location or low parser confidence must never
+  // lower the priority of an otherwise urgent incident.
+  const flags = scoringRules.verification_flags;
 
-  if (record.location.dispatchable_location_score < penalties.low_location_confidence.threshold) {
-    score += penalties.low_location_confidence.penalty;
-    reasonCodes.push(penalties.low_location_confidence.reason_code);
+  if (record.location.dispatchable_location_score < flags.low_location_confidence.threshold) {
+    reasonCodes.push(flags.low_location_confidence.reason_code);
     breakdown.push({
-      reason_code: penalties.low_location_confidence.reason_code,
-      weight: penalties.low_location_confidence.penalty,
-      description: penalties.low_location_confidence.description,
+      reason_code: flags.low_location_confidence.reason_code,
+      weight: 0,
+      description: flags.low_location_confidence.description,
     });
   }
 
-  if (record.incident.confidence < penalties.low_parse_confidence.threshold) {
-    score += penalties.low_parse_confidence.penalty;
-    reasonCodes.push(penalties.low_parse_confidence.reason_code);
+  if (record.incident.confidence < flags.low_parse_confidence.threshold) {
+    reasonCodes.push(flags.low_parse_confidence.reason_code);
     breakdown.push({
-      reason_code: penalties.low_parse_confidence.reason_code,
-      weight: penalties.low_parse_confidence.penalty,
-      description: penalties.low_parse_confidence.description,
+      reason_code: flags.low_parse_confidence.reason_code,
+      weight: 0,
+      description: flags.low_parse_confidence.description,
     });
   }
 

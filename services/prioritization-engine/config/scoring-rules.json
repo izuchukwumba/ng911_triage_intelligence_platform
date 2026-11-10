@@ -1,6 +1,6 @@
 {
   "_comment": "Versioned scoring config for the NG911 triage prioritization engine. Bump scoring_version whenever weights change so historical audit records remain traceable.",
-  "scoring_version": "0.2.0",
+  "scoring_version": "0.3.0",
 
   "_comment_base": "Domain-specific base scores replace the single base_score. EMS and hazmat incidents start higher because even an unconfirmed medical call warrants faster response than a vague police call.",
   "domain_base_scores": {
@@ -108,20 +108,19 @@
     "description": "Score contribution from estimated victim count beyond 1"
   },
 
-  "penalty_rules": {
+  "verification_flags": {
+    "_comment": "Flags surface uncertainty for operator verification. They carry no weight: missing location or low parser confidence must never lower an incident's priority.",
     "low_location_confidence": {
       "threshold": 0.30,
       "field": "location.dispatchable_location_score",
-      "penalty": -0.08,
       "reason_code": "LOW_LOCATION_CONFIDENCE",
-      "description": "Dispatchable location score is low — response routing may be impaired"
+      "description": "Dispatchable location score is low — verify location with caller (does not lower priority)"
     },
     "low_parse_confidence": {
       "threshold": 0.40,
       "field": "incident.confidence",
-      "penalty": -0.06,
       "reason_code": "LOW_PARSE_CONFIDENCE",
-      "description": "Parser confidence is low — incident classification uncertain"
+      "description": "Parser confidence is low — confirm classification (does not lower priority)"
     }
   },
 
