@@ -88,7 +88,7 @@ Last updated: 2026-11-10.
 | Simulation banner, queue, detail with evidence, why panel, review/override, replay, audit (§11.1) | Done | `apps/dashboard` |
 | No colour-only signals, keyboard focus, labels (§11.2) | Partial | Implemented; no automated accessibility tests |
 | Evaluation report screen (§11.1) | Not done | Reports live in `docs/evaluation/results` |
-| State machine RECEIVED → … → CLOSED (§11.3) | Partial | `awaiting_review` / `reviewed` / `processing_failed`; no explicit closed state |
+| State machine RECEIVED → … → CLOSED (§11.3) | Done | `awaiting_review` / `reviewed` / `processing_failed` / `closed`; closing is a review decision and a new message reopens |
 
 ## Generator, security, CI (§12, §13, §14)
 
