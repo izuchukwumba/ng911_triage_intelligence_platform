@@ -43,6 +43,7 @@ from ntip.generator.scenarios import (
     Situation,
 )
 from ntip.generator.scenarios_v2 import SITUATIONS
+from ntip.generator.scenarios_v21 import PRONOUNS, REASSURANCES, SPANISH_KIN, applies
 
 GENERATOR_VERSION = "2.0.0"
 
@@ -244,8 +245,29 @@ class _Draft:
     variant: list[str]
 
 
-def _draft(situation: Situation, rng: random.Random) -> _Draft:
+_KIN = re.compile(r"([Mm]i) (" + "|".join(SPANISH_KIN["m"] + SPANISH_KIN["f"]) + r")")
+_OBJECT = {"he": "him", "she": "her", "they": "them"}
+
+
+def _swap_kin(rng: random.Random, template: str) -> str:
+    """Generator 2.1: replace "mi <family word>" with a random word of the same gender."""
+
+    def swap(m: re.Match[str]) -> str:
+        gender = "m" if m.group(2) in SPANISH_KIN["m"] else "f"
+        return f"{m.group(1)} {rng.choice(SPANISH_KIN[gender])}"
+
+    return _KIN.sub(swap, template)
+
+
+def _shout(t: Tagged) -> Tagged:
+    return Tagged([c.upper() for c in t.chars], list(t.tags))
+
+
+def _draft(situation: Situation, rng: random.Random, extras: bool = False) -> _Draft:
+    """One call. ``extras`` adds generator 2.1's variants; without it the
+    random draws, and so the 2.0.0 dataset, are exactly as before."""
     variant: list[str] = []
+    template, who = "", ""
     severity = situation.severity
     status = CueStatus.AFFIRMED
     victims: int | str | None = None
@@ -253,7 +275,10 @@ def _draft(situation: Situation, rng: random.Random) -> _Draft:
 
     use_spanish = bool(situation.spanish) and rng.random() < 0.15
     if use_spanish:
-        body = render(rng.choice(situation.spanish), "")
+        spanish_template = rng.choice(situation.spanish)
+        if extras and "CHILDBIRTH" not in situation.cues:
+            spanish_template = _swap_kin(rng, spanish_template)
+        body = render(spanish_template, "")
         variant.append("spanish")
         if any(w in body.text.lower() for w in ("mi hijo", "mi hija", "mi bebé")):
             # Spanish phrasings name their own person; tag it as the child.
@@ -302,11 +327,37 @@ def _draft(situation: Situation, rng: random.Random) -> _Draft:
         if status not in (CueStatus.NEGATED, CueStatus.HISTORICAL):
             severity = _escalate(severity)
 
+    if extras and not use_spanish and status in (CueStatus.AFFIRMED, CueStatus.UNCERTAIN):
+        names_person = "{who}" in template.lower()
+        candidates = [r for r in REASSURANCES if applies(r, situation, names_person)]
+        if candidates and rng.random() < 0.3:
+            reassurance = rng.choice(candidates)
+            pronoun = PRONOUNS[who]
+            phrasing = (
+                rng.choice(reassurance.phrasings)
+                .replace("{P}", pronoun.capitalize())
+                .replace("{p}", _OBJECT[pronoun])
+                .replace("{be}", "are" if pronoun == "they" else "is")
+            )
+            sentence = render(phrasing, who)
+            # A pronoun needs its person first; a general denial can go either side.
+            before = not reassurance.personal and rng.random() < 0.5
+            body = sentence + Tagged.of(" ") + body if before else body + Tagged.of(" ") + sentence
+            statuses[reassurance.code] = CueStatus.NEGATED
+            variant.append("reassured")
+    injury_denied = statuses.get("INJURY_REPORTED") is CueStatus.NEGATED
+
     location, location_label, location_kind = _location(rng, use_spanish)
     first = body + (Tagged.of(" ") + location if location.chars else Tagged())
 
     live = status not in (CueStatus.NEGATED, CueStatus.HISTORICAL)
-    if live and not use_spanish and situation.personal and rng.random() < 0.15:
+    if (
+        live
+        and not use_spanish
+        and situation.personal
+        and rng.random() < 0.15
+        and not injury_denied
+    ):
         n = rng.choice(list(NUMBER_WORDS))
         first = (
             first
@@ -339,8 +390,10 @@ def _draft(situation: Situation, rng: random.Random) -> _Draft:
         variant.append("corrected_address")
 
     if not use_spanish:
-        roll = rng.random()
-        if roll < 0.08:
+        if extras and rng.random() < 0.06:
+            messages[0] = _shout(messages[0])
+            variant.append("shouting")
+        elif rng.random() < 0.08:
             messages[0] = _speech_recognition(rng, messages[0])
             variant.append("speech_recognition")
         else:
@@ -389,19 +442,29 @@ def _labels(situation: Situation, draft: _Draft) -> CaseLabels:
     )
 
 
-def generate(n: int, seed: int) -> Iterator[EvalCase]:
-    """``n`` cases, cycling through families; identical for the same seed."""
+def generate(
+    n: int,
+    seed: int,
+    *,
+    situations: tuple[Situation, ...] = SITUATIONS,
+    version: str = GENERATOR_VERSION,
+    extras: bool = False,
+) -> Iterator[EvalCase]:
+    """``n`` cases, cycling through families; identical for the same seed.
+
+    Generator 2.1 calls this with its own situations and ``extras=True``.
+    """
     rng = random.Random(seed)
+    prefix = "g2" if version == GENERATOR_VERSION else "g" + version.replace(".", "")[:2]
     for i in range(n):
-        situation = SITUATIONS[i % len(SITUATIONS)]
-        draft = _draft(situation, rng)
+        situation = situations[i % len(situations)]
+        draft = _draft(situation, rng, extras)
         yield EvalCase(
-            case_id=f"g2s{seed}-{i:04d}",
+            case_id=f"{prefix}s{seed}-{i:04d}",
             split=situation.split,
             family=situation.family,
             messages=[m.text for m in draft.messages],
             label_source=LabelSource.GENERATOR,
             labels=_labels(situation, draft),
-            notes=f"generator {GENERATOR_VERSION}, seed {seed}; "
-            + (", ".join(draft.variant) or "plain"),
+            notes=f"generator {version}, seed {seed}; " + (", ".join(draft.variant) or "plain"),
         )
