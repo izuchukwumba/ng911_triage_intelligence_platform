@@ -359,3 +359,44 @@ Ruleset `research-1.2.0`, now the default, rates each one `high`, except `TRAFFI
 - A B1e model trained for 23 codes is refused by the current code, which expects 35.
 
 **Revisit when:** practitioner review (study A) or independent annotation disagrees with a severity or a definition.
+
+## DDL-022: Neither score calibration nor fusion policy 2.0.0 is adopted
+
+**Decision:**
+- **Fusion:** hybrid fusion stays on policy 1.0.0, so every verified model
+  cue is added. Policy 2.0.0 stays in the code and the schema for research,
+  selectable with `NTIP_FUSION_POLICY`, but it is not the default.
+- **Calibration:** B1e runs uncalibrated. Temperature scaling and per-cue
+  thresholds (`ntip.ml.calibrate`) stay available, but no calibration file
+  is applied (milestone ML-9; [results](../evaluation/results/README.md#ml-9-outcome-calibration-and-fusion-2-on-generator-22-not-adopted)).
+
+**Evidence:**
+- **Setup:** a B1e trained on generator 2.2's dev split, calibrated on its
+  regression split (870 calls from families it never saw), and compared on
+  those calls and on curated dev + regression.
+- **Fusion 2 fails its adoption gate** (ML layer design §7 required
+  critical under-triage not to rise). It treats only the three codes that
+  are critical on their own as critical. Many P0 calls, however, are a
+  *high* cue plus a child or several victims. Fusion 2 held those back as
+  suggestions, and critical under-triage rose from 41 to 81 of 249 P0
+  calls, about the rules' own 82.
+- **Calibration did not improve the system** on either dataset. It made
+  fusion 1 over-triage two more curated calls (8 instead of 6).
+- **The project owner set the stopping rule in advance:** one more attempt
+  at calibration after fixing the data, then skip it if it did not help.
+
+**Rationale:** Never risking a critical miss (design v1.2 §3A.6) outweighs
+precision. Fusion 1 has the most over-triage (80 of 870 calls against the
+rules' 48), but it also has by far the least under-triage (123 against 313).
+
+**Lessons:**
+- The 30 curated cases favoured fusion 2, and the 870 regression calls
+  reversed that. A policy choice needs a sample large enough to see rare
+  escalation paths.
+- A split-based design should first check that each cue code appears on
+  both sides of the split. The data cards show this.
+
+**Revisit when:** a fusion policy treats "would this cue change the
+priority" as critical, rather than a fixed code list. Calibration is worth
+retrying once adjudicated labels exist (ML-11) or B1e trains on much more
+varied data.
