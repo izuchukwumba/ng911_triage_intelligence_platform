@@ -135,7 +135,13 @@ def build_scorer(encoder: Any) -> "torch.nn.Module":
 class B1eModel:
     model_id = MODEL_ID
 
-    def __init__(self, directory: Path, *, candidate_at: float = CANDIDATE_AT) -> None:
+    def __init__(
+        self,
+        directory: Path,
+        *,
+        candidate_at: float = CANDIDATE_AT,
+        calibration: Path | None = None,
+    ) -> None:
         import torch
         from safetensors.torch import load_file
         from transformers import AutoModel, AutoTokenizer
@@ -155,6 +161,14 @@ class B1eModel:
         if digest != self.manifest["weights_digest"]:
             raise InvalidModel("weights digest does not match the manifest")
         self.model_version = f"{MODEL_SERIES}+{digest.removeprefix('sha256:')[:12]}"
+        # Calibrated scores and per-cue thresholds (ML-9), bound to these weights.
+        self.calibration = None
+        if calibration is not None:
+            from ntip.ml.calibrate import Calibration
+
+            self.calibration = Calibration.load(calibration)
+            if self.calibration.weights_digest != digest:
+                raise InvalidModel(f"{calibration.name} was fitted for another model")
         self.max_length = int(self.manifest["params"]["max_length"])
 
         torch.manual_seed(0)  # nothing is random at inference; fixed for certainty
@@ -201,7 +215,13 @@ class B1eModel:
         for code in CODES if clauses else ():
             best = max(range(len(clauses)), key=lambda i: scores[i][code])
             score = scores[best][code]
-            if score >= self.candidate_at:
+            threshold: float | None = self.candidate_at
+            if self.calibration is not None:
+                score = self.calibration.score(score)
+                threshold = self.calibration.threshold(code)
+            if threshold is None:  # calibration found no threshold precise enough
+                continue
+            if score >= threshold:
                 message, span = clauses[best]
                 candidates.append(
                     Candidate(
@@ -213,7 +233,7 @@ class B1eModel:
                         confidence=round(score, 4),
                     )
                 )
-            elif score >= ABSTAIN_FROM:
+            elif score >= threshold * ABSTAIN_FROM / CANDIDATE_AT:
                 abstentions.append(
                     Abstention(code=code, reason=f"score {score:.2f} between thresholds")
                 )
@@ -223,6 +243,6 @@ class B1eModel:
             model_version=self.model_version,
             candidates=candidates,
             abstentions=abstentions,
-            calibrated=False,
+            calibrated=self.calibration is not None,
             runtime_ms=(time.perf_counter() - started) * 1000,
         )
