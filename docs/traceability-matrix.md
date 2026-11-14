@@ -32,7 +32,7 @@ Last updated: 2026-11-10.
 | B2 structured-output LLM (§3A.4) | Partial (optional) | Adapter and tests done (`ntip/ml/b2.py`); not evaluated. Demoted to an optional, research-only comparison: a hosted model could not be deployed on real calls, so B1e, run locally, is the primary path (DDL-020; [model card](ml/model-card-b2.md)) |
 | B3 domain-adapted model (§3A.4) | Not done | Only after dataset quality is established, per the design; entry conditions in the [ML layer design](design/ml-layer-design-v1.0.md) §5.5 |
 | ML for all four §3A.1 tasks | Partial | Models extract cues only; incident type, victim count and location entities come from the rules ([ML layer design](design/ml-layer-design-v1.0.md) §2) |
-| Calibrated scores and data-driven abstention (§3A.1 task 4, §3A.5) | Partial | Calibration is measured (ECE, Brier, risk-coverage) but not corrected; abstention thresholds are set by hand ([ML layer design](design/ml-layer-design-v1.0.md) §6) |
+| Calibrated scores and data-driven abstention (§3A.1 task 4, §3A.5) | Partial (tried, not adopted) | Temperature scaling and per-cue thresholds are built (`ntip/ml/calibrate.py`) and were fitted twice on held-out families. They did not improve the hybrid system, so scores stay uncalibrated (DDL-022; [results](evaluation/results/README.md#ml-9-outcome-calibration-and-fusion-2-on-generator-22-not-adopted)) |
 | Inference contract, span verification, abstentions (§3A.5) | Done | `ntip/ml/contract.py`, `verify.py`; safety case S6 |
 | Modes `rules_only` / `ml_shadow` / `hybrid_review`, timeout fallback (§3A.3, §3A.6) | Done | `ntip/ml/fusion.py`, pipeline; safety case S7–S8; CI smoke test runs hybrid with B1 |
 | Separate inference service (§3A.3) | Done | `ntip.ml.service`, compose `inference` service |

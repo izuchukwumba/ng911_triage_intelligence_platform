@@ -393,3 +393,66 @@ design of the split, not the calibration method.
 best cue F1 of any hybrid so far (0.947, precision 0.923). That is on 30
 cases, with a model that never saw 12 codes; on these cases the rules
 supply those codes. It is not evidence that less training data is better.
+
+## ML-9 outcome: calibration and fusion 2 on generator 2.2 (not adopted)
+
+The second attempt, after fixing both causes of the first:
+- **Data:** generator 2.2 puts every cue code in dev, regression and test (#84).
+- **Floor:** critical thresholds can no longer fall below 0.3 (#85).
+- **Model:** B1e `0.1.0+a576fe617662`
+  ([manifest](b1e-0.1.0+a576fe617662-manifest.json)), trained on a Colab T4
+  at `62a232b` on generator 2.2's **dev** split (930 calls, 31 families).
+- **Calibration:** [fitted](b1e-0.1.0+a576fe617662-calibration-regression.json)
+  on the **regression** split (870 calls, 29 unseen families).
+
+**The calibration itself is now sound.**
+- T = 1.53. On the regression split, ECE fell from 0.016 to 0.005 and Brier
+  score from 0.0199 to 0.0190.
+- Three cues are never proposed (`HAZARDOUS_ENVIRONMENT`, `MISSING_PERSON`,
+  `WEAPON_PRESENT`), against 12 in the first attempt.
+- The floor held all three critical thresholds at 0.3. The recall target
+  alone would again have set them below 0.01.
+
+**On curated dev + regression (30 cases)**
+([uncalibrated](compare-curated-dev-regression-b1e-0.1.0+a576fe617662.md),
+[calibrated](compare-curated-dev-regression-b1e-0.1.0+a576fe617662-calibrated.md)):
+
+| | B0 | Hybrid fusion 1 | Hybrid fusion 1, calibrated | Hybrid fusion 2 | Hybrid fusion 2, calibrated |
+|---|---|---|---|---|---|
+| Under-triage | 1/30 | 0/30 | 0/30 | 1/30 | 1/30 |
+| Over-triage | 4/30 | 6/30 | 8/30 | 4/30 | 4/30 |
+| Cue precision | 0.973 | 0.861 | 0.787 | 0.973 | 0.973 |
+
+**On the 870 regression calls**
+([report](compare-generated-regression-b1e-0.1.0+a576fe617662.md); the
+uncalibrated model, which never saw these families):
+
+| | B0 | B1e only | Hybrid fusion 1 | Hybrid fusion 2 |
+|---|---|---|---|---|
+| Critical under-triage (labelled P0) | 82/249 | 128/249 | **41/249** | 81/249 |
+| Under-triage (any) | 313/870 | 354/870 | **123/870** | 312/870 |
+| Over-triage (any) | 48/870 | 60/870 | 80/870 | 56/870 |
+| Priority exact | 509/870 | 456/870 | **667/870** | 502/870 |
+| Cue precision / recall | 0.961 / 0.699 | 0.882 / 0.573 | 0.893 / 0.850 | 0.946 / 0.700 |
+
+**Findings:**
+1. **Calibration does not help the system.** Under fusion 2 it changes
+   nothing on curated. Under fusion 1 it adds two over-triaged calls and
+   lowers precision. Calibration is **skipped for now**, as agreed
+   beforehand (DDL-022).
+2. **Fusion 2 fails its own adoption gate.** Its definition of "critical"
+   is the three codes that make a call critical on their own. Many P0
+   calls, however, are a *high* cue plus a child or several victims:
+   - "my son… is cutting themselves";
+   - "can't catch their breath… two people hurt".
+
+   The rules miss those phrasings and B1e finds them. Fusion 2 then holds
+   them back as non-critical suggestions, so the call loses its P0. Critical
+   under-triage doubles from 41 to 81 of 249, which is no better than the
+   rules alone (82). The 30 curated cases could not show this: there, fusion
+   2 looked best. **Fusion 2 is not adopted** (DDL-022).
+3. **Fusion 1 with B1e is the strongest result so far.** On families the
+   model never saw, it halves critical under-triage against the rules (82 to
+   41 of 249) and cuts all under-triage by 61% (313 to 123). Over-triage
+   rises from 48 to 80. Labels are generator-intended, so this is a stress
+   test, not accuracy.

@@ -1,0 +1,330 @@
+{
+  "format": "ntip-calibration/1",
+  "model_version": "0.1.0+a576fe617662",
+  "weights_digest": "sha256:a576fe61766277f7b7a197948799b9f6907a423bc4169954ba492e2b79f774d7",
+  "data": {
+    "path": "data/eval/generated-2.2.0-seed42.jsonl",
+    "digest": "sha256:fc839b30cf1a8863d9689ae677f4dc94c666a8274889a53fbadc40e234394858",
+    "split": "regression",
+    "calls": 870
+  },
+  "method": {
+    "temperature": "single, grid search on negative log-likelihood",
+    "target_precision": 0.9,
+    "critical_recall": 0.95,
+    "critical_floor": 0.3,
+    "min_positives": 10,
+    "default_threshold": 0.5
+  },
+  "temperature": 1.529,
+  "codes": {
+    "ACTIVE_BLEEDING": {
+      "threshold": 0.222418,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9655,
+      "recall": 0.9333
+    },
+    "ACTIVE_VIOLENCE": {
+      "threshold": 0.95334,
+      "critical": false,
+      "positives": 24,
+      "negatives": 846,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 1.0,
+      "recall": 0.3333
+    },
+    "ALLERGIC_REACTION": {
+      "threshold": 0.099471,
+      "critical": false,
+      "positives": 27,
+      "negatives": 843,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9167,
+      "recall": 0.8148
+    },
+    "BREATHING_DIFFICULTY": {
+      "threshold": 0.362718,
+      "critical": false,
+      "positives": 24,
+      "negatives": 846,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9091,
+      "recall": 0.4167
+    },
+    "BURN_INJURY": {
+      "threshold": 0.52693,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 1.0,
+      "recall": 0.9333
+    },
+    "CARDIAC_SYMPTOMS": {
+      "threshold": 0.661726,
+      "critical": false,
+      "positives": 25,
+      "negatives": 845,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9048,
+      "recall": 0.76
+    },
+    "CHILDBIRTH": {
+      "threshold": 0.11017,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9412,
+      "recall": 0.5333
+    },
+    "CHILD_INVOLVED": {
+      "threshold": 0.869802,
+      "critical": false,
+      "positives": 109,
+      "negatives": 761,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9444,
+      "recall": 0.9358
+    },
+    "DIABETIC_EMERGENCY": {
+      "threshold": 0.302491,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9,
+      "recall": 0.9
+    },
+    "DROWNING": {
+      "threshold": 0.444542,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 1.0,
+      "recall": 0.1333
+    },
+    "ELECTROCUTION": {
+      "threshold": 0.229333,
+      "critical": false,
+      "positives": 25,
+      "negatives": 845,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9259,
+      "recall": 1.0
+    },
+    "EXPLOSION_REPORTED": {
+      "threshold": 0.89438,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 1.0,
+      "recall": 0.2333
+    },
+    "FALL_FROM_HEIGHT": {
+      "threshold": 0.419045,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9091,
+      "recall": 1.0
+    },
+    "FIRE_REPORTED": {
+      "threshold": 0.046717,
+      "critical": false,
+      "positives": 115,
+      "negatives": 755,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9121,
+      "recall": 0.7217
+    },
+    "FIRE_SPREADING": {
+      "threshold": 0.738402,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9259,
+      "recall": 0.8333
+    },
+    "HAZARDOUS_ENVIRONMENT": {
+      "threshold": null,
+      "critical": false,
+      "positives": 28,
+      "negatives": 842,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "INJURY_REPORTED": {
+      "threshold": 0.141191,
+      "critical": false,
+      "positives": 125,
+      "negatives": 745,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.902,
+      "recall": 0.736
+    },
+    "INTRUDER_PRESENT": {
+      "threshold": 0.185277,
+      "critical": false,
+      "positives": 27,
+      "negatives": 843,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9412,
+      "recall": 0.5926
+    },
+    "MISSING_PERSON": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "MULTIPLE_VICTIMS": {
+      "threshold": 0.0457,
+      "critical": false,
+      "positives": 73,
+      "negatives": 797,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9012,
+      "recall": 1.0
+    },
+    "NOT_BREATHING": {
+      "threshold": 0.3,
+      "critical": true,
+      "positives": 55,
+      "negatives": 815,
+      "rule": "critical: highest threshold with recall >= 0.95, not below 0.3: recall target needs 0.0068, floor applied",
+      "precision": 0.625,
+      "recall": 0.6364
+    },
+    "OCCUPANTS_TRAPPED": {
+      "threshold": 0.3,
+      "critical": true,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "critical: highest threshold with recall >= 0.95, not below 0.3: recall target needs 0.0032, floor applied",
+      "precision": null,
+      "recall": 0.0
+    },
+    "OVERDOSE": {
+      "threshold": 0.060254,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9032,
+      "recall": 0.9333
+    },
+    "POISONING": {
+      "threshold": 0.229045,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9062,
+      "recall": 0.9667
+    },
+    "SEIZURE": {
+      "threshold": 0.177745,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9231,
+      "recall": 0.8
+    },
+    "SELF_HARM_RISK": {
+      "threshold": 0.247706,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9,
+      "recall": 0.9
+    },
+    "SMOKE_REPORTED": {
+      "threshold": 0.092331,
+      "critical": false,
+      "positives": 29,
+      "negatives": 841,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9259,
+      "recall": 0.8621
+    },
+    "STROKE_SYMPTOMS": {
+      "threshold": 0.285025,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9062,
+      "recall": 0.9667
+    },
+    "TRAFFIC_COLLISION": {
+      "threshold": 0.343498,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 1.0,
+      "recall": 0.2667
+    },
+    "UNABLE_TO_GET_UP": {
+      "threshold": 0.297932,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9231,
+      "recall": 0.4
+    },
+    "UNCONSCIOUS": {
+      "threshold": 0.3,
+      "critical": true,
+      "positives": 50,
+      "negatives": 820,
+      "rule": "critical: highest threshold with recall >= 0.95, not below 0.3: recall target needs 0.0032, floor applied",
+      "precision": 0.9048,
+      "recall": 0.38
+    },
+    "WEAPON_PRESENT": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 840,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    }
+  },
+  "fit_quality": {
+    "before": {
+      "pairs": 27840,
+      "positives": 1276,
+      "brier": 0.0199,
+      "ece": 0.0162,
+      "aurc": 0.0049,
+      "risk_at": {
+        "50%": 0.0045,
+        "80%": 0.0053,
+        "100%": 0.0231
+      }
+    },
+    "after": {
+      "pairs": 27840,
+      "positives": 1276,
+      "brier": 0.019,
+      "ece": 0.0054,
+      "aurc": 0.0049,
+      "risk_at": {
+        "50%": 0.0045,
+        "80%": 0.0053,
+        "100%": 0.0231
+      }
+    }
+  }
+}

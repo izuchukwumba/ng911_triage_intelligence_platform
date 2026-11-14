@@ -116,6 +116,9 @@ Needs the `ml-encoder` extra (`uv sync --extra ml-encoder`).
   It is fitted on a split the model never trained on, and it is bound to
   the model's weights digest. B1e then reports `calibrated: true`
   (milestone ML-9).
+
+  Calibration was tried twice and is **not used** (DDL-022). It did not
+  improve the hybrid system.
 - Research only, synthetic text only. Not a clinical or dispatch model.
 
 ## Evaluation
