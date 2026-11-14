@@ -99,6 +99,15 @@ Only "hijo", "hija" and "bebé" are labelled `CHILD_INVOLVED`.
 
 The additions were written after looking at B1e's errors on curated dev. Curated dev is therefore no longer an independent check of these four patterns; the test splits are.
 
+## `generated-2.2.0-seed42.jsonl`
+
+2,610 cases from `python -m ntip.generator --generator 2.2.0 --n 2610 --seed 42`.
+Generator 2.1 plus 20 families, so that every labelled cue code has a family
+in **dev, regression and test**. Generator 2.x had covered each code in
+training and test, but not in both training splits. That broke calibrating
+a dev-trained B1e on regression (results README, the first calibration
+attempt). See its [card](cards/generated-2.2.0-seed42.md).
+
 ## Running
 
 ```sh
