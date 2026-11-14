@@ -97,7 +97,7 @@ class TestSeverity:
         result = triage("He is not breathing at 12 Oak Street.")
         firing = next(r for r in result.reasons if r.rule_id == "R-RESP-001")
         assert firing.rule_version == "1.0.0"
-        assert result.ruleset_version == "research-1.1.0"
+        assert result.ruleset_version == "research-1.2.0"
 
 
 class TestSafetyInvariants:
