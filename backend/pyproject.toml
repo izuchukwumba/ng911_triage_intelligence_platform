@@ -20,6 +20,14 @@ dependencies = [
 ml = [
   "scikit-learn>=1.5",
 ]
+# B1e: small encoder run locally on CPU, the primary ML model (DDL-020).
+# Training is fastest on a GPU (see notebooks/train_b1e.ipynb).
+ml-encoder = [
+  "numpy>=1.26",
+  "safetensors>=0.4",
+  "torch>=2.4",
+  "transformers>=4.46",
+]
 # B2: structured-output language model through the Anthropic API. Sends
 # transcripts to an external service; opt-in only (see ntip.ml.b2).
 llm = [
@@ -69,4 +77,9 @@ packages = ["ntip"]
 [[tool.mypy.overrides]]
 # scikit-learn ships no type information.
 module = ["sklearn", "sklearn.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# The ml-encoder extra (B1e) is optional and not installed in every environment.
+module = ["torch", "torch.*", "transformers", "transformers.*", "safetensors", "safetensors.*"]
 ignore_missing_imports = true
