@@ -14,6 +14,7 @@ from typing import Any
 
 from ntip.evaluation.dataset import Dataset, EvalCase, Split
 from ntip.evaluation.metrics import PRF, bootstrap_metric, confusion, rate
+from ntip.evaluation.spans import Mention, predicted_mentions, score_spans
 from ntip.parser.parser import PARSER_ID, PARSER_VERSION, parse
 from ntip.schema.advisory import Assessment, SeverityBand
 from ntip.schema.base import SCHEMA_VERSION, FactStatus, sha256_digest
@@ -70,6 +71,9 @@ class CaseResult:
     predicted_location: str
     predicted_victims: int | str | None
     errors: list[str] = field(default_factory=list)
+    # Every cue the system mentioned, with status and quoted span (for span metrics).
+    mentions: list[Mention] = field(default_factory=list)
+    relevant: frozenset[str] = frozenset()
 
 
 def _location_status(incident: Incident) -> str:
@@ -106,6 +110,10 @@ def evaluate_case(case: EvalCase, system: System, relevant: set[str]) -> CaseRes
         predicted_priority=assessment.advisory_priority,
         predicted_location=_location_status(incident),
         predicted_victims=_victims(incident),
+        mentions=predicted_mentions(
+            incident, [f"evt_{i}" for i in range(1, len(case.messages) + 1)]
+        ),
+        relevant=frozenset(relevant),
     )
     labels = case.labels
     expected = set(labels.cues)
@@ -196,7 +204,13 @@ def score(results: Sequence[CaseResult], *, seed: int, critical: set[str]) -> di
     def r(outcomes: Sequence[bool]) -> dict[str, Any]:
         return rate(outcomes, seed=seed).as_dict()
 
+    spans = score_spans(
+        [(x.case, x.mentions) for x in results],
+        set().union(*(x.relevant for x in results)) if results else set(),
+        seed=seed,
+    )
     return {
+        **({"spans": spans} if spans is not None else {}),
         "cases": len(results),
         "cue_extraction": {
             "micro": {
