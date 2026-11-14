@@ -27,11 +27,11 @@ thresholds are the same as B1's and were declared in advance: a candidate at
 
 ## Training
 
-- **Data:** `data/eval/generated-2.0.0-seed42.jsonl` from version 0.2 on,
-  **dev and regression splits only** (1,188 synthetic calls from 39
-  families, generator-intended labels). The 0.1.0 baseline used
-  `generated-1.0.0-seed42.jsonl` (300 calls from 10 families). Test data is
-  never read by the training code.
+- **Data:** `data/eval/generated-2.1.0-seed42.jsonl`, **dev and regression
+  splits only** (1,200 synthetic calls from 40 families, generator-intended
+  labels). Test data is never read by the training code. Earlier runs:
+  - `0.1.0+3cf9758d0861` used generator 2.0.0 (1,188 calls, 39 families);
+  - `0.1.0+69412079012c` used generator 1.0.0 (300 calls, 10 families).
 - **Fixed in advance:**
   - 15 epochs;
   - batches of 8 calls;
