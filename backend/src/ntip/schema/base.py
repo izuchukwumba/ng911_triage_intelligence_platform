@@ -12,7 +12,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
-SCHEMA_VERSION = "2.6.0"
+SCHEMA_VERSION = "2.7.0"
 
 #: Tenant of records written before tenants existed, and of single-tenant use.
 DEFAULT_TENANT = "default"

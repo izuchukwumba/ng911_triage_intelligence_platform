@@ -226,6 +226,15 @@ class InferenceStatus(StrEnum):
     DEGRADED = "degraded"
 
 
+class ModelSuggestion(SchemaModel):
+    """A cue only the model found that, under the fusion policy, does not change
+    priority: shown to the reviewer with its evidence (2.7.0)."""
+
+    code: ReasonCode
+    evidence: Evidence
+    heuristic_confidence: float | None = Field(default=None, ge=0, le=1)
+
+
 class InferenceInfo(SchemaModel):
     """Which model contributed to an incident version, and how it went."""
 
@@ -239,6 +248,10 @@ class InferenceInfo(SchemaModel):
     rejected_candidates: int = Field(default=0, ge=0)
     abstained_codes: list[ReasonCode] = Field(default_factory=list)
     detail: str | None = None
+    # The versioned fusion policy applied (2.7.0); absent for policy 1.0.0 records.
+    fusion_policy: str | None = None
+    # Model-only cues held back from priority by the fusion policy (2.7.0).
+    suggestions: list[ModelSuggestion] = Field(default_factory=list)
 
 
 def _not_reported() -> Fact[int]:

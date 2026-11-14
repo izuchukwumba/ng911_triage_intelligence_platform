@@ -25,7 +25,12 @@ EXAMPLES = sorted(EXAMPLES_DIR.glob("*.json"))
 # date when a minor version adds a field: it is the evidence for "additive".
 ADDED_AFTER_2_0: dict[str, list[tuple[str, str]]] = {
     "source-event": [("tenant_id", "2.5.0"), ("supplied_locations", "2.6.0")],
-    "incident": [("inference", "2.2.0"), ("locations.*.supplied_by", "2.6.0")],
+    "incident": [
+        ("inference", "2.2.0"),
+        ("locations.*.supplied_by", "2.6.0"),
+        ("inference.fusion_policy", "2.7.0"),
+        ("inference.suggestions", "2.7.0"),
+    ],
     "assessment": [],
     "human-review": [],
     "audit-event": [],

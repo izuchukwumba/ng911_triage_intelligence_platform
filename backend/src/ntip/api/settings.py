@@ -9,6 +9,7 @@ from ntip.api.auth import Principal, Role
 from ntip.evaluation.runner import REPO_ROOT
 from ntip.location.reference import ReferenceLayer
 from ntip.ml.extractors import HttpExtractor, ModelExtractor
+from ntip.ml.fusion import DEFAULT_FUSION_POLICY, FUSION_POLICIES
 from ntip.schema.base import DEFAULT_TENANT
 from ntip.schema.canonical import InferenceMode
 from ntip.store import EventStore, InMemoryEventStore
@@ -41,6 +42,7 @@ class Settings:
     cors_origins: list[str] = field(default_factory=lambda: ["http://localhost:5173"])
     # Model use (design v1.2, 3A.3). rules_only needs no inference service.
     inference_mode: InferenceMode = InferenceMode.RULES_ONLY
+    fusion_policy: str = DEFAULT_FUSION_POLICY
     inference_url: str | None = None
     inference_timeout_s: float = 2.0
     # Interop credentials, token -> tenant. Empty means interop is disabled.
@@ -89,6 +91,7 @@ class Settings:
             eval_data_dir=Path(os.environ.get("NTIP_EVAL_DATA_DIR") or REPO_ROOT / "data" / "eval"),
             cors_origins=[o.strip() for o in origins.split(",")] if origins else cls().cors_origins,
             inference_mode=InferenceMode(os.environ.get("NTIP_INFERENCE_MODE", "rules_only")),
+            fusion_policy=_fusion_policy(os.environ.get("NTIP_FUSION_POLICY")),
             inference_url=os.environ.get("NTIP_INFERENCE_URL") or None,
             inference_timeout_s=float(os.environ.get("NTIP_INFERENCE_TIMEOUT_S", "2.0")),
             interop_tokens=_parse_tokens(os.environ.get("NTIP_INTEROP_TOKENS", "")),
@@ -108,6 +111,13 @@ class Settings:
         from ntip.store.postgres import PostgresEventStore
 
         return PostgresEventStore(self.database_url, pool_size=self.database_pool_size)
+
+
+def _fusion_policy(raw: str | None) -> str:
+    policy = raw or DEFAULT_FUSION_POLICY
+    if policy not in FUSION_POLICIES:
+        raise ConfigurationError(f"NTIP_FUSION_POLICY must be one of {FUSION_POLICIES}")
+    return policy
 
 
 def _parse_tokens(raw: str) -> dict[str, str]:

@@ -17,7 +17,7 @@ from enum import StrEnum
 from ntip.location.reference import ReferenceLayer, validate_locations
 from ntip.ml.contract import InferenceMessage, InferenceRequest, ModelOutput
 from ntip.ml.extractors import ModelExtractor
-from ntip.ml.fusion import fuse
+from ntip.ml.fusion import DEFAULT_FUSION_POLICY, fuse
 from ntip.ml.verify import verify
 from ntip.parser.parser import PARSER_ID, PARSER_VERSION, parse
 from ntip.schema.advisory import Assessment, AssessmentStatus
@@ -76,6 +76,7 @@ class Pipeline:
     # How model output is used (design v1.2, section 3A.3). The rules baseline
     # always runs; a model can only add to it, and never blocks it.
     inference_mode: InferenceMode = InferenceMode.RULES_ONLY
+    fusion_policy: str = DEFAULT_FUSION_POLICY
     extractor: ModelExtractor | None = None
     # Location level L3: a GIS reference layer to check addresses against.
     reference: ReferenceLayer | None = None
@@ -232,6 +233,7 @@ class Pipeline:
                 abstained_codes=[a.code for a in response.abstentions],
                 model_id=model_id,
                 model_version=model_version,
+                policy=self.fusion_policy,
             )
             error = None
         except Exception as err:  # the model is optional; fall back to the rules

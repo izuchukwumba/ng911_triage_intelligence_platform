@@ -36,7 +36,7 @@ from ntip.evaluation.runner import (
 from ntip.ml.b1 import ABSTAIN_FROM, B1Model
 from ntip.ml.contract import InferenceMessage, InferenceRequest
 from ntip.ml.extractors import ModelExtractor
-from ntip.ml.fusion import fuse
+from ntip.ml.fusion import DEFAULT_FUSION_POLICY, fuse
 from ntip.ml.verify import verify
 from ntip.parser.parser import parse
 from ntip.schema.advisory import Assessment
@@ -51,7 +51,9 @@ def _messages(messages: list[str]) -> list[InferenceMessage]:
     return [InferenceMessage(source_event_id=f"evt_{i}", text=m) for i, m in enumerate(messages, 1)]
 
 
-def model_system(model: ModelExtractor, *, model_only: bool) -> System:
+def model_system(
+    model: ModelExtractor, *, model_only: bool, policy: str = DEFAULT_FUSION_POLICY
+) -> System:
     def run(messages: list[str]) -> tuple[Incident, Assessment]:
         sources = [
             SourceEvent.from_text(
@@ -73,6 +75,7 @@ def model_system(model: ModelExtractor, *, model_only: bool) -> System:
             model_id=model.model_id,
             model_version=model.model_version,
             abstained_codes=[a.code for a in response.abstentions],
+            policy=policy,
         )
         if model_only:
             # No rules observations to disagree with.
@@ -128,6 +131,10 @@ def compare(
     for name, model in (extra_models or {}).items():
         systems[f"{name} only"] = model_system(model, model_only=True)
         systems[f"Hybrid B0+{name}"] = model_system(model, model_only=False)
+        # Fusion policy 2.0.0: non-critical model-only cues are suggestions (ML-9).
+        systems[f"Hybrid B0+{name} (fusion 2)"] = model_system(
+            model, model_only=False, policy="2.0.0"
+        )
     results: dict[str, Any] = {}
     for name, system in systems.items():
         case_results = [evaluate_case(case, system, relevant) for case in cases]
