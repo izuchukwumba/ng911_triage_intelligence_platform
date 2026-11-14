@@ -32,7 +32,8 @@ Design: [technical design v1.2](docs/design/technical-design-v1.2.md) ·
 architecture: [system overview](docs/architecture/system-overview.md) ·
 safety: [safety case](docs/safety/safety-case.md), [threat model](docs/safety/threat-model.md) ·
 decisions: [decision log](docs/design-decisions/decision-log.md) ·
-status against the design: [traceability matrix](docs/traceability-matrix.md)
+status against the design: [traceability matrix](docs/traceability-matrix.md) ·
+research plans: [docs/research](docs/research/README.md)
 
 ---
 
