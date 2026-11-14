@@ -321,7 +321,7 @@ recovers precision. The decision and its numbers go in a decision-log entry.
 
 | Change | Where |
 |---|---|
-| Label schema 2.0 and dataset cards | `ntip.evaluation.dataset`, `data/eval/` |
+| Label schema 2.0 and dataset cards (**built**) | `ntip.evaluation.dataset`, `ntip.evaluation.datacard`, `data/eval/cards/` |
 | Annotation export, import and agreement | `ntip.evaluation.annotation`, `ntip.evaluation.agreement` |
 | Generator 2.0 | `ntip.generator` |
 | Span-level metrics (exact and overlap F1) and status accuracy (**built**) | `ntip.evaluation.spans`, reported by the runner and the comparison |

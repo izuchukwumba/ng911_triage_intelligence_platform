@@ -3,6 +3,15 @@
 All data here is **synthetic**. No real emergency calls are included or may be added
 (design v1.2, ADR-006).
 
+Every dataset has a **data card** in [`cards/`](cards/). Each card covers:
+- why the dataset exists and how it was made;
+- what it is and is not suitable for;
+- its limitations;
+- its composition by split.
+
+The composition section is generated from the data (`python -m ntip.evaluation.datacard`).
+A test fails if a dataset has no card or a card is out of date.
+
 ## `curated.jsonl`
 
 50 hand-written cases, one JSON object per line (`ntip.evaluation.dataset.EvalCase`):
