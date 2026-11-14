@@ -1,0 +1,291 @@
+{
+  "format": "ntip-calibration/1",
+  "model_version": "0.1.0+30718f35865b",
+  "weights_digest": "sha256:30718f35865b58e3305c6e341e5caf727c1f2cc052e203294d66d5ea9e75711a",
+  "data": {
+    "path": "data/eval/generated-2.1.0-seed42.jsonl",
+    "digest": "sha256:dd51225c65dca08d9feb3141462137d54885fcd6b3d44ea5087b23f6ae58f519",
+    "split": "regression",
+    "calls": 570
+  },
+  "method": {
+    "temperature": "single, grid search on negative log-likelihood",
+    "target_precision": 0.9,
+    "critical_recall": 0.95,
+    "min_positives": 10,
+    "default_threshold": 0.5
+  },
+  "temperature": 2.0351,
+  "codes": {
+    "ACTIVE_BLEEDING": {
+      "threshold": 0.316588,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9062,
+      "recall": 0.9667
+    },
+    "ACTIVE_VIOLENCE": {
+      "threshold": null,
+      "critical": false,
+      "positives": 26,
+      "negatives": 544,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "ALLERGIC_REACTION": {
+      "threshold": null,
+      "critical": false,
+      "positives": 28,
+      "negatives": 542,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "BREATHING_DIFFICULTY": {
+      "threshold": 0.643603,
+      "critical": false,
+      "positives": 26,
+      "negatives": 544,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9091,
+      "recall": 0.3846
+    },
+    "BURN_INJURY": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "CARDIAC_SYMPTOMS": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "CHILDBIRTH": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "CHILD_INVOLVED": {
+      "threshold": 0.765003,
+      "critical": false,
+      "positives": 77,
+      "negatives": 493,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9846,
+      "recall": 0.8312
+    },
+    "DIABETIC_EMERGENCY": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "DROWNING": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "ELECTROCUTION": {
+      "threshold": null,
+      "critical": false,
+      "positives": 27,
+      "negatives": 543,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "EXPLOSION_REPORTED": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "FALL_FROM_HEIGHT": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "FIRE_REPORTED": {
+      "threshold": 0.151471,
+      "critical": false,
+      "positives": 84,
+      "negatives": 486,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9275,
+      "recall": 0.7619
+    },
+    "FIRE_SPREADING": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "HAZARDOUS_ENVIRONMENT": {
+      "threshold": 0.597076,
+      "critical": false,
+      "positives": 25,
+      "negatives": 545,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 1.0,
+      "recall": 0.04
+    },
+    "INJURY_REPORTED": {
+      "threshold": 0.158681,
+      "critical": false,
+      "positives": 97,
+      "negatives": 473,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.9048,
+      "recall": 0.7835
+    },
+    "INTRUDER_PRESENT": {
+      "threshold": null,
+      "critical": false,
+      "positives": 27,
+      "negatives": 543,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "MISSING_PERSON": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "MULTIPLE_VICTIMS": {
+      "threshold": 0.11721,
+      "critical": false,
+      "positives": 42,
+      "negatives": 528,
+      "rule": "lowest threshold with precision >= 0.9",
+      "precision": 0.913,
+      "recall": 1.0
+    },
+    "NOT_BREATHING": {
+      "threshold": 0.063073,
+      "critical": true,
+      "positives": 54,
+      "negatives": 516,
+      "rule": "critical: highest threshold with recall >= 0.95",
+      "precision": 0.3041,
+      "recall": 0.963
+    },
+    "OCCUPANTS_TRAPPED": {
+      "threshold": 0.025425,
+      "critical": true,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "critical: highest threshold with recall >= 0.95",
+      "precision": 0.0668,
+      "recall": 1.0
+    },
+    "OVERDOSE": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "POISONING": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "SEIZURE": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "SELF_HARM_RISK": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "SMOKE_REPORTED": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "STROKE_SYMPTOMS": {
+      "threshold": 0.5,
+      "critical": false,
+      "positives": 0,
+      "negatives": 570,
+      "rule": "fewer than 10 labelled cases: default threshold"
+    },
+    "TRAFFIC_COLLISION": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "UNABLE_TO_GET_UP": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    },
+    "UNCONSCIOUS": {
+      "threshold": 0.078974,
+      "critical": true,
+      "positives": 49,
+      "negatives": 521,
+      "rule": "critical: highest threshold with recall >= 0.95",
+      "precision": 0.2035,
+      "recall": 0.9592
+    },
+    "WEAPON_PRESENT": {
+      "threshold": null,
+      "critical": false,
+      "positives": 30,
+      "negatives": 540,
+      "rule": "lowest threshold with precision >= 0.9: not reachable, never proposed"
+    }
+  },
+  "fit_quality": {
+    "before": {
+      "pairs": 18240,
+      "positives": 862,
+      "brier": 0.0349,
+      "ece": 0.0287,
+      "aurc": 0.0403,
+      "risk_at": {
+        "50%": 0.0334,
+        "80%": 0.0247,
+        "100%": 0.0383
+      }
+    },
+    "after": {
+      "pairs": 18240,
+      "positives": 862,
+      "brier": 0.0351,
+      "ece": 0.0122,
+      "aurc": 0.0403,
+      "risk_at": {
+        "50%": 0.0334,
+        "80%": 0.0247,
+        "100%": 0.0383
+      }
+    }
+  }
+}
