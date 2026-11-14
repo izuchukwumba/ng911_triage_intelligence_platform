@@ -219,9 +219,30 @@ Case-level columns are repeated on each cue row of the same case. A case
 with no cues has one row with `cue_code` empty.
 
 The coordinator converts the returned workbooks into dataset records with
-`label_source: "adjudicated"` after adjudication. The tooling to export
-blinded workbooks and import them back is planned in the
-[ML layer design](../design/ml-layer-design-v1.0.md) (milestone ML-6).
+`label_source: "adjudicated"` after adjudication. Three commands do the
+mechanical work (`backend/src/ntip/evaluation/annotation.py`):
+
+1. **`sample`** fixes the round's cases. It writes a *round file* that maps
+   neutral four-digit case numbers to case ids and records each dataset's
+   digest. Only the coordinator keeps it.
+2. **`export`** writes two CSV files per annotator. `A1-cases.csv` holds the
+   case numbers and messages, in an order unique to that annotator.
+   `A1-labels.csv` is the label sheet with the columns above. Neither file
+   names a case id, family, split, label or platform output.
+3. **`import`** reads the returned label sheets and checks them. It refuses
+   to run if a dataset has changed since sampling. It checks every value
+   and every case's repeated columns. Each quoted `evidence` and location
+   part must occur verbatim in the case's messages, and it becomes an exact
+   span. Every problem is reported with its spreadsheet row number, and
+   nothing is written until the sheet is clean. Practitioner fields are kept
+   apart from the labels.
+
+```sh
+cd backend
+python -m ntip.evaluation.annotation sample --round R1 --seed <seed> --all ../data/eval/curated.jsonl --exclude <training case ids> --stratified ../data/eval/generated-2.1.0-seed42.jsonl --per-family 3 --out <private dir>/R1.json
+python -m ntip.evaluation.annotation export --round <private dir>/R1.json --annotator A1 --annotator A2 --out <private dir>/R1
+python -m ntip.evaluation.annotation import --round <private dir>/R1.json --workbook A1-labels.csv --workbook A2-labels.csv --out <private dir>/R1/imported
+```
 
 ### Worked example
 
