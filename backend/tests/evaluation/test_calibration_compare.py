@@ -58,3 +58,28 @@ def test_compare_runs_all_systems(tmp_path: Path) -> None:
     assert systems["Hybrid B0+B1"]["metrics"]["critical_undertriage"]["numerator"] == 0
     assert result["b1_calibration"]["pairs"] > 0
     assert "| Critical-cue sensitivity |" in to_markdown(result)
+
+
+def test_compare_records_extra_models(tmp_path: Path) -> None:
+    pytest.importorskip("sklearn")
+    from ntip.evaluation.compare import compare, to_markdown
+    from ntip.evaluation.dataset import Split, load_dataset
+    from ntip.ml.extractors import RulesAsModel
+
+    case = {
+        "case_id": "a", "split": "dev", "family": "f", "label_source": "author",
+        "messages": ["My father is not breathing. We are at 12 Oak Street."],
+        "labels": {"domain": "ems", "severity": "critical", "priority": "P0",
+                   "cues": ["NOT_BREATHING"], "location": "present"},
+    }  # fmt: skip
+    path = tmp_path / "cases.jsonl"
+    path.write_text(json.dumps(case), encoding="utf-8")
+    extra = RulesAsModel()
+
+    result = compare(load_dataset(path), [Split.DEV], extra_models={"Extra": extra})
+
+    assert result["manifest"]["extra_models"] == {
+        "Extra": {"model_id": extra.model_id, "model_version": extra.model_version}
+    }
+    assert {"Extra only", "Hybrid B0+Extra"} <= set(result["systems"])
+    assert f"Extra `{extra.model_version}`" in to_markdown(result)
