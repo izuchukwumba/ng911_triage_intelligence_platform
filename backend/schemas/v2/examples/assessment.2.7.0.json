@@ -1,0 +1,63 @@
+{
+  "advisory_priority": "P0",
+  "assessed_at": "2026-01-01T12:00:40Z",
+  "assessment_id": "assess_sample0009",
+  "assessor": {
+    "extractor_id": "triage-engine",
+    "kind": "rule",
+    "version": "1.2.0"
+  },
+  "failure_reason": null,
+  "incident_id": "inc_sample0001",
+  "location_quality": {
+    "conflicting_location_ids": [],
+    "missing_fields": [],
+    "status": "requires_verification"
+  },
+  "priority_scheme": "research-v1",
+  "reasons": [
+    {
+      "location_ids": [],
+      "observation_ids": [
+        "obs_3"
+      ],
+      "reason_code": "OCCUPANTS_TRAPPED",
+      "rule_id": "R-FIRE-002",
+      "rule_version": "1.0.0"
+    },
+    {
+      "location_ids": [],
+      "observation_ids": [
+        "obs_2"
+      ],
+      "reason_code": "FIRE_REPORTED",
+      "rule_id": "R-FIRE-001",
+      "rule_version": "1.0.0"
+    },
+    {
+      "location_ids": [],
+      "observation_ids": [
+        "obs_1"
+      ],
+      "reason_code": "SMOKE_REPORTED",
+      "rule_id": "R-FIRE-005",
+      "rule_version": "1.0.0"
+    },
+    {
+      "location_ids": [],
+      "observation_ids": [],
+      "reason_code": "LOCATION_REQUIRES_VERIFICATION",
+      "rule_id": "P-REVIEW-005",
+      "rule_version": "1.2.0"
+    }
+  ],
+  "requires_human_review": true,
+  "review_actions": [
+    "CONFIRM_CRITICAL_REPORT",
+    "VERIFY_LOCATION"
+  ],
+  "ruleset_version": "research-1.2.0",
+  "schema_version": "2.7.0",
+  "severity_band": "critical",
+  "status": "completed"
+}

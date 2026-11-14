@@ -157,7 +157,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.6.0",
+            "default": "2.7.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -252,7 +252,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.6.0",
+            "default": "2.7.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -1045,7 +1045,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.6.0",
+            "default": "2.7.0",
             "title": "Schema Version",
             "type": "string"
           }
@@ -1127,7 +1127,7 @@
             "type": "array"
           },
           "schema_version": {
-            "default": "2.6.0",
+            "default": "2.7.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -1377,6 +1377,17 @@
             ],
             "title": "Detail"
           },
+          "fusion_policy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fusion Policy"
+          },
           "mode": {
             "$ref": "#/components/schemas/InferenceMode"
           },
@@ -1410,6 +1421,13 @@
           },
           "status": {
             "$ref": "#/components/schemas/InferenceStatus"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelSuggestion"
+            },
+            "title": "Suggestions",
+            "type": "array"
           }
         },
         "required": [
@@ -1420,7 +1438,9 @@
           "accepted_candidates",
           "rejected_candidates",
           "abstained_codes",
-          "detail"
+          "detail",
+          "fusion_policy",
+          "suggestions"
         ],
         "title": "InferenceInfo",
         "type": "object"
@@ -1983,6 +2003,40 @@
         "title": "ModelOutput",
         "type": "object"
       },
+      "ModelSuggestion": {
+        "additionalProperties": false,
+        "description": "A cue only the model found that, under the fusion policy, does not change\npriority: shown to the reviewer with its evidence (2.7.0).",
+        "properties": {
+          "code": {
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "title": "Code",
+            "type": "string"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/Evidence"
+          },
+          "heuristic_confidence": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Heuristic Confidence"
+          }
+        },
+        "required": [
+          "code",
+          "evidence",
+          "heuristic_confidence"
+        ],
+        "title": "ModelSuggestion",
+        "type": "object"
+      },
       "Observation": {
         "additionalProperties": false,
         "properties": {
@@ -2444,7 +2498,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.6.0",
+            "default": "2.7.0",
             "title": "Schema Version",
             "type": "string"
           },
@@ -2851,7 +2905,7 @@
             "type": "string"
           },
           "schema_version": {
-            "default": "2.6.0",
+            "default": "2.7.0",
             "title": "Schema Version",
             "type": "string"
           },

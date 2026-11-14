@@ -443,7 +443,7 @@ export interface components {
             ruleset_version: string;
             /**
              * Schema Version
-             * @default 2.6.0
+             * @default 2.7.0
              */
             schema_version: string;
             severity_band: components["schemas"]["SeverityBand"];
@@ -478,7 +478,7 @@ export interface components {
             occurred_at: string;
             /**
              * Schema Version
-             * @default 2.6.0
+             * @default 2.7.0
              */
             schema_version: string;
             /** Subject Digest */
@@ -713,7 +713,7 @@ export interface components {
             reviewer_id: string;
             /**
              * Schema Version
-             * @default 2.6.0
+             * @default 2.7.0
              */
             schema_version: string;
         };
@@ -741,7 +741,7 @@ export interface components {
             observations: components["schemas"]["Observation"][];
             /**
              * Schema Version
-             * @default 2.6.0
+             * @default 2.7.0
              */
             schema_version: string;
             /** Source Event Ids */
@@ -815,6 +815,8 @@ export interface components {
             accepted_candidates: number;
             /** Detail */
             detail: string | null;
+            /** Fusion Policy */
+            fusion_policy: string | null;
             mode: components["schemas"]["InferenceMode"];
             /** Model Id */
             model_id: string | null;
@@ -826,6 +828,8 @@ export interface components {
              */
             rejected_candidates: number;
             status: components["schemas"]["InferenceStatus"];
+            /** Suggestions */
+            suggestions: components["schemas"]["ModelSuggestion"][];
         };
         /** InferenceMessage */
         InferenceMessage: {
@@ -1023,6 +1027,18 @@ export interface components {
             request: components["schemas"]["InferenceRequest"];
             response: components["schemas"]["InferenceResponse"] | null;
         };
+        /**
+         * ModelSuggestion
+         * @description A cue only the model found that, under the fusion policy, does not change
+         *     priority: shown to the reviewer with its evidence (2.7.0).
+         */
+        ModelSuggestion: {
+            /** Code */
+            code: string;
+            evidence: components["schemas"]["Evidence"];
+            /** Heuristic Confidence */
+            heuristic_confidence: number | null;
+        };
         /** Observation */
         Observation: {
             /** @default unspecified */
@@ -1161,7 +1177,7 @@ export interface components {
             run_id: string;
             /**
              * Schema Version
-             * @default 2.6.0
+             * @default 2.7.0
              */
             schema_version: string;
             summary: components["schemas"]["ReplaySummary"];
@@ -1296,7 +1312,7 @@ export interface components {
             received_at: string;
             /**
              * Schema Version
-             * @default 2.6.0
+             * @default 2.7.0
              */
             schema_version: string;
             /** Source Event Id */

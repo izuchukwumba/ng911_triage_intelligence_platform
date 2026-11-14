@@ -1,0 +1,172 @@
+{
+  "classification": {
+    "domain": "fire",
+    "heuristic_confidence": 0.8,
+    "status": "provisional",
+    "subtype": null
+  },
+  "conflicts": [],
+  "derived_at": "2026-01-01T12:00:40Z",
+  "incident_id": "inc_sample0001",
+  "inference": {
+    "abstained_codes": [],
+    "accepted_candidates": 0,
+    "detail": null,
+    "fusion_policy": null,
+    "mode": "rules_only",
+    "model_id": null,
+    "model_version": null,
+    "rejected_candidates": 0,
+    "status": "disabled",
+    "suggestions": []
+  },
+  "language": "en",
+  "locations": [
+    {
+      "civic_address": {
+        "floor": "second",
+        "house_number": "14",
+        "landmark": null,
+        "locality": null,
+        "postal_code": null,
+        "region": null,
+        "street": "Elm Street",
+        "unit": null
+      },
+      "coordinates": null,
+      "evidence": {
+        "source_event_id": "evt_sample0002",
+        "span": {
+          "end": 60,
+          "start": 31
+        },
+        "text": "second floor at 14 Elm Street"
+      },
+      "extractor": {
+        "extractor_id": "rules-parser",
+        "kind": "rule",
+        "version": "1.5.0"
+      },
+      "location_id": "loc_1",
+      "missing_fields": [
+        "locality",
+        "region"
+      ],
+      "raw_text": "second floor at 14 Elm Street",
+      "role": "reported",
+      "supplied_by": null,
+      "validation": "unverified",
+      "validation_source": null
+    },
+    {
+      "civic_address": {
+        "floor": null,
+        "house_number": "14",
+        "landmark": null,
+        "locality": "Springfield",
+        "postal_code": null,
+        "region": "IL",
+        "street": "Elm Street",
+        "unit": null
+      },
+      "coordinates": {
+        "crs": "EPSG:4326",
+        "lat": 39.7817,
+        "lng": -89.6501,
+        "uncertainty_m": 25.0
+      },
+      "evidence": null,
+      "extractor": {
+        "extractor_id": "rules-parser",
+        "kind": "rule",
+        "version": "1.5.0"
+      },
+      "location_id": "loc_2",
+      "missing_fields": [],
+      "raw_text": "14 Elm Street, Springfield, IL",
+      "role": "device_provided",
+      "supplied_by": {
+        "origin": "/sample/location",
+        "source_event_id": "evt_sample0007"
+      },
+      "validation": "unverified",
+      "validation_source": null
+    }
+  ],
+  "observations": [
+    {
+      "attribution": "unspecified",
+      "code": "SMOKE_REPORTED",
+      "evidence": {
+        "source_event_id": "evt_sample0002",
+        "span": {
+          "end": 14,
+          "start": 9
+        },
+        "text": "smoke"
+      },
+      "extractor": {
+        "extractor_id": "rules-parser",
+        "kind": "rule",
+        "version": "1.5.0"
+      },
+      "heuristic_confidence": null,
+      "observation_id": "obs_1",
+      "polarity": "affirmed",
+      "temporality": "current"
+    },
+    {
+      "attribution": "first_hand",
+      "code": "FIRE_REPORTED",
+      "evidence": {
+        "source_event_id": "evt_sample0007",
+        "span": {
+          "end": 20,
+          "start": 14
+        },
+        "text": "flames"
+      },
+      "extractor": {
+        "extractor_id": "rules-parser",
+        "kind": "rule",
+        "version": "1.5.0"
+      },
+      "heuristic_confidence": null,
+      "observation_id": "obs_2",
+      "polarity": "affirmed",
+      "temporality": "current"
+    },
+    {
+      "attribution": "first_hand",
+      "code": "OCCUPANTS_TRAPPED",
+      "evidence": {
+        "source_event_id": "evt_sample0007",
+        "span": {
+          "end": 43,
+          "start": 36
+        },
+        "text": "trapped"
+      },
+      "extractor": {
+        "extractor_id": "rules-parser",
+        "kind": "rule",
+        "version": "1.5.0"
+      },
+      "heuristic_confidence": null,
+      "observation_id": "obs_3",
+      "polarity": "affirmed",
+      "temporality": "current"
+    }
+  ],
+  "schema_version": "2.7.0",
+  "source_event_ids": [
+    "evt_sample0002",
+    "evt_sample0007"
+  ],
+  "victim_count": {
+    "candidates": [],
+    "evidence": [],
+    "status": "not_reported",
+    "value": null
+  }
+}
