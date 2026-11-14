@@ -93,8 +93,13 @@ Needs the `ml-encoder` extra (`uv sync --extra ml-encoder`).
   - denials of cues the generator only adds as side effects ("nobody is
     hurt") are scored live;
   - a cue shouted in capitals is missed;
-  - `UNCONSCIOUS` is added whenever someone is not breathing;
-  - Spanish family words are misread ("esposo" scored as a child).
+  - `UNCONSCIOUS` is often added when someone is not breathing, and was
+    once scored on "he's awake and talking";
+  - Spanish family words are misread ("esposo" scored as a child);
+  - hearsay about a past event ("someone said there was a fire yesterday")
+    can be scored live.
+
+  Generator 2.1 fixed the earlier denial and all-capitals errors.
 
   See the evaluation below.
 - **Scores are not calibrated** (`calibrated: false`); calibration is milestone
@@ -122,6 +127,19 @@ broader training data, not model changes.
   no case, but over-triages two more than the rules alone.
 
 On 30 cases none of these differences is statistically meaningful.
+
+[Trained on generator 2.1](../evaluation/results/README.md#b1e-on-generator-21-curated-dev--regression)
+(`0.1.0+e6517d2f2406`, the current best run), on the same curated splits:
+- 13 of 15 critical cues found on its own;
+- cue precision 0.77 and F1 0.75;
+- the hybrid with the rules reaches cue F1 0.89 and still under-triages no
+  case.
+
+Denials and shouting are fixed. Spanish family words are not.
+
+A new error: "he's awake and talking" is scored as `UNCONSCIOUS` (0.78), so
+the hybrid raises a P2 call to P0. That is a calibration and fusion
+problem, milestone ML-9.
 
 The held-out test split is reserved for the pre-registered frozen comparison
 (milestone ML-10).

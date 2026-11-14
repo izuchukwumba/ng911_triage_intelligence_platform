@@ -275,3 +275,62 @@ split (ML-10) all the more important.
 
 The model directory (540 MB) is not committed. Its manifest records the
 sha256 of every file, and the platform refuses a copy that does not match.
+
+## B1e on generator 2.1 (curated dev + regression)
+
+[Report](compare-curated-dev-regression-b1e-0.1.0+e6517d2f2406.md) · model
+manifest [`b1e-0.1.0+e6517d2f2406`](b1e-0.1.0+e6517d2f2406-manifest.json).
+
+- **Training:** a Colab T4 at commit `695f568`, on the 1,200 dev and
+  regression calls of `generated-2.1.0-seed42.jsonl`, with the same
+  settings as before. Only the training data changed.
+- **Evaluation:** a laptop CPU run of the same model at the same commit
+  reproduced the Colab report exactly.
+- **B1 version:** the B1 column carries a different B1 version from the
+  generator 2.0 report (`a20d70dfc761` against `f764c2172d5a`). B1 is
+  refitted when it loads, and its digest differs between the Colab and the
+  laptop environments. Its figures are identical.
+
+| | B0 rules | B1e (gen 2.0) | **B1e (gen 2.1)** | Hybrid B0+B1e (gen 2.0) | **Hybrid B0+B1e (gen 2.1)** |
+|---|---|---|---|---|---|
+| Critical-cue sensitivity | 15/15 | 11/15 | **13/15** | 15/15 | **15/15** |
+| Critical under-triage | 0/13 | 3/13 | **2/13** | 0/13 | **0/13** |
+| Under-triage (any) | 1/30 | 5/30 | **4/30** | 0/30 | **0/30** |
+| Over-triage (any) | 4/30 | 6/30 | **7/30** | 6/30 | **6/30** |
+| Priority exact | 25/30 | 19/30 | **19/30** | 24/30 | **24/30** |
+| Cue micro recall | 0.97 | 0.73 | **0.73** | 1.00 | **1.00** |
+| Cue micro precision | 0.97 | 0.68 | **0.77** | 0.73 | **0.80** |
+| Cue micro F1 | 0.97 | 0.70 | **0.75** | 0.84 | **0.89** |
+| Denied/past cues reported live | 0 | 3 | **1** | 3 | **1** |
+
+**The four patterns generator 2.1 targeted**, case by case:
+
+| Pattern | Result |
+|---|---|
+| Denials ("Nobody is hurt", "There is no fire") | **Fixed.** `fx-022`, `cu-101` and `cu-120` are no longer reported live. |
+| Shouting (`fx-018`, "HE IS NOT BREATHING") | **Fixed.** `NOT_BREATHING` is now found. |
+| `UNCONSCIOUS` added whenever someone is not breathing | **Partly fixed.** "He's still conscious" (`fx-001`) is now respected. `fx-002`, `fx-011` and `cu-106` still get `UNCONSCIOUS`, at scores 0.59 to 0.99. |
+| Spanish family words (`fx-015` "Mi esposo", `cu-115` "Mi hija") | **Not fixed.** "esposo" still scores 0.91 as a child, and "hija" 0.28. About 320 Spanish training calls were not enough to separate the family words. |
+
+**Hybrid priority errors** (these remain after 2.1, or are new):
+
+| Case | Error | Status |
+|---|---|---|
+| `cu-104`: "He was not breathing earlier but he is breathing now, he's awake and talking" | B1e scores `UNCONSCIOUS` 0.78 on "he's awake and talking", so the hybrid raises P2 to **P0** | New. The worst error in this run: a critical over-triage. The training data has "awake" only as a denial of `UNCONSCIOUS`, yet the model reads it as the cue. |
+| `cu-103`: "Someone said there was a fire at the school yesterday" | `FIRE_REPORTED` scored live (0.94), P3 to P2 | New. Gold is P4; the rules already give P3. |
+| `fx-008`: a fall on the pavement | `FALL_FROM_HEIGHT`, P2 to P1 | As before. |
+| `cu-116`: "two cars crashed" | Hybrid gives P2 | Correct, as before. The rules alone give P3. |
+
+**Reading:** better precision and F1 overall, and B1e on its own now finds
+13 of 15 critical cues. Two of the four targeted patterns are fixed, one
+partly and one not.
+
+The hybrid still under-triages nothing. Its over-triage is unchanged in
+number but different in kind: `cu-104` is now raised to P0.
+
+Milestone ML-9 is where this gets addressed. Fusion v2 (ML layer design §7)
+keeps raising priority for a critical cue only the model found, but marks
+it "model-only: confirm" for a reviewer. Per-cue calibration and threshold
+selection (§6) are what would stop a 0.78 score from counting as a finding.
+
+On 30 cases none of these differences is statistically meaningful.
