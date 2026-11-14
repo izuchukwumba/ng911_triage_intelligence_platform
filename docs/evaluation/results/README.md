@@ -215,3 +215,63 @@ further model work.
 
 A first run without positive weighting underfitted instead: it recognised
 26 of 96 cues in its own training calls and 6% on curated calls.
+
+## B1e on generator 2.0 (curated dev + regression)
+
+[Report](compare-curated-dev-regression-b1e-0.1.0+3cf9758d0861.md) · model
+manifest [`b1e-0.1.0+3cf9758d0861`](b1e-0.1.0+3cf9758d0861-manifest.json).
+The model was trained on a free Colab T4 GPU from commit `a786e6f`. It used
+the 1,188 dev and regression calls of `generated-2.0.0-seed42.jsonl` (39
+families), with the same fixed settings as the 0.1.0 baseline. The
+evaluation was then run on a laptop CPU at commit `800da31`, which adds the
+`cu-116` relabel. Before the relabel, the CPU run reproduced the Colab
+report exactly.
+
+| | B0 rules | B1 only | B1e 0.1.0 (generator 1.0) | **B1e (generator 2.0)** | Hybrid B0+B1 | **Hybrid B0+B1e** |
+|---|---|---|---|---|---|---|
+| Critical-cue sensitivity | 15/15 | 10/15 | 8/15 | **11/15** | 15/15 | **15/15** |
+| Critical under-triage | 0/13 | 4/13 | 5/13 | **3/13** | 0/13 | **0/13** |
+| Under-triage (any) | 1/30 | 10/30 | – | **5/30** | 1/30 | **0/30** |
+| Over-triage (any) | 4/30 | 4/30 | – | **6/30** | 5/30 | **6/30** |
+| Priority exact | 25/30 | 16/30 | – | **19/30** | 24/30 | **24/30** |
+| Cue micro recall | 0.97 | 0.51 | 0.47 | **0.73** | 0.97 | **1.00** |
+| Cue micro precision | 0.97 | 0.59 | 0.55 | **0.68** | 0.72 | **0.73** |
+| Denied/past cues reported live | 0 | 0 | 1 | **3** | 0 | **3** |
+
+The 0.1.0 column was measured before the `cu-116` relabel, so its
+under-triage, over-triage and priority figures are left out. Its cue
+figures change by at most one cue.
+
+- **Broader data was the right fix.** The model and the settings were
+  unchanged. Recall on unseen calls rose from 0.47 to 0.73, and B1e is now
+  better than B1 on every cue metric. This confirms the narrow-data
+  diagnosis above.
+- **Hybrid B0+B1e** finds every labelled cue and under-triages no case. It
+  catches the one case the rules under-triage: `cu-116`, "two cars crashed",
+  which the rules do not match. The cost is two more over-triaged cases
+  than the rules alone:
+  - `fx-006`: B1e adds a false `MULTIPLE_VICTIMS`, so P1 becomes P0.
+  - `fx-008`: B1e adds `FALL_FROM_HEIGHT` for a fall on a pavement, so P2
+    becomes P1.
+- **30 cases.** None of these differences is statistically meaningful. The
+  pre-registered test-split comparison (ML-10) is the measure that counts.
+
+**Error analysis** (B1e on its own, per case):
+
+| Pattern | Cases | What B1e did |
+|---|---|---|
+| Denials | `fx-022` "Nobody seems to be hurt", `cu-120` "Nobody is hurt", `cu-101` "There is no fire" | Scored the denied cue live (0.92, 0.98, 0.66). The hybrid keeps these cues too, but none of them changed a priority here. The generator labels `INJURY_REPORTED` only as a side effect of other cues, so it never denies it on its own. |
+| Shouting | `fx-018` "HE IS NOT BREATHING" in capitals | Missed it: score 0.00. The base model is case-sensitive, and the generator has no all-capitals variant. |
+| Cues that often appear together | `fx-002`, `fx-011`, `cu-106`, `fx-001` | Added `UNCONSCIOUS` whenever someone is not breathing, including "He's still conscious". The generator's families almost always pair the two. |
+| Spanish | `fx-015` "Mi esposo no está respirando… ataque al corazón", `cu-115` "Mi hija" | Read "esposo" (husband) as a child (0.99), missed "ataque al corazón", and missed `CHILD_INVOLVED` for "hija" (daughter). |
+| Unseen phrasing | `cu-105` "collapsed", `cu-110` "trouble breathing" next to chest pain, `fx-003` "people inside" a burning house, `cu-126` "not sure if he's breathing" | Missed each one (scores 0.01 to 0.39). |
+
+Most of these are gaps in the generator, not in the model: no all-capitals
+variant, no denials of side-effect cues, cues that always appear together,
+and thin Spanish. They were found on curated **dev** cases, so closing them
+in the generator is legitimate development. However, curated dev then stops
+being an independent check of those patterns, which makes the held-out test
+split (ML-10) all the more important.
+
+The model directory (540 MB) is not committed. Its manifest records the
+sha256 of every file, and the platform refuses a copy that does not match.

@@ -28,7 +28,7 @@ thresholds are the same as B1's and were declared in advance: a candidate at
 ## Training
 
 - **Data:** `data/eval/generated-2.0.0-seed42.jsonl` from version 0.2 on,
-  **dev and regression splits only** (1,066 synthetic calls from 39
+  **dev and regression splits only** (1,188 synthetic calls from 39
   families, generator-intended labels). The 0.1.0 baseline used
   `generated-1.0.0-seed42.jsonl` (300 calls from 10 families). Test data is
   never read by the training code.
@@ -86,9 +86,17 @@ Needs the `ml-encoder` extra (`uv sync --extra ml-encoder`).
 - **Absent cues are learned, not reported.** The absent output shapes the
   encoder, but only live cues are returned. The rules stay the reference for
   negation and tense.
-- **Small, synthetic training set:** 300 calls from 10 of the generator's 17
-  scenario families, with generator-intended labels. Cues that occur only in
-  held-out families are unlikely to be learned.
+- **Small, synthetic training set:** 1,188 calls from 39 of generator 2.0's
+  66 scenario families, with generator-intended labels (0.1.0: 300 calls
+  from 10 families).
+- **Known failure patterns** (found on curated dev):
+  - denials of cues the generator only adds as side effects ("nobody is
+    hurt") are scored live;
+  - a cue shouted in capitals is missed;
+  - `UNCONSCIOUS` is added whenever someone is not breathing;
+  - Spanish family words are misread ("esposo" scored as a child).
+
+  See the evaluation below.
 - **Scores are not calibrated** (`calibrated: false`); calibration is milestone
   ML-9.
 - Research only, synthetic text only. Not a clinical or dispatch model.
@@ -103,8 +111,17 @@ on the curated dev and regression splits:
 - it misses 7 of 15 critical cues on its own;
 - it adds nothing in the hybrid with the rules.
 
-It memorised the 30 training templates of generator 1.0.0. The next step is
-broader training data (generator 2.0), not model changes.
+It memorised the 30 training templates of generator 1.0.0. The next step was
+broader training data, not model changes.
+
+[Trained on generator 2.0](../evaluation/results/README.md#b1e-on-generator-20-curated-dev--regression)
+(`0.1.0+3cf9758d0861`, Colab T4, same settings), on the same curated splits:
+- cue recall rose from 0.47 to 0.73, and precision to 0.68;
+- it misses 4 of 15 critical cues on its own;
+- in the hybrid with the rules it finds every labelled cue and under-triages
+  no case, but over-triages two more than the rules alone.
+
+On 30 cases none of these differences is statistically meaningful.
 
 The held-out test split is reserved for the pre-registered frozen comparison
 (milestone ML-10).
