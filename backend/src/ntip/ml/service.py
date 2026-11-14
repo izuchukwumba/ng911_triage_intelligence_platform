@@ -5,6 +5,7 @@ InferenceRequest and returns an InferenceResponse. Transcript text is treated
 strictly as data to extract from, never as instructions.
 
     NTIP_MODEL=b1-tfidf-logreg uvicorn ntip.ml.service:create_inference_app --factory --port 8100
+    NTIP_MODEL=b1e-encoder NTIP_B1E_PATH=path/to/b1e uvicorn ntip.ml.service:...
 """
 
 import os
@@ -23,6 +24,17 @@ def _b1() -> ModelExtractor:
     return B1Model()
 
 
+def _b1e() -> ModelExtractor:
+    from pathlib import Path
+
+    from ntip.ml.b1e import B1eModel  # needs the "ml-encoder" extra
+
+    path = os.environ.get("NTIP_B1E_PATH")
+    if not path:
+        raise RuntimeError("NTIP_B1E_PATH must name a trained B1e model directory")
+    return B1eModel(Path(path))
+
+
 def _b2() -> ModelExtractor:
     from ntip.ml.b2 import B2Model  # needs the "llm" extra and NTIP_B2_ALLOW_EXTERNAL=1
 
@@ -33,6 +45,7 @@ def _b2() -> ModelExtractor:
 MODELS: dict[str, Callable[[], ModelExtractor]] = {
     "b0-rules-as-model": RulesAsModel,
     "b1-tfidf-logreg": _b1,
+    "b1e-encoder": _b1e,
     "b2-claude-structured": _b2,
 }
 
