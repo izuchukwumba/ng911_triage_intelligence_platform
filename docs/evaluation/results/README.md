@@ -167,6 +167,27 @@ predates the unable-to-get-up rule. This is an illustrative difference, not a
 validated improvement.
 
 
+## Rules on generator 2.0 (dev + regression, 1,188 calls)
+
+[Report](b0-generated-2.0.0-parser-1.5.0-research-1.2.0-dev-regression.md):
+parser 1.5.0, ruleset research-1.2.0.
+
+| | Generator 1.0.0 (parser 1.3.0) | Generator 2.0.0 (parser 1.5.0) |
+|---|---|---|
+| Critical-cue sensitivity | 0.985 (67/68) | 0.686 (129/188) |
+| Critical under-triage | 1/109 | 102/334 (0.305) |
+| Cue micro recall | 0.978 | 0.756 |
+| Cue micro precision | 1.000 | 0.958 |
+| Priority exact | 0.937 | 0.638 |
+
+Generator 2.0's phrasings were written without reference to the rules'
+phrase lists ("went limp", "is out cold", "can't get any air in", "the
+blood won't stop"). Exact phrase matching misses almost a third of the
+critical calls. This is the gap a learned model is meant to close, measured
+on phrasing the rules were not written for. The rules are **not** changed to
+fit this data, so it stays a fair test of them. Labels are
+generator-intended; this is a stress test, not accuracy.
+
 ## B1e 0.1.0 baseline (curated dev + regression)
 
 [Report](compare-curated-dev-regression-b1e-0.1.0.md) · model manifest
