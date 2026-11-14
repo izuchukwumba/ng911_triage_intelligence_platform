@@ -102,3 +102,13 @@ def test_histograms_are_cumulative() -> None:
     assert 'latency_bucket{le="0.05"} 2' in text
     assert 'latency_bucket{le="+Inf"} 3' in text
     assert "latency_count 3" in text
+
+
+def test_fusion_policy_is_read_and_checked(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("NTIP_AUTH_DISABLED", "1")
+    assert Settings.from_env().fusion_policy == "1.0.0"
+    monkeypatch.setenv("NTIP_FUSION_POLICY", "2.0.0")
+    assert Settings.from_env().fusion_policy == "2.0.0"
+    monkeypatch.setenv("NTIP_FUSION_POLICY", "3")
+    with pytest.raises(ConfigurationError, match="NTIP_FUSION_POLICY"):
+        Settings.from_env()

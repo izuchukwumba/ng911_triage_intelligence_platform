@@ -157,3 +157,55 @@ def test_model_only_serious_cue_raises_severity_but_needs_confirmation() -> None
     assert ReviewAction.CONFIRM_CRITICAL_REPORT in hybrid.review_actions
     assert ReviewAction.RESOLVE_CONFLICT in hybrid.review_actions
     assert any(r.rule_id == "P-REVIEW-006" for r in hybrid.reasons)
+
+
+class TestFusionPolicy2:
+    """Fusion 2.0.0: non-critical model-only cues are suggestions (ML layer design 7)."""
+
+    FALL = "She fell on the sidewalk and her hip hurts. We are at 12 Oak Street."
+
+    def _fused(self, text: str, *candidates: Candidate, policy: str) -> Incident:
+        verified = verify(response(*candidates), {"evt_1": text})
+        return fuse(
+            rules_incident(text),
+            InferenceMode.HYBRID_REVIEW,
+            verified=verified,
+            model_id="fake-model",
+            model_version="0.1.0",
+            policy=policy,
+        )
+
+    def test_a_non_critical_model_only_cue_is_a_suggestion(self) -> None:
+        fall = candidate("fell on the sidewalk", "FALL_FROM_HEIGHT", self.FALL)
+        v1 = self._fused(self.FALL, fall, policy="1.0.0")
+        v2 = self._fused(self.FALL, fall, policy="2.0.0")
+        rules = assess(rules_incident(self.FALL), assessment_id="a", assessed_at=AT)
+
+        assert "FALL_FROM_HEIGHT" in {o.code for o in v1.observations}
+        assert v1.inference is not None and v1.inference.fusion_policy is None
+        assert "FALL_FROM_HEIGHT" not in {o.code for o in v2.observations}
+        assert v2.inference is not None and v2.inference.fusion_policy == "2.0.0"
+        [suggestion] = v2.inference.suggestions
+        assert suggestion.code == "FALL_FROM_HEIGHT"
+        assert suggestion.evidence.text == "fell on the sidewalk"
+        # Priority is the rules' priority, and no conflict asks for review.
+        hybrid = assess(v2, assessment_id="a", assessed_at=AT)
+        assert hybrid.advisory_priority == rules.advisory_priority
+        assert "FALL_FROM_HEIGHT" not in {c.code for c in v2.conflicts}
+
+    def test_a_critical_model_only_cue_still_raises_priority_for_confirmation(self) -> None:
+        fused = self._fused(TEXT, candidate("not breathign", "NOT_BREATHING"), policy="2.0.0")
+        hybrid = assess(fused, assessment_id="a", assessed_at=AT)
+        assert fused.inference is not None and fused.inference.suggestions == []
+        assert hybrid.severity_band == "critical"
+        assert ReviewAction.CONFIRM_CRITICAL_REPORT in hybrid.review_actions
+
+    def test_a_cue_the_rules_also_found_is_added_as_before(self) -> None:
+        text = "There is smoke in the kitchen. We are at 12 Oak Street."
+        fused = self._fused(text, candidate("smoke", "SMOKE_REPORTED", text), policy="2.0.0")
+        assert fused.inference is not None and fused.inference.suggestions == []
+        assert [o.code for o in fused.observations].count("SMOKE_REPORTED") == 2
+
+    def test_an_unknown_policy_is_refused(self) -> None:
+        with pytest.raises(ValueError, match="unknown fusion policy"):
+            fuse(rules_incident(), InferenceMode.HYBRID_REVIEW, policy="9.9.9")
