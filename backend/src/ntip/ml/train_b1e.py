@@ -83,6 +83,8 @@ def train(
     log: Any = print,
     splits: tuple[str, ...] = TRAINING_SPLITS,
 ) -> dict[str, Any]:
+    if not splits or not set(splits) <= set(ALLOWED_SPLITS):
+        raise ValueError(f"training may read only {ALLOWED_SPLITS}, not {splits}")
     import numpy as np
     import torch
     import transformers
@@ -90,8 +92,6 @@ def train(
     from transformers import AutoModel, AutoTokenizer, get_linear_schedule_with_warmup
 
     params = {**PARAMS, **(params or {})}
-    if not splits or not set(splits) <= set(ALLOWED_SPLITS):
-        raise ValueError(f"training may read only {ALLOWED_SPLITS}, not {splits}")
     if out.exists() and any(out.iterdir()):
         raise FileExistsError(f"{out} is not empty")
     examples, data_digest = load_examples(dataset, splits)
