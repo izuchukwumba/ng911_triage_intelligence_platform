@@ -107,8 +107,11 @@ and seed. Highlights from [docs/evaluation/results](docs/evaluation/results/READ
 - On the held-out curated test split, hybrid rules + B1 removes both critical
   under-triages the rules make (2/9 → 0/9), at the cost of more over-triage;
   B1 alone generalises poorly. `rules_only` stays the default ([DDL-014](docs/design-decisions/decision-log.md)).
-- B2 (Claude) has an adapter and tests but **has not been evaluated**: running
-  it calls a paid external API and needs the owner's authorisation.
+- B2 (Claude) has an adapter and tests but **has not been evaluated**. It is an
+  optional, research-only comparison: a hosted model could not be deployed on
+  real calls, so the planned primary model is a small encoder run locally
+  ([DDL-020](docs/design-decisions/decision-log.md),
+  [ML layer design](docs/design/ml-layer-design-v1.0.md)).
 
 ---
 

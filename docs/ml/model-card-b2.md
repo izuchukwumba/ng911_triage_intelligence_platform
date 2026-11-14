@@ -4,7 +4,7 @@
 |---|---|
 | Model | Claude Opus 5.5 (`claude-opus-5-5`) through the Anthropic Messages API, with a strict JSON-schema structured output |
 | Adapter | `backend/src/ntip/ml/b2.py`, prompt version 1.0.0; model version `1.0.0+claude-opus-5-5` |
-| Role | Baseline B2 in design v1.2 §3A.4: a zero-shot structured-output language model to compare with the rules (B0) and the small learned model (B1) |
+| Role | Optional, research-only comparison (DDL-020): a zero-shot structured-output language model. Not on the platform's path; the primary ML model is B1e, run locally |
 | Settings | Adaptive thinking, effort `medium`, `max_tokens` 16000, 30 s timeout, 2 retries, server-side refusal fallback enabled |
 
 ## Data governance
@@ -43,11 +43,11 @@ and a cue still has to be grounded and verified before it can affect anything.
 ## Evaluation status
 
 **Not yet run.** Running B2 over the evaluation sets calls a paid external API,
-so it needs the project owner's authorisation. B2 is zero-shot and nothing was
-tuned on any split, so the first run covers every split, test included, with
-prompt 1.0.0 frozen as committed. The plan, measures and cost estimate (about
-$20 to $45) are in the [ML layer design](../design/ml-layer-design-v1.0.md),
-section 5.4 (milestone ML-7).
+so it needs the project owner's authorisation, and nothing depends on it
+(DDL-020). If run, it runs once: every split, test included, with prompt 1.0.0
+frozen as committed, since nothing was tuned on any split. Plan and cost
+estimate (about $12 to $30): [ML layer design](../design/ml-layer-design-v1.0.md),
+section 5.4.
 
     NTIP_B2_ALLOW_EXTERNAL=1 python -m ntip.evaluation.compare \
         --dataset ../data/eval/curated.jsonl \
