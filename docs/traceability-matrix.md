@@ -27,17 +27,22 @@ Last updated: 2026-11-10.
 | Requirement | Status | Evidence |
 |---|---|---|
 | Rules baseline B0 kept as permanent fallback (§3A.2) | Done | `ntip.parser`; fusion never removes rules findings |
-| B1 small task-specific model (§3A.4) | Done | `ntip/ml/b1.py`, [model card](ml/model-card-b1.md) |
+| B1 small task-specific model (§3A.4) | Done (n-gram model) | `ntip/ml/b1.py`, [model card](ml/model-card-b1.md). An n-gram linear model, not the encoder or sequence labeller §3A.4 describes; B1e is planned in the [ML layer design](design/ml-layer-design-v1.0.md) §5.3 |
 | B2 structured-output LLM (§3A.4) | Partial | Adapter and tests done (`ntip/ml/b2.py`); **not evaluated**: needs the owner's authorisation to call a paid API ([model card](ml/model-card-b2.md)) |
-| B3 domain-adapted model (§3A.4) | Not done | Only after dataset quality is established, per the design |
+| B3 domain-adapted model (§3A.4) | Not done | Only after dataset quality is established, per the design; entry conditions in the [ML layer design](design/ml-layer-design-v1.0.md) §5.5 |
+| ML for all four §3A.1 tasks | Partial | Models extract cues only; incident type, victim count and location entities come from the rules ([ML layer design](design/ml-layer-design-v1.0.md) §2) |
+| Calibrated scores and data-driven abstention (§3A.1 task 4, §3A.5) | Partial | Calibration is measured (ECE, Brier, risk-coverage) but not corrected; abstention thresholds are set by hand ([ML layer design](design/ml-layer-design-v1.0.md) §6) |
 | Inference contract, span verification, abstentions (§3A.5) | Done | `ntip/ml/contract.py`, `verify.py`; safety case S6 |
 | Modes `rules_only` / `ml_shadow` / `hybrid_review`, timeout fallback (§3A.3, §3A.6) | Done | `ntip/ml/fusion.py`, pipeline; safety case S7–S8; CI smoke test runs hybrid with B1 |
 | Separate inference service (§3A.3) | Done | `ntip.ml.service`, compose `inference` service |
 | Recorded-output replay for models (§3A.9) | Done | `ModelOutput` records, `/v1/incidents/{id}/model-outputs` |
 | Dataset with leakage-safe family splits and held-out set (§3A.7) | Done | `data/eval/curated.jsonl`, `generated-1.0.0-seed42.jsonl`; loader rejects leakage |
+| Separate held-out challenge set of novel compositions (§3A.7) | Not done | Planned as `challenge` 1.0 in the [ML layer design](design/ml-layer-design-v1.0.md) §4.2 |
+| Annotation manual with evidence spans, negation scope, location components, uncertainty class (§3A.7) | Partial | The labelling guide records cue presence and absence only; spans, statuses and components are defined in the [annotation protocol](research/annotation-protocol.md) and label schema 2.0 ([ML layer design](design/ml-layer-design-v1.0.md) §4.1) |
 | Labelling guide (§3A.7) | Done | [labelling-guide.md](evaluation/labelling-guide.md) |
 | Independent annotation and inter-annotator agreement (§3A.7) | External (protocol ready) | Needs at least two qualified annotators and an adjudicator; procedure, blinding, label fields and pre-declared agreement measures in the [annotation protocol](research/annotation-protocol.md) |
-| Metrics: per-field P/R/F1, critical false negatives separately, calibration, risk-coverage, slices, ablations (§3A.8) | Done | `ntip.evaluation`, `compare.py`, `calibration.py`; [results](evaluation/results/README.md) |
+| Metrics: per-field P/R/F1, critical false negatives separately, calibration, risk-coverage, slices (§3A.8) | Done | `ntip.evaluation`, `compare.py`, `calibration.py`; [results](evaluation/results/README.md) |
+| Ablations of abstention, provenance validation, rules fusion and location handling (§3A.8) | Partial | Only the abstention ablation runs; the rest are planned in the [ML layer design](design/ml-layer-design-v1.0.md) §8 |
 | Reproducibility manifests (§3A.9, §10.3) | Done | Every report records commit, dataset, ruleset, schema, lockfile digests and seed |
 | Milestones ML-1 to ML-4 | Done | Baseline reproducible by one command; contract; comparison; ML-4 gate met (hybrid never increases critical FNs) |
 | ML-5 research release with independent review | External (protocol ready) | Needs independent reviewers; study C of the [research protocol](research/research-protocol.md) defines the reproduction check |
