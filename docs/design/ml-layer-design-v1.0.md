@@ -326,7 +326,7 @@ recovers precision. The decision and its numbers go in a decision-log entry.
 | Generator 2.0 | `ntip.generator` |
 | Span-level metrics (exact and overlap F1) and status accuracy (**built**) | `ntip.evaluation.spans`, reported by the runner and the comparison |
 | B1e training, manifest and adapter | `ntip.ml.b1e`, `ntip.ml.train`, `models/manifests/` |
-| Calibration maps and threshold selection | `ntip.ml.calibrate`; applied in `ntip.ml.verify` |
+| Calibration maps and threshold selection (**built**: temperature scaling and per-cue thresholds, bound to the model's weights digest) | `ntip.ml.calibrate`; applied in `ntip.ml.b1e` |
 | Location-component and victim-count candidates in the contract | `ntip.ml.contract` (schema minor version bump; additive) |
 | Location candidates from models feed L1 to L3, never marked validated | `ntip.location` |
 | Fusion policy v2, versioned | `ntip.ml.fusion`, `rulesets/` |
