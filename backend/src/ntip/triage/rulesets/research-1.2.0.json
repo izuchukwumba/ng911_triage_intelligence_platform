@@ -1,0 +1,372 @@
+{
+  "ruleset_id": "research",
+  "version": "1.2.0",
+  "priority_scheme": "research-v1",
+  "description": "Adds twelve reported conditions (DDL-021): allergic reaction, diabetic emergency, childbirth, poisoning, drowning, burn injury, electrocution, fall from height, risk of self-harm and an intruder present (high); a traffic collision and a missing person (elevated). Their severities are the author's research rubric and have not been reviewed by practitioners. Otherwise identical to research-1.1.0. Severity comes only from reported conditions; location quality, uncertainty, conflicts and prank cues change review actions, never severity.",
+  "priority_by_severity": {
+    "critical": "P0",
+    "high": "P1",
+    "elevated": "P2",
+    "standard": "P3",
+    "low": "P4",
+    "undetermined": "P2"
+  },
+  "confirm_classification_below": 0.5,
+  "rules": [
+    {
+      "id": "R-RESP-001",
+      "version": "1.0.0",
+      "description": "Caller reports the person is not breathing or has no pulse",
+      "all_of": [
+        "NOT_BREATHING"
+      ],
+      "severity": "critical",
+      "reason_code": "NOT_BREATHING_REPORTED"
+    },
+    {
+      "id": "R-CONS-001",
+      "version": "1.0.0",
+      "description": "Caller reports the person is unconscious or unresponsive",
+      "all_of": [
+        "UNCONSCIOUS"
+      ],
+      "severity": "critical",
+      "reason_code": "UNCONSCIOUS_REPORTED"
+    },
+    {
+      "id": "R-FIRE-002",
+      "version": "1.0.0",
+      "description": "People reported trapped",
+      "all_of": [
+        "OCCUPANTS_TRAPPED"
+      ],
+      "severity": "critical",
+      "reason_code": "OCCUPANTS_TRAPPED"
+    },
+    {
+      "id": "R-VIOL-002",
+      "version": "1.0.0",
+      "description": "Weapon reported together with active bleeding",
+      "all_of": [
+        "WEAPON_PRESENT",
+        "ACTIVE_BLEEDING"
+      ],
+      "severity": "critical",
+      "reason_code": "WEAPON_WITH_BLEEDING"
+    },
+    {
+      "id": "R-BLEED-001",
+      "version": "1.0.0",
+      "description": "Active bleeding reported",
+      "all_of": [
+        "ACTIVE_BLEEDING"
+      ],
+      "severity": "high",
+      "reason_code": "ACTIVE_BLEEDING_REPORTED"
+    },
+    {
+      "id": "R-VIOL-001",
+      "version": "1.0.0",
+      "description": "Weapon reported",
+      "all_of": [
+        "WEAPON_PRESENT"
+      ],
+      "severity": "high",
+      "reason_code": "WEAPON_REPORTED"
+    },
+    {
+      "id": "R-VIOL-003",
+      "version": "1.0.0",
+      "description": "Ongoing violence reported",
+      "all_of": [
+        "ACTIVE_VIOLENCE"
+      ],
+      "severity": "high",
+      "reason_code": "ACTIVE_VIOLENCE_REPORTED"
+    },
+    {
+      "id": "R-CARD-001",
+      "version": "1.0.0",
+      "description": "Possible cardiac symptoms reported",
+      "all_of": [
+        "CARDIAC_SYMPTOMS"
+      ],
+      "severity": "high",
+      "reason_code": "CARDIAC_SYMPTOMS_REPORTED"
+    },
+    {
+      "id": "R-RESP-002",
+      "version": "1.0.0",
+      "description": "Breathing difficulty reported",
+      "all_of": [
+        "BREATHING_DIFFICULTY"
+      ],
+      "severity": "high",
+      "reason_code": "BREATHING_DIFFICULTY_REPORTED"
+    },
+    {
+      "id": "R-NEURO-001",
+      "version": "1.0.0",
+      "description": "Seizure reported",
+      "all_of": [
+        "SEIZURE"
+      ],
+      "severity": "high",
+      "reason_code": "SEIZURE_REPORTED"
+    },
+    {
+      "id": "R-NEURO-002",
+      "version": "1.0.0",
+      "description": "Possible stroke symptoms reported",
+      "all_of": [
+        "STROKE_SYMPTOMS"
+      ],
+      "severity": "high",
+      "reason_code": "STROKE_SYMPTOMS_REPORTED"
+    },
+    {
+      "id": "R-TOX-001",
+      "version": "1.0.0",
+      "description": "Possible overdose reported",
+      "all_of": [
+        "OVERDOSE"
+      ],
+      "severity": "high",
+      "reason_code": "OVERDOSE_REPORTED"
+    },
+    {
+      "id": "R-FIRE-003",
+      "version": "1.0.0",
+      "description": "Fire reported as spreading",
+      "all_of": [
+        "FIRE_SPREADING"
+      ],
+      "severity": "high",
+      "reason_code": "FIRE_SPREADING_REPORTED"
+    },
+    {
+      "id": "R-FIRE-004",
+      "version": "1.0.0",
+      "description": "Explosion reported",
+      "all_of": [
+        "EXPLOSION_REPORTED"
+      ],
+      "severity": "high",
+      "reason_code": "EXPLOSION_REPORTED"
+    },
+    {
+      "id": "R-HAZ-001",
+      "version": "1.0.0",
+      "description": "Hazardous environment reported (gas, chemical, carbon monoxide)",
+      "all_of": [
+        "HAZARDOUS_ENVIRONMENT"
+      ],
+      "severity": "high",
+      "reason_code": "HAZARDOUS_ENVIRONMENT_REPORTED"
+    },
+    {
+      "id": "R-ALRG-001",
+      "version": "1.0.0",
+      "description": "Caller reports an allergic reaction or anaphylaxis",
+      "all_of": [
+        "ALLERGIC_REACTION"
+      ],
+      "severity": "high",
+      "reason_code": "ALLERGIC_REACTION_REPORTED"
+    },
+    {
+      "id": "R-METAB-001",
+      "version": "1.0.0",
+      "description": "Caller reports a diabetic emergency (very low or high blood sugar)",
+      "all_of": [
+        "DIABETIC_EMERGENCY"
+      ],
+      "severity": "high",
+      "reason_code": "DIABETIC_EMERGENCY_REPORTED"
+    },
+    {
+      "id": "R-OB-001",
+      "version": "1.0.0",
+      "description": "Caller reports labour or a birth in progress",
+      "all_of": [
+        "CHILDBIRTH"
+      ],
+      "severity": "high",
+      "reason_code": "CHILDBIRTH_REPORTED"
+    },
+    {
+      "id": "R-TOX-002",
+      "version": "1.0.0",
+      "description": "Caller reports a poisoning (a harmful substance swallowed, not a drug overdose)",
+      "all_of": [
+        "POISONING"
+      ],
+      "severity": "high",
+      "reason_code": "POISONING_REPORTED"
+    },
+    {
+      "id": "R-ENV-001",
+      "version": "1.0.0",
+      "description": "Caller reports a drowning or a person pulled from water",
+      "all_of": [
+        "DROWNING"
+      ],
+      "severity": "high",
+      "reason_code": "DROWNING_REPORTED"
+    },
+    {
+      "id": "R-BURN-001",
+      "version": "1.0.0",
+      "description": "Caller reports a burn or scald injury",
+      "all_of": [
+        "BURN_INJURY"
+      ],
+      "severity": "high",
+      "reason_code": "BURN_INJURY_REPORTED"
+    },
+    {
+      "id": "R-ELEC-001",
+      "version": "1.0.0",
+      "description": "Caller reports an electric shock or electrocution",
+      "all_of": [
+        "ELECTROCUTION"
+      ],
+      "severity": "high",
+      "reason_code": "ELECTROCUTION_REPORTED"
+    },
+    {
+      "id": "R-FALL-001",
+      "version": "1.0.0",
+      "description": "Caller reports a fall from a height (roof, ladder, balcony, window, stairs)",
+      "all_of": [
+        "FALL_FROM_HEIGHT"
+      ],
+      "severity": "high",
+      "reason_code": "FALL_FROM_HEIGHT_REPORTED"
+    },
+    {
+      "id": "R-PSY-001",
+      "version": "1.0.0",
+      "description": "Caller reports a risk of suicide or self-harm",
+      "all_of": [
+        "SELF_HARM_RISK"
+      ],
+      "severity": "high",
+      "reason_code": "SELF_HARM_RISK_REPORTED"
+    },
+    {
+      "id": "R-INTR-001",
+      "version": "1.0.0",
+      "description": "Caller reports an intruder in the home now",
+      "all_of": [
+        "INTRUDER_PRESENT"
+      ],
+      "severity": "high",
+      "reason_code": "INTRUDER_PRESENT_REPORTED"
+    },
+    {
+      "id": "R-TRAF-001",
+      "version": "1.0.0",
+      "description": "Caller reports a traffic collision",
+      "all_of": [
+        "TRAFFIC_COLLISION"
+      ],
+      "severity": "elevated",
+      "reason_code": "TRAFFIC_COLLISION_REPORTED"
+    },
+    {
+      "id": "R-MISS-001",
+      "version": "1.0.0",
+      "description": "Caller reports a missing person",
+      "all_of": [
+        "MISSING_PERSON"
+      ],
+      "severity": "elevated",
+      "reason_code": "MISSING_PERSON_REPORTED"
+    },
+    {
+      "id": "R-FIRE-001",
+      "version": "1.0.0",
+      "description": "Fire reported",
+      "all_of": [
+        "FIRE_REPORTED"
+      ],
+      "severity": "elevated",
+      "reason_code": "FIRE_REPORTED"
+    },
+    {
+      "id": "R-FIRE-005",
+      "version": "1.0.0",
+      "description": "Smoke reported",
+      "all_of": [
+        "SMOKE_REPORTED"
+      ],
+      "severity": "elevated",
+      "reason_code": "SMOKE_REPORTED"
+    },
+    {
+      "id": "R-INJ-001",
+      "version": "1.0.0",
+      "description": "Injury reported",
+      "all_of": [
+        "INJURY_REPORTED"
+      ],
+      "severity": "standard",
+      "reason_code": "INJURY_REPORTED"
+    },
+    {
+      "id": "R-SCALE-001",
+      "version": "1.0.0",
+      "description": "Multiple victims reported: one band more severe",
+      "all_of": [
+        "MULTIPLE_VICTIMS"
+      ],
+      "severity": "elevated",
+      "effect": "escalate",
+      "reason_code": "MULTIPLE_VICTIMS_REPORTED"
+    },
+    {
+      "id": "R-VULN-001",
+      "version": "1.0.0",
+      "description": "Child involved: one band more severe",
+      "all_of": [
+        "CHILD_INVOLVED"
+      ],
+      "severity": "standard",
+      "effect": "escalate",
+      "reason_code": "CHILD_INVOLVED"
+    },
+    {
+      "id": "R-MOB-001",
+      "version": "1.0.0",
+      "description": "Person reported unable to get up",
+      "all_of": [
+        "UNABLE_TO_GET_UP"
+      ],
+      "severity": "elevated",
+      "reason_code": "UNABLE_TO_GET_UP"
+    },
+    {
+      "id": "R-HIST-001",
+      "version": "1.0.0",
+      "description": "Breathing or pulse reported to have stopped earlier",
+      "all_of": [
+        "NOT_BREATHING"
+      ],
+      "severity": "elevated",
+      "temporality": "historical",
+      "reason_code": "RECENT_NOT_BREATHING"
+    },
+    {
+      "id": "R-HIST-002",
+      "version": "1.0.0",
+      "description": "Person reported to have been unconscious earlier",
+      "all_of": [
+        "UNCONSCIOUS"
+      ],
+      "severity": "elevated",
+      "temporality": "historical",
+      "reason_code": "RECENT_UNCONSCIOUSNESS"
+    }
+  ]
+}

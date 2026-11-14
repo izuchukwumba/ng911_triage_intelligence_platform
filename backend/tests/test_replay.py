@@ -50,7 +50,7 @@ def test_stored_assessments_are_reproducible() -> None:
 
 def test_candidate_ruleset_comparison_flags_lower_priority() -> None:
     pipeline = make_pipeline()
-    result = pipeline.ingest(RECOVERED)  # default ruleset research-1.1.0 -> elevated (P2)
+    result = pipeline.ingest(RECOVERED)  # default ruleset research-1.2.0 -> elevated (P2)
 
     run = replay(pipeline, candidate_ruleset="research-1.0.0")
     [case] = run.cases
@@ -130,5 +130,5 @@ class TestApi:
 
     def test_lists_released_rulesets(self, client: TestClient) -> None:
         rulesets = {r["name"]: r for r in client.get("/v1/rulesets").json()}
-        assert rulesets["research-1.1.0"]["default"] is True
+        assert rulesets["research-1.2.0"]["default"] is True
         assert rulesets["research-1.0.0"]["digest"].startswith("sha256:")

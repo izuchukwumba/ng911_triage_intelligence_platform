@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Model | Claude Opus 5.5 (`claude-opus-5-5`) through the Anthropic Messages API, with a strict JSON-schema structured output |
-| Adapter | `backend/src/ntip/ml/b2.py`, prompt version 1.0.0; model version `1.0.0+claude-opus-5-5` |
+| Adapter | `backend/src/ntip/ml/b2.py`, prompt version 1.1.0 (1.0.0 covered the original 23 cue codes; 1.1.0 lists all 35, DDL-021); model version `1.1.0+claude-opus-5-5` |
 | Role | Optional, research-only comparison (DDL-020): a zero-shot structured-output language model. Not on the platform's path; the primary ML model is B1e, run locally |
 | Settings | Adaptive thinking, effort `medium`, `max_tokens` 16000, 30 s timeout, 2 retries, server-side refusal fallback enabled |
 
@@ -44,7 +44,7 @@ and a cue still has to be grounded and verified before it can affect anything.
 
 **Not yet run.** Running B2 over the evaluation sets calls a paid external API,
 so it needs the project owner's authorisation, and nothing depends on it
-(DDL-020). If run, it runs once: every split, test included, with prompt 1.0.0
+(DDL-020). If run, it runs once: every split, test included, with prompt 1.1.0
 frozen as committed, since nothing was tuned on any split. Plan and cost
 estimate (about $12 to $30): [ML layer design](../design/ml-layer-design-v1.0.md),
 section 5.4.

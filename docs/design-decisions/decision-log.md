@@ -336,3 +336,26 @@ The threat model listed the unauthenticated research API as the main gap before 
 - *Remove B2:* saves maintenance, but discards working, tested code that a later paper may want for the comparison.
 
 **Revisit when:** a locally run open-weight language model becomes practical on the reference hardware, or a deployment arrangement allows hosted inference under appropriate agreements.
+
+---
+
+## DDL-021: Twelve more reported conditions, with research severities
+
+**Decision:** The cue vocabulary grows from 23 to 35 codes. Parser 1.5.0 detects, in English and Spanish:
+- `ALLERGIC_REACTION`, `DIABETIC_EMERGENCY`, `CHILDBIRTH`, `POISONING`;
+- `TRAFFIC_COLLISION`, `DROWNING`, `BURN_INJURY`, `ELECTROCUTION`, `FALL_FROM_HEIGHT`;
+- `SELF_HARM_RISK`, `INTRUDER_PRESENT`, `MISSING_PERSON`.
+
+Ruleset `research-1.2.0`, now the default, rates each one `high`, except `TRAFFIC_COLLISION` and `MISSING_PERSON`, which are `elevated`. The existing rules still raise severity when other cues are present: people trapped, a child, several people hurt. The labelling guide moves to v2.1.
+
+**Rationale:** The platform could not represent a large share of ordinary emergency calls (crashes, falls, burns, labour, overdose-like poisonings, mental-health crises, break-ins). Those calls fell back to generic injury or `undetermined`. The ML layer also needs a vocabulary broad enough to learn from (ML layer design §4.2). Every severity comes only from the reported condition, as DDL-013 requires.
+
+**Not validated:** the severities are the author's research rubric. They are flagged for the practitioner review in the [research protocol](../research/research-protocol.md) (study A), and are not a dispatch protocol.
+
+**Consequences:**
+- Three curated cases gained a label for a new code. No priority changed, and the regression safety gate still passes.
+- `generated-1.0.0-seed42.jsonl` predates the new codes and is kept unchanged, so earlier reports stay reproducible. Its "fell down the stairs" family has no `FALL_FROM_HEIGHT` label, so results on that file under `research-1.2.0` show over-triage for that family.
+- B2's output schema lists every code, so its prompt version moves to 1.1.0.
+- A B1e model trained for 23 codes is refused by the current code, which expects 35.
+
+**Revisit when:** practitioner review (study A) or independent annotation disagrees with a severity or a definition.

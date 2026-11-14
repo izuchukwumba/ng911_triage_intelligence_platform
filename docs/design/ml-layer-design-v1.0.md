@@ -28,7 +28,7 @@ and needs its own design before it starts.
 |---|---|
 | B0 rules parser | Complete. The permanent baseline and fallback |
 | B1 `b1-tfidf-logreg` | One logistic regression per cue over character and word n-grams; trained deterministically at load time on generated dev and regression data ([model card](../ml/model-card-b1.md)) |
-| B2 `b2-claude-structured` | Adapter, prompt 1.0.0 and tests; **never run on the evaluation sets** ([model card](../ml/model-card-b2.md)) |
+| B2 `b2-claude-structured` | Adapter, prompt 1.1.0 and tests; **never run on the evaluation sets** ([model card](../ml/model-card-b2.md)) |
 | Inference contract and verification | Quotes are matched to the source; ungrounded output is rejected and counted |
 | Fusion and modes | `rules_only` (default), `ml_shadow`, `hybrid_review`; a model can raise but never lower; a model-only serious cue needs human confirmation |
 | Inference service | Separate HTTP service with timeout and fallback |
@@ -194,7 +194,7 @@ remaining errors come from the data or from the model's size, and how B2
 handles denial, past tense and uncertainty. Ungrounded quotes would measure
 fabrication.
 
-**Protocol, if run.** Prompt 1.0.0, as committed, on every split of both
+**Protocol, if run.** Prompt 1.1.0, as committed, on every split of both
 datasets, once, before anyone looks at an output. Nothing was tuned on any
 split, so this is an honest held-out result. The prompt is not developed
 further.
@@ -336,7 +336,7 @@ New safety-case claims are added when each piece merges.
 | Milestone | Delivers | Gate | Depends on |
 |---|---|---|---|
 | **ML-6** Data foundations | Label schema 2.0; annotation tooling; dataset cards; span metrics | Existing reports reproduce unchanged; annotation workbooks round-trip | None |
-| ML-7 (optional) B2 comparison | B2 prompt 1.0.0 on every split, once | Report published, including failures | Owner's spending authorisation; nothing depends on it |
+| ML-7 (optional) B2 comparison | B2 prompt 1.1.0 on every split, once | Report published, including failures | Owner's spending authorisation; nothing depends on it |
 | **ML-8** B1e | Encoder model, manifest, adapter, results on dev and regression | Beats B1 on dev cue F1 without lowering critical recall; p95 within target, or the miss reported | Generator 2.0 |
 | **ML-9** Calibration and fusion v2 | Calibrated scores, chosen thresholds, fusion policy v2 | Critical under-triage stays 0 on regression; precision recovered against current hybrid; decision-log entry | ML-8 |
 | **ML-10** Frozen comparison | Pre-registered test and challenge run of B0, B1, B1e and hybrids (B2 too, if ML-7 was run) | Published with paired statistics, slices, ablations; ML-4 gate re-checked | ML-8, ML-9; challenge set |
