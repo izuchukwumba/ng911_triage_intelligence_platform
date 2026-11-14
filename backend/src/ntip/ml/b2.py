@@ -29,7 +29,7 @@ from ntip.schema.base import SourceSpan
 from ntip.schema.canonical import Polarity, Temporality
 
 MODEL_ID = "b2-claude-structured"
-PROMPT_VERSION = "1.0.0"
+PROMPT_VERSION = "1.1.0"
 CLAUDE_MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 TIMEOUT_S = 30.0
