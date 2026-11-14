@@ -42,9 +42,14 @@ from ntip.ml.b1e import (
 TRAINING_SPLITS = ("dev", "regression")
 SEED = 20261113
 PARAMS: dict[str, Any] = {
-    "epochs": 6,
+    "epochs": 15,
     "batch_calls": 8,
     "learning_rate": 5e-5,
+    # The new scoring layer starts from random weights; the encoder is pretrained.
+    "head_learning_rate": 1e-3,
+    # Almost every output is negative (a call mentions one or two of 23 codes),
+    # so positives are up-weighted or the model learns to answer "no" to all.
+    "positive_weight": 10.0,
     "weight_decay": 0.01,
     "warmup_fraction": 0.1,
     "max_length": 64,
@@ -93,15 +98,22 @@ def train(
     tokenizer = AutoTokenizer.from_pretrained(base_model, revision=revision)
     encoder = AutoModel.from_pretrained(base_model, revision=revision)
     scorer = build_scorer(encoder).to(device)
+    scorer_head: Any = scorer.head
     optimiser = torch.optim.AdamW(
-        scorer.parameters(), lr=params["learning_rate"], weight_decay=params["weight_decay"]
+        [
+            {"params": encoder.parameters(), "lr": params["learning_rate"]},
+            {"params": scorer_head.parameters(), "lr": params["head_learning_rate"]},
+        ],
+        weight_decay=params["weight_decay"],
     )
     batches_per_epoch = -(-len(examples) // params["batch_calls"])
     steps = batches_per_epoch * params["epochs"]
     schedule = get_linear_schedule_with_warmup(  # type: ignore[no-untyped-call,unused-ignore]
         optimiser, int(steps * params["warmup_fraction"]), steps
     )
-    loss_fn = torch.nn.BCEWithLogitsLoss()
+    loss_fn = torch.nn.BCEWithLogitsLoss(
+        pos_weight=torch.full((2 * len(CODES),), params["positive_weight"], device=device)
+    )
     order = random.Random(seed)
 
     scorer.train()
