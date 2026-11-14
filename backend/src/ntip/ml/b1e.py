@@ -118,7 +118,7 @@ def build_scorer(encoder: Any) -> "torch.nn.Module":
     """The encoder plus one linear layer giving live and absent logits per code."""
     import torch
 
-    class ClauseScorer(torch.nn.Module):
+    class ClauseScorer(torch.nn.Module):  # type: ignore[misc,unused-ignore]
         def __init__(self) -> None:
             super().__init__()
             self.encoder = encoder
