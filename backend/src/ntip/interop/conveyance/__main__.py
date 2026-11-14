@@ -34,6 +34,7 @@ def main() -> int:
     pipeline = Pipeline(
         store=store,
         inference_mode=settings.inference_mode,
+        fusion_policy=settings.fusion_policy,
         extractor=settings.build_extractor(),
         reference=settings.build_reference(),
     )
