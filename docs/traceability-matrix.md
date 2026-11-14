@@ -36,7 +36,7 @@ Last updated: 2026-11-10.
 | Recorded-output replay for models (§3A.9) | Done | `ModelOutput` records, `/v1/incidents/{id}/model-outputs` |
 | Dataset with leakage-safe family splits and held-out set (§3A.7) | Done | `data/eval/curated.jsonl`, `generated-1.0.0-seed42.jsonl`; loader rejects leakage |
 | Labelling guide (§3A.7) | Done | [labelling-guide.md](evaluation/labelling-guide.md) |
-| Independent annotation and inter-annotator agreement (§3A.7) | External | Needs at least two qualified reviewers |
+| Independent annotation and inter-annotator agreement (§3A.7) | External (protocol ready) | Needs at least two qualified annotators and an adjudicator; procedure, blinding, label fields and pre-declared agreement measures in the [annotation protocol](research/annotation-protocol.md) |
 | Metrics: per-field P/R/F1, critical false negatives separately, calibration, risk-coverage, slices, ablations (§3A.8) | Done | `ntip.evaluation`, `compare.py`, `calibration.py`; [results](evaluation/results/README.md) |
 | Reproducibility manifests (§3A.9, §10.3) | Done | Every report records commit, dataset, ruleset, schema, lockfile digests and seed |
 | Milestones ML-1 to ML-4 | Done | Baseline reproducible by one command; contract; comparison; ML-4 gate met (hybrid never increases critical FNs) |
