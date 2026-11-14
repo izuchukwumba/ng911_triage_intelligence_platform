@@ -4,7 +4,7 @@ Fitted on data the model did not train on: the generated dataset's
 **regression** split, for a model trained with ``--split dev``. Test data is
 refused.
 
-    python -m ntip.ml.calibrate --model b1e --dataset ../data/eval/generated-2.1.0-seed42.jsonl \\
+    python -m ntip.ml.calibrate --model b1e --dataset ../data/eval/generated-2.2.0-seed42.jsonl \\
         --split regression --out b1e-calibration.json
 
 Method, fixed before fitting:
@@ -15,7 +15,10 @@ Method, fixed before fitting:
 2. **A threshold per cue**, on the calibrated scores:
    - a *critical* cue (critical on its own in the ruleset) takes the highest
      threshold that still finds at least ``CRITICAL_RECALL`` of its labelled
-     cases, because a missed critical cue costs more than a false one;
+     cases, because a missed critical cue costs more than a false one, but
+     never less than ``CRITICAL_FLOOR``: on families a model never saw, the
+     recall target alone drove thresholds towards zero (results README, the
+     first calibration attempt);
    - any other cue takes the lowest threshold whose findings are right at
      least ``TARGET_PRECISION`` of the time (selective risk at most 10%).
      If no threshold reaches that, the cue is never proposed;
@@ -40,6 +43,7 @@ from ntip.evaluation.calibration import summarise
 CALIBRATION_FORMAT = "ntip-calibration/1"
 TARGET_PRECISION = 0.9
 CRITICAL_RECALL = 0.95
+CRITICAL_FLOOR = 0.3
 MIN_POSITIVES = 10
 DEFAULT_THRESHOLD = 0.5
 ALLOWED_SPLITS = ("dev", "regression")
@@ -84,12 +88,20 @@ def _threshold(
         return sum(found), len(found)
 
     if critical:
-        info["rule"] = f"critical: highest threshold with recall >= {CRITICAL_RECALL}"
+        info["rule"] = (
+            f"critical: highest threshold with recall >= {CRITICAL_RECALL}, "
+            f"not below {CRITICAL_FLOOR}"
+        )
+        chosen = candidates[-1]
         for t in candidates:  # descending: the first that reaches the recall is the highest
             tp, _ = at(t)
             if tp / positives >= CRITICAL_RECALL:
-                return _record(t, at(t), positives, info)
-        return _record(candidates[-1], at(candidates[-1]), positives, info)
+                chosen = t
+                break
+        if chosen < CRITICAL_FLOOR:
+            info["rule"] += f": recall target needs {round(chosen, 4)}, floor applied"
+            chosen = CRITICAL_FLOOR
+        return _record(chosen, at(chosen), positives, info)
 
     info["rule"] = f"lowest threshold with precision >= {TARGET_PRECISION}"
     best: float | None = None
@@ -201,6 +213,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                  "calls": len(cases)},
         "method": {"temperature": "single, grid search on negative log-likelihood",
                    "target_precision": TARGET_PRECISION, "critical_recall": CRITICAL_RECALL,
+                   "critical_floor": CRITICAL_FLOOR,
                    "min_positives": MIN_POSITIVES, "default_threshold": DEFAULT_THRESHOLD},
         **fitted,
     }  # fmt: skip
