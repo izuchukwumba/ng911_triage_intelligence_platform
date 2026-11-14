@@ -163,3 +163,52 @@ def test_training_reads_only_the_chosen_development_splits(tmp_path: Path) -> No
     for splits in ((), ("test",), ("dev", "test")):
         with pytest.raises(ValueError, match="may read only"):
             train(write_dataset(tmp_path / "d.jsonl"), tmp_path / "m", splits=splits)
+
+
+def test_a_calibration_file_is_applied_and_bound_to_its_model(
+    trained: tuple[Path, dict[str, Any]], tmp_path: Path
+) -> None:
+    from ntip.ml.b1e import B1eModel, InvalidModel
+    from ntip.ml.calibrate import CALIBRATION_FORMAT
+    from ntip.ml.calibrate import main as calibrate
+
+    out, manifest = trained
+    document = {
+        "format": CALIBRATION_FORMAT,
+        "model_version": "x",
+        "weights_digest": manifest["weights_digest"],
+        "temperature": 1.0,
+        # Every cue proposed whatever its score, except fire, which never is.
+        "codes": {code: {"threshold": 0.0} for code in CODES}
+        | {"FIRE_REPORTED": {"threshold": None}},
+    }
+    path = tmp_path / "calibration.json"
+    path.write_text(json.dumps(document), "utf-8")
+    model = B1eModel(out, calibration=path)
+    request = InferenceRequest(
+        request_id="r",
+        incident_id="i",
+        messages=[InferenceMessage(source_event_id="evt_1", text="The kitchen is on fire.")],
+    )
+    response = model.infer(request)
+    assert response.calibrated is True
+    codes = {c.code for c in response.candidates}
+    assert "FIRE_REPORTED" not in codes and "NOT_BREATHING" in codes
+
+    path.write_text(json.dumps({**document, "weights_digest": "sha256:other"}), "utf-8")
+    with pytest.raises(InvalidModel, match="another model"):
+        B1eModel(out, calibration=path)
+    # The tiny model trained on dev and regression, so neither may calibrate it.
+    with pytest.raises(SystemExit):
+        calibrate(
+            [
+                "--model",
+                str(out),
+                "--dataset",
+                str(write_dataset(tmp_path / "d.jsonl")),
+                "--split",
+                "regression",
+                "--out",
+                str(tmp_path / "c.json"),
+            ]
+        )
