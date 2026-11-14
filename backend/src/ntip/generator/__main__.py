@@ -3,6 +3,7 @@
 python -m ntip.generator --n 510 --seed 42                              # generated-1.0.0-seed42
 python -m ntip.generator --generator 2.0.0 --n 2010 --seed 42           # generated-2.0.0-seed42
 python -m ntip.generator --generator 2.1.0 --n 2010 --seed 42           # generated-2.1.0-seed42
+python -m ntip.generator --generator 2.2.0 --n 2610 --seed 42           # generated-2.2.0-seed42
 python -m ntip.generator --generator 2.0.0 --n 2010 --seed 42 --check   # exit 1 if it differs
 """
 
@@ -15,11 +16,13 @@ from ntip.evaluation.runner import REPO_ROOT
 from ntip.generator import generate as v1
 from ntip.generator import generate_v2 as v2
 from ntip.generator import generate_v21 as v21
+from ntip.generator import generate_v22 as v22
 
 GENERATORS: dict[str, Callable[[int, int], Iterator[EvalCase]]] = {
     v1.GENERATOR_VERSION: v1.generate,
     v2.GENERATOR_VERSION: v2.generate,
     v21.GENERATOR_VERSION: v21.generate,
+    v22.GENERATOR_VERSION: v22.generate,
 }
 
 
