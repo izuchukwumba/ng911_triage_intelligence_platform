@@ -318,3 +318,21 @@ The threat model listed the unauthenticated research API as the main gap before 
 
 **Kept on purpose:** Replay runs, which hold identifiers, priorities and reason codes but no transcript text or payloads.
 
+
+---
+
+## DDL-020: A small local model is the primary ML path; the hosted LLM is an optional comparison
+
+**Decision:** B1e, a small openly licensed encoder trained on the project's own data and run locally on CPU, is the platform's primary ML model (ML layer design v1.0, section 5.3). B2, the hosted structured-output LLM, is demoted to an optional, research-only comparison: it stays in the code, off by default, and is run at most once on synthetic data if the project owner approves the cost. No milestone, gate or default depends on it.
+
+**Rationale:**
+- *Deployment reality:* an emergency communications centre would not send call content to a third-party API. Privacy, legal and network constraints rule it out, and design v1.2 section 3B.6 already forbids it for real data. A model that could never be deployed should not be the platform's main path.
+- *Latency and cost:* a hosted LLM adds seconds and a per-call charge; a small encoder runs in milliseconds on an ordinary CPU at no cost per call, inside the existing timeout and fallback rules.
+- *Reproducibility:* local weights are pinned by hash and give the same output every run; a hosted model can change underneath the platform.
+- *What is lost:* the evaluation loses its zero-shot ceiling (how well a strong general model does untrained). If that comparison is wanted, it can be made with B2 once, or with an open-weight model run locally.
+
+**Alternatives considered:**
+- *Keep B2 as a full baseline (ML layer design v1.0 as first written):* gives the zero-shot comparison but costs money on every run, and puts an undeployable model on the critical path of the milestones.
+- *Remove B2:* saves maintenance, but discards working, tested code that a later paper may want for the comparison.
+
+**Revisit when:** a locally run open-weight language model becomes practical on the reference hardware, or a deployment arrangement allows hosted inference under appropriate agreements.
