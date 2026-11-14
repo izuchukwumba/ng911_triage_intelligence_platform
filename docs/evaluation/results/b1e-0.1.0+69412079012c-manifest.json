@@ -1,0 +1,71 @@
+{
+  "model_id": "b1e-encoder",
+  "model_version": "0.1.0+69412079012c",
+  "base_model": {
+    "id": "distilbert/distilbert-base-multilingual-cased",
+    "revision": "45c032ab32cc946ad88a166f7cb282f58c753c2e"
+  },
+  "codes": [
+    "ACTIVE_BLEEDING",
+    "ACTIVE_VIOLENCE",
+    "BREATHING_DIFFICULTY",
+    "CALLER_HIGH_DISTRESS",
+    "CALLER_LOCATION_UNKNOWN",
+    "CARDIAC_SYMPTOMS",
+    "CHILD_INVOLVED",
+    "EXPLOSION_REPORTED",
+    "FIRE_REPORTED",
+    "FIRE_SPREADING",
+    "HAZARDOUS_ENVIRONMENT",
+    "INJURY_REPORTED",
+    "MULTIPLE_VICTIMS",
+    "NOT_BREATHING",
+    "OCCUPANTS_TRAPPED",
+    "OVERDOSE",
+    "POSSIBLE_PRANK",
+    "SEIZURE",
+    "SMOKE_REPORTED",
+    "STROKE_SYMPTOMS",
+    "UNABLE_TO_GET_UP",
+    "UNCONSCIOUS",
+    "WEAPON_PRESENT"
+  ],
+  "training_data": {
+    "path": "generated-1.0.0-seed42.jsonl",
+    "digest": "sha256:a064e9dbe885a3448314e654c2650c7e20b6e200c29c1b26c45f1bea9b045555",
+    "splits": [
+      "dev",
+      "regression"
+    ],
+    "calls": 300
+  },
+  "params": {
+    "epochs": 15,
+    "batch_calls": 8,
+    "learning_rate": 5e-05,
+    "head_learning_rate": 0.001,
+    "positive_weight": 10.0,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.1,
+    "max_length": 64
+  },
+  "seed": 20261113,
+  "environment": {
+    "python": "3.12.10",
+    "torch": "2.15.0+cpu",
+    "transformers": "5.23.0",
+    "device": "cpu",
+    "gpu": null,
+    "platform": "Windows-11-10.0.26300-SP0"
+  },
+  "git_commit": "a5b62bd3293078d3a5251bd8edf06ad909f63c4c",
+  "trained_at": "2026-11-14T03:51:30.883653+00:00",
+  "files": {
+    "encoder/config.json": "sha256:902fe193fee75d107369e3492d13fec18c7a94a284e5aef97566ddfe4170924f",
+    "encoder/model.safetensors": "sha256:bd5af5eb2428002d2d29273de82a5b6d57c05c0f1ef74c12f6bd0b80ee1d49b4",
+    "encoder/tokenizer.json": "sha256:54e36b3d2e5cf6af1e2291f4c2bc8c4bdf240f640d03161f9e562baa88e58100",
+    "encoder/tokenizer_config.json": "sha256:55f686f3c1111e477bcd12bd9736d6b554fa2e3f94f1c3fbd2c16c467cdbf0eb",
+    "head.safetensors": "sha256:ae052bbdd41e16eb71e064edc12f0a72856f2833de2ecf01b8a1158fcd46c8ba"
+  },
+  "weights_digest": "sha256:69412079012c55730d76e864815e6ecc0e0743c119b3f59e8220b4ac48c249b8"
+}

@@ -166,3 +166,31 @@ where the person cannot get up drops from P2 to P3, because that ruleset
 predates the unable-to-get-up rule. This is an illustrative difference, not a
 validated improvement.
 
+
+## B1e 0.1.0 baseline (curated dev + regression)
+
+[Report](compare-curated-dev-regression-b1e-0.1.0.md) · model manifest
+[`b1e-0.1.0+69412079012c`](b1e-0.1.0+69412079012c-manifest.json) (trained on
+a laptop CPU in 16 minutes, from commit `a5b62bd` plus the positive-weighting
+fix committed next as `c65bbcf`; the manifest's `params` record the settings
+used).
+
+| | B0 rules | B1 only | B1e only | Hybrid B0+B1 | Hybrid B0+B1e |
+|---|---|---|---|---|---|
+| Critical-cue sensitivity | 15/15 | 10/15 | 8/15 | 15/15 | 15/15 |
+| Critical under-triage | 0/13 | 4/13 | 5/13 | 0/13 | 0/13 |
+| Cue micro recall | 1.00 | 0.56 | 0.47 | 1.00 | 1.00 |
+| Cue micro precision | 0.97 | 0.59 | 0.55 | 0.71 | 0.71 |
+
+B1e fits its training data completely: 96 of 96 training cues, every one
+scored 1.0. On curated calls it never saw, it does no better than B1. It has
+memorised its training templates rather than learned the cues. Those are
+the 10 scenario families of generator 1.0.0, with 3 sentence templates each,
+so 30 base sentences in all. This is the narrow-data problem the ML layer
+design describes (§4.2), measured. The training method works; the data
+cannot teach generalisation. Generator 2.0 (more scenario families, more
+templates, every cue in both training and test families) comes before any
+further model work.
+
+A first run without positive weighting underfitted instead: it recognised
+26 of 96 cues in its own training calls and 6% on curated calls.

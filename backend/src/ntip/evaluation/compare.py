@@ -229,9 +229,19 @@ def main() -> int:
         action="store_true",
         help="also run B2 (calls the Anthropic API: costs money, needs NTIP_B2_ALLOW_EXTERNAL=1)",
     )
+    parser.add_argument(
+        "--with-b1e",
+        type=Path,
+        metavar="MODEL_DIR",
+        help="also run B1e from a trained model directory (needs the ml-encoder extra)",
+    )
     args = parser.parse_args()
     splits = [Split(s) for s in (args.split or ["test"])]
     extra: dict[str, ModelExtractor] = {}
+    if args.with_b1e:
+        from ntip.ml.b1e import B1eModel
+
+        extra["B1e"] = B1eModel(args.with_b1e)
     if args.with_b2:
         from ntip.ml.b2 import B2Model
 

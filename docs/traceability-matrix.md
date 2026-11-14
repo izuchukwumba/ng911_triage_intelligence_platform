@@ -28,6 +28,7 @@ Last updated: 2026-11-10.
 |---|---|---|
 | Rules baseline B0 kept as permanent fallback (§3A.2) | Done | `ntip.parser`; fusion never removes rules findings |
 | B1 small task-specific model (§3A.4) | Done (n-gram model) | `ntip/ml/b1.py`, [model card](ml/model-card-b1.md). An n-gram linear model, not the encoder or sequence labeller §3A.4 describes; B1e is planned in the [ML layer design](design/ml-layer-design-v1.0.md) §5.3 |
+| B1e small encoder, primary ML model (§3A.4, DDL-020) | Partial | Model, training command, Colab notebook and integrity-checked model directory done (`ntip/ml/b1e.py`, `ntip/ml/train_b1e.py`, `notebooks/train_b1e.ipynb`, [model card](ml/model-card-b1e.md)); not yet trained and evaluated (milestone ML-8) |
 | B2 structured-output LLM (§3A.4) | Partial (optional) | Adapter and tests done (`ntip/ml/b2.py`); not evaluated. Demoted to an optional, research-only comparison: a hosted model could not be deployed on real calls, so B1e, run locally, is the primary path (DDL-020; [model card](ml/model-card-b2.md)) |
 | B3 domain-adapted model (§3A.4) | Not done | Only after dataset quality is established, per the design; entry conditions in the [ML layer design](design/ml-layer-design-v1.0.md) §5.5 |
 | ML for all four §3A.1 tasks | Partial | Models extract cues only; incident type, victim count and location entities come from the rules ([ML layer design](design/ml-layer-design-v1.0.md) §2) |
