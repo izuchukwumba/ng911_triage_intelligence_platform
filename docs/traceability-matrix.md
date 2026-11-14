@@ -40,7 +40,7 @@ Last updated: 2026-11-10.
 | Metrics: per-field P/R/F1, critical false negatives separately, calibration, risk-coverage, slices, ablations (§3A.8) | Done | `ntip.evaluation`, `compare.py`, `calibration.py`; [results](evaluation/results/README.md) |
 | Reproducibility manifests (§3A.9, §10.3) | Done | Every report records commit, dataset, ruleset, schema, lockfile digests and seed |
 | Milestones ML-1 to ML-4 | Done | Baseline reproducible by one command; contract; comparison; ML-4 gate met (hybrid never increases critical FNs) |
-| ML-5 research release with independent review | External | Needs independent reviewers |
+| ML-5 research release with independent review | External (protocol ready) | Needs independent reviewers; study C of the [research protocol](research/research-protocol.md) defines the reproduction check |
 
 ## NG911 interoperability (§3B)
 
@@ -50,7 +50,7 @@ Last updated: 2026-11-10.
 | Phase II: import-only adapter, source preservation, idempotency, INT-001…012 (§3B.3, §3B.7) | Done | `ntip/interop/*`; [interop-verification.md](standards-alignment/interop-verification.md) |
 | Phase III: ML advisory attached without blocking ingestion | Done (synchronous, bounded by timeout) | INT-007; safety case S8 |
 | Phase IV: lab interoperability with NENA artefacts / Texas A&M tooling | Done (reviewed) | NENA's published sample validates; NENA's conveyance message schema is pinned and tested. Texas A&M `ng911-dev` reviewed: it tests i3 functional elements and covers EIDO only as logging events, so none of its tests applies ([review](standards-alignment/tamu-ng911-dev-review.md)) |
-| Phase V: external engineering and practitioner review | External | — |
+| Phase V: external engineering and practitioner review | External (protocol ready) | Studies A (practitioner review) and C (independent re-evaluation) of the [research protocol](research/research-protocol.md); no reviewer recruited yet |
 | Mapping beyond notes (locations, persons, PIDF-LO) | Done | PIDF-LO civic addresses, points and circles become supplied (`device_provided`) locations with provenance; conflicts with the narrative are detected; reference URLs are never dereferenced; persons deliberately unmapped (data minimisation). `ntip/interop/eido/pidf.py`, `tests/interop/test_pidf.py`, `tests/interop/test_eido_locations.py` |
 | NENA-STA-024 conveyance | Done (subscriber role) | `ntip/interop/conveyance`: WebSocket subscriber with acknowledgements, retries/reconnect, renewal and fail-closed TLS; messages validated against NENA's pinned schema; `tests/interop/test_conveyance.py`. Notifier, push and dereference roles are out of scope (DDL-018) |
 | Tenant isolation (INT-010) | Done | Incidents, replay runs, idempotency keys and interop receipts are scoped to a tenant; another tenant's incident is indistinguishable from a missing one (DDL-017); `tests/api/test_tenants.py` |
@@ -85,7 +85,7 @@ Last updated: 2026-11-10.
 | Human-review replay: machine output beside operator correction, not ground truth (§10.2) | Done | `GET /v1/review-comparison` (`ntip/review_replay.py`): latest decision per reviewed assessment, raised/lowered/confirmed/reclassified, tenant-scoped; dashboard Replay tab; `tests/test_review_replay.py`, end-to-end test |
 | Stream replay with relative timing (§10.2) | Done | `python -m ntip.stream` (simulated clock, queue timeline, time to P0, candidate comparison; streams from files or stored traffic); `tests/test_stream.py`; [example](evaluation/results/stream-escalation-research-1.1.0-vs-1.0.0.md) |
 | Latency baseline (§10.5, §13.3) | Done | `ntip.evaluation.latency`; results README |
-| Human-factors study (§10.5, §16.1 RQ4) | External | Needs a controlled study with consent |
+| Human-factors study (§10.5, §16.1 RQ4) | External (protocol ready) | Study B of the [research protocol](research/research-protocol.md): design, hypotheses, measures and analysis plan; needs ethics review, participants and the study build (RP-E1) |
 
 ## Dashboard (§11)
 
