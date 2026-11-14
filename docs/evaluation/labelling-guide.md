@@ -1,4 +1,4 @@
-# Labelling guide (v2.0)
+# Labelling guide (v2.1)
 
 How to label a synthetic case in `data/eval/*.jsonl` so that labels are
 consistent and can be checked by a second annotator (design v1.2, §3A.7).
@@ -33,6 +33,18 @@ Put a cue in `absent_cues` when it is mentioned but **denied** ("no fire"),
 | `UNABLE_TO_GET_UP` | the person cannot get up, stand or move from where they fell (added in v1.1) |
 | `MULTIPLE_VICTIMS` | two or more people affected |
 | `CHILD_INVOLVED` | a baby, toddler or child (an explicit age under 18 also counts) |
+| `ALLERGIC_REACTION` | an allergic reaction or anaphylaxis: throat, tongue or face swelling, hives with distress, an EpiPen used (v2.1) |
+| `DIABETIC_EMERGENCY` | a diabetic who is unwell, very low or high blood sugar, too much insulin (v2.1) |
+| `CHILDBIRTH` | labour, contractions, waters broken, a baby being born (v2.1) |
+| `POISONING` | a harmful substance swallowed or drunk that is not a drug overdose: bleach, cleaning products, antifreeze, rat poison (v2.1) |
+| `TRAFFIC_COLLISION` | a crash or collision involving a vehicle, or a person hit by one (v2.1) |
+| `DROWNING` | drowning or near-drowning, a person pulled from water or found face down in it (v2.1) |
+| `BURN_INJURY` | a person burned or scalded, including chemical burns (v2.1) |
+| `ELECTROCUTION` | an electric shock, a person touching a power line or live wire, a lightning strike (v2.1) |
+| `FALL_FROM_HEIGHT` | a fall from a roof, ladder, balcony, window, scaffolding, tree, or down stairs (v2.1) |
+| `SELF_HARM_RISK` | a person threatening or attempting suicide or self-harm (v2.1) |
+| `INTRUDER_PRESENT` | someone breaking in or inside the caller's home now (v2.1) |
+| `MISSING_PERSON` | a person who is missing, has wandered off or has not come home (v2.1) |
 
 ## 2. Severity and priority (`labels.severity`, `labels.priority`)
 
@@ -42,8 +54,8 @@ Research rubric, applied in order. Priority follows from severity
 | Severity | When |
 |---|---|
 | critical | An immediate threat to life: not breathing, unconscious, people trapped, weapon with bleeding; or a *high* situation involving a child or multiple victims |
-| high | A serious current condition: weapon, active violence, significant bleeding, cardiac or breathing symptoms, seizure, stroke, overdose, spreading fire, explosion, hazardous materials |
-| elevated | Fire or smoke without the above; an older person unable to get up; entrapment with no hazard; a threat that has left the scene |
+| high | A serious current condition: weapon, active violence, significant bleeding, cardiac or breathing symptoms, seizure, stroke, overdose, spreading fire, explosion, hazardous materials; an allergic reaction, diabetic emergency, childbirth, poisoning, drowning, burn, electrocution, fall from height, risk of self-harm, or an intruder present (v2.1) |
+| elevated | Fire or smoke without the above; an older person unable to get up; entrapment with no hazard; a threat that has left the scene; a traffic collision or a missing person without the above (v2.1) |
 | standard | A matter for emergency services with no serious condition (minor injury, minor bleeding, property crime, welfare check) |
 | low | No current emergency: prank, retraction, past event, hypothetical |
 | undetermined | The nature of the call cannot be told from the transcript |
@@ -87,6 +99,13 @@ that do not.
 
 ## Changes
 
+- v2.1: added twelve cue codes (DDL-021) and their severities in section 2.
+  These severities are the author's research rubric and are flagged for
+  practitioner review. Three curated cases gained a label for a new code
+  (`fx-014` and `fx-023`: `TRAFFIC_COLLISION`; `cu-124`: `DROWNING`); no
+  priority changed. `generated-1.0.0-seed42.jsonl` predates v2.1 and is not
+  relabelled: its "fell down the stairs" family has no `FALL_FROM_HEIGHT`
+  label.
 - v2.0: added the optional finer labels in section 6 (cue status and
   evidence spans, location components, case uncertainty). Sections 1 to 5
   are unchanged, so every v1.1 label is still a valid v2.0 label.
