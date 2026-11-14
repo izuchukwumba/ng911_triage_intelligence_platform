@@ -124,6 +124,11 @@ that appears in two splits.
 
 ### 4.3 Generator 2.0
 
+**Built** (`ntip.generator.generate_v2`, `data/eval/generated-2.0.0-seed42.jsonl`):
+66 families, 279 phrasings, 32 cue codes each in training and test families,
+evidence spans, speech-recognition noise. Multiple speakers and longer
+multi-message incidents are not built yet.
+
 - Emits spans and statuses with each case, so generated data can train span
   models.
 - New perturbations: speech-recognition errors (homophones, dropped words,
