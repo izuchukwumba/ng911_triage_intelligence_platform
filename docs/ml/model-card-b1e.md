@@ -27,9 +27,14 @@ thresholds are the same as B1's and were declared in advance: a candidate at
 
 ## Training
 
-- **Data:** `data/eval/generated-2.1.0-seed42.jsonl`, **dev and regression
-  splits only** (1,200 synthetic calls from 40 families, generator-intended
-  labels). Test data is never read by the training code. Earlier runs:
+- **Data:** `data/eval/generated-2.1.0-seed42.jsonl`. From milestone ML-9
+  on, B1e trains on the **dev split only** (630 calls, 21 families) with
+  `--split dev`. The regression split (570 calls, 19 unseen families) is
+  kept for calibrating its scores and choosing per-cue thresholds (ML layer
+  design §6). Test data is never read by the training code; training
+  refuses any split but dev and regression. Earlier runs:
+  - `0.1.0+e6517d2f2406` used generator 2.1, dev and regression (1,200
+    calls, 40 families);
   - `0.1.0+3cf9758d0861` used generator 2.0.0 (1,188 calls, 39 families);
   - `0.1.0+69412079012c` used generator 1.0.0 (300 calls, 10 families).
 - **Fixed in advance:**

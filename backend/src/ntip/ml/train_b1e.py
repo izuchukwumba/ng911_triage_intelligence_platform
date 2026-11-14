@@ -1,6 +1,9 @@
 """Train B1e and write a model directory with a manifest.
 
     python -m ntip.ml.train_b1e --dataset ../data/eval/generated-2.1.0-seed42.jsonl --out b1e
+    # Leave the regression split unseen, to calibrate scores on (ML layer design 6):
+    python -m ntip.ml.train_b1e --dataset ../data/eval/generated-2.1.0-seed42.jsonl --split dev \
+        --out b1e
 
 Runs on CPU or a GPU (a free Colab or Kaggle T4 trains it in minutes; see
 ``notebooks/train_b1e.ipynb``). Only the dev and regression splits are read;
@@ -40,6 +43,8 @@ from ntip.ml.b1e import (
 )
 
 TRAINING_SPLITS = ("dev", "regression")
+# Splits training may read. Test data never reaches training.
+ALLOWED_SPLITS = ("dev", "regression")
 SEED = 20261113
 PARAMS: dict[str, Any] = {
     "epochs": 15,
@@ -76,7 +81,10 @@ def train(
     seed: int = SEED,
     device: str | None = None,
     log: Any = print,
+    splits: tuple[str, ...] = TRAINING_SPLITS,
 ) -> dict[str, Any]:
+    if not splits or not set(splits) <= set(ALLOWED_SPLITS):
+        raise ValueError(f"training may read only {ALLOWED_SPLITS}, not {splits}")
     import numpy as np
     import torch
     import transformers
@@ -86,9 +94,9 @@ def train(
     params = {**PARAMS, **(params or {})}
     if out.exists() and any(out.iterdir()):
         raise FileExistsError(f"{out} is not empty")
-    examples, data_digest = load_examples(dataset, TRAINING_SPLITS)
+    examples, data_digest = load_examples(dataset, splits)
     if not examples:
-        raise ValueError(f"no training examples in the {TRAINING_SPLITS} splits of {dataset}")
+        raise ValueError(f"no training examples in the {splits} splits of {dataset}")
 
     random.seed(seed)
     np.random.seed(seed)
@@ -166,7 +174,7 @@ def train(
         "training_data": {
             "path": dataset.name,
             "digest": data_digest,
-            "splits": list(TRAINING_SPLITS),
+            "splits": list(splits),
             "calls": len(examples),
         },
         "params": params,
@@ -194,9 +202,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--device", help="cpu or cuda (default: cuda when available)")
+    parser.add_argument(
+        "--split",
+        action="append",
+        choices=ALLOWED_SPLITS,
+        help="a split to train on (repeatable; default: dev and regression)",
+    )
     args = parser.parse_args(argv)
     try:
-        train(args.dataset, args.out, device=args.device)
+        splits = tuple(args.split) if args.split else TRAINING_SPLITS
+        train(args.dataset, args.out, device=args.device, splits=splits)
     except (FileExistsError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
