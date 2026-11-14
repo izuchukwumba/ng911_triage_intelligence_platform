@@ -63,7 +63,7 @@ longer matches the generator.
 | Scenario families | 17 | 66 (dev 20, regression 19, test 27) |
 | Base phrasings | 51 (3 per family) | 279 (3 to 6 per family), plus denials, past-tense and Spanish versions |
 | Cue codes | 20, six of them only in test families | 32 (labelling guide v2.1), every one in both a training and a test family |
-| Training calls (dev + regression) | 300 | 1,066 |
+| Training calls (dev + regression) | 300 | 1,188 |
 | Labels | Cue lists | Label schema 2.0: each cue's status and exact evidence span, and the location components the caller gave |
 | Perturbations | Location form, child, several people, uncertainty, hearsay, denial, past tense, disfluency, misspelling, address correction, Spanish | The same, plus a speech-recognition-style variant (lower case, no punctuation, homophones) |
 
