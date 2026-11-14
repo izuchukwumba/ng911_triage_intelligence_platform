@@ -103,7 +103,11 @@ that do not.
   These severities are the author's research rubric and are flagged for
   practitioner review. Three curated cases gained a label for a new code
   (`fx-014` and `fx-023`: `TRAFFIC_COLLISION`; `cu-124`: `DROWNING`); no
-  priority changed. `generated-1.0.0-seed42.jsonl` predates v2.1 and is not
+  priority changed. A fourth was missed then and corrected later: `cu-116`
+  ("Two cars crashed…, both drivers… seem fine") gained `TRAFFIC_COLLISION`
+  and so became elevated/P2 (was standard/P3). It was found when B1e
+  disagreed with the label; every curated case was then re-checked against
+  the v2.1 codes and no other was missing one. `generated-1.0.0-seed42.jsonl` predates v2.1 and is not
   relabelled: its "fell down the stairs" family has no `FALL_FROM_HEIGHT`
   label.
 - v2.0: added the optional finer labels in section 6 (cue status and
