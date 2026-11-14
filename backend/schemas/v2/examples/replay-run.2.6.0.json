@@ -24,7 +24,7 @@
           "SMOKE_REPORTED",
           "LOCATION_REQUIRES_VERIFICATION"
         ],
-        "ruleset_version": "research-1.1.0",
+        "ruleset_version": "research-1.2.0",
         "severity_band": "critical"
       },
       "reproducible": true,
@@ -37,7 +37,7 @@
           "SMOKE_REPORTED",
           "LOCATION_REQUIRES_VERIFICATION"
         ],
-        "ruleset_version": "research-1.1.0",
+        "ruleset_version": "research-1.2.0",
         "severity_band": "critical"
       },
       "stored_assessment_id": "assess_sample0009"
