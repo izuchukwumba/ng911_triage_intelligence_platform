@@ -28,7 +28,8 @@ React + TypeScript (Vite) · Docker Compose · GitHub Actions
 | **Interoperates** | An import-only gateway accepts NENA EIDO objects of one pinned edition (NENA-STA-021.1b), validated against NENA's own schema, with receipts, quarantine, idempotency and tenant isolation. |
 | **Measures itself** | Labelled synthetic datasets, a scenario generator, metrics with confidence intervals, calibration, ML comparisons, latency, and a CI gate that fails any change that under-triages a critical case. |
 
-Design: [technical design v1.2](docs/design/technical-design-v1.2.md) ·
+Design: [technical design v1.2](docs/design/technical-design-v1.2.md),
+[ML layer design](docs/design/ml-layer-design-v1.0.md) (proposed) ·
 architecture: [system overview](docs/architecture/system-overview.md) ·
 safety: [safety case](docs/safety/safety-case.md), [threat model](docs/safety/threat-model.md) ·
 decisions: [decision log](docs/design-decisions/decision-log.md) ·
