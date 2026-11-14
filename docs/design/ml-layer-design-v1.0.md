@@ -324,7 +324,7 @@ recovers precision. The decision and its numbers go in a decision-log entry.
 | Label schema 2.0 and dataset cards | `ntip.evaluation.dataset`, `data/eval/` |
 | Annotation export, import and agreement | `ntip.evaluation.annotation`, `ntip.evaluation.agreement` |
 | Generator 2.0 | `ntip.generator` |
-| Span-level metrics (exact and overlap F1) and status accuracy | `ntip.evaluation.metrics` |
+| Span-level metrics (exact and overlap F1) and status accuracy (**built**) | `ntip.evaluation.spans`, reported by the runner and the comparison |
 | B1e training, manifest and adapter | `ntip.ml.b1e`, `ntip.ml.train`, `models/manifests/` |
 | Calibration maps and threshold selection | `ntip.ml.calibrate`; applied in `ntip.ml.verify` |
 | Location-component and victim-count candidates in the contract | `ntip.ml.contract` (schema minor version bump; additive) |
