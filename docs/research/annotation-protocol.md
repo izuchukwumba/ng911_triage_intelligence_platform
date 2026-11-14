@@ -291,6 +291,12 @@ before the round):
 Low agreement is a finding, not a failure to hide. All figures are
 published, including the poor ones.
 
+`python -m ntip.evaluation.agreement <imported>/A1.jsonl <imported>/A2.jsonl --out <dir>`
+computes every measure above from the imported label sheets and writes
+`agreement.json` and `agreement.md`. Each figure comes with its count, a
+bootstrap interval and its band. The implementation is checked against
+Krippendorff's published worked example.
+
 ## 9. What happens to the labels
 
 - **Adjudicated labels become the reference labels** for the evaluation sets,

@@ -151,6 +151,8 @@ See `data/eval/README.md`.
 
 ### 4.4 Annotation tooling
 
+**Built** (`ntip.evaluation.annotation`, `ntip.evaluation.agreement`).
+
 - `python -m ntip.evaluation.annotation export`: blinded, per-annotator
   shuffled workbooks (annotation protocol §7).
 - `python -m ntip.evaluation.annotation import`: reads returned workbooks,
