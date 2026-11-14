@@ -334,3 +334,62 @@ it "model-only: confirm" for a reviewer. Per-cue calibration and threshold
 selection (§6) are what would stop a 0.78 score from counting as a finding.
 
 On 30 cases none of these differences is statistically meaningful.
+
+## B1e calibration on the regression split: a negative result (ML-9)
+
+**Plan.** Train B1e on generator 2.1's **dev** split only, then fit the
+temperature and per-cue thresholds (`ntip.ml.calibrate`, #82) on the
+**regression** split, whose families the model never saw.
+
+**Run:**
+- model `b1e-0.1.0+30718f35865b`
+  ([manifest](b1e-0.1.0+30718f35865b-manifest.json)), trained on a Colab T4
+  at `fcf9333` on 630 calls;
+- [calibration file](b1e-0.1.0+30718f35865b-calibration-regression.json),
+  fitted on the 570 regression calls.
+
+Reports, uncalibrated and calibrated:
+- [uncalibrated](compare-curated-dev-regression-b1e-0.1.0+30718f35865b.md);
+- [calibrated](compare-curated-dev-regression-b1e-0.1.0+30718f35865b-calibrated.md).
+
+| Curated dev + regression (30) | B0 | Hybrid, fusion 2, uncalibrated | Hybrid, fusion 2, **calibrated** |
+|---|---|---|---|
+| Critical under-triage | 0/13 | 0/13 | 0/13 |
+| Under-triage | 1/30 | 1/30 | 0/30 |
+| Over-triage | 4/30 | 6/30 | **15/30** |
+| Cue precision | 0.973 | 0.923 | **0.439** |
+| Cue F1 | 0.973 | 0.947 | **0.605** |
+
+**Calibration made the system much worse. Not adopted.** The reason is the
+design of the split, not the calibration method.
+
+- **The two training splits do not share cue codes.** Generator 2.x
+  guarantees each code is in *some* training family and in a test family.
+  It does not guarantee a family in both dev and regression; the data cards
+  show the zeros. So 12 codes exist only in regression families. These
+  include `WEAPON_PRESENT`, `ACTIVE_VIOLENCE`, `DROWNING`,
+  `TRAFFIC_COLLISION` and `SEIZURE`. The dev-only model never learned them,
+  and calibration correctly concluded they could never be proposed at
+  precision 0.9. Another 11 codes have no regression family, so they kept
+  the default threshold.
+- **The critical-recall rule collapses on unseen families.** To find 95%
+  of `NOT_BREATHING`, `UNCONSCIOUS` and `OCCUPANTS_TRAPPED` in families
+  never trained on, the thresholds fell to 0.06, 0.08 and 0.03, with
+  precision 0.30, 0.20 and 0.07. Almost every call then has a critical cue,
+  and half the curated calls are over-triaged.
+- **Temperature scaling barely helped.** T = 2.04 reduced ECE from 0.029 to
+  0.012 on the regression split, but Brier score and AURC were unchanged.
+  The scores were already about as well calibrated as a single temperature
+  can make them.
+
+**What this shows:**
+1. Calibrating per code by held-out family needs every code to appear in
+   families on both sides of the split.
+2. A recall target for critical cues, fitted on families the model never
+   saw, pushes thresholds towards zero. The rule needs a floor, or a
+   different target.
+
+**A side result.** The uncalibrated dev-only model with fusion 2 had the
+best cue F1 of any hybrid so far (0.947, precision 0.923). That is on 30
+cases, with a model that never saw 12 codes; on these cases the rules
+supply those codes. It is not evidence that less training data is better.
