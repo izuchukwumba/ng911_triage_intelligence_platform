@@ -1,0 +1,83 @@
+{
+  "model_id": "b1e-encoder",
+  "model_version": "0.1.0+3cf9758d0861",
+  "base_model": {
+    "id": "distilbert/distilbert-base-multilingual-cased",
+    "revision": "45c032ab32cc946ad88a166f7cb282f58c753c2e"
+  },
+  "codes": [
+    "ACTIVE_BLEEDING",
+    "ACTIVE_VIOLENCE",
+    "ALLERGIC_REACTION",
+    "BREATHING_DIFFICULTY",
+    "BURN_INJURY",
+    "CALLER_HIGH_DISTRESS",
+    "CALLER_LOCATION_UNKNOWN",
+    "CARDIAC_SYMPTOMS",
+    "CHILDBIRTH",
+    "CHILD_INVOLVED",
+    "DIABETIC_EMERGENCY",
+    "DROWNING",
+    "ELECTROCUTION",
+    "EXPLOSION_REPORTED",
+    "FALL_FROM_HEIGHT",
+    "FIRE_REPORTED",
+    "FIRE_SPREADING",
+    "HAZARDOUS_ENVIRONMENT",
+    "INJURY_REPORTED",
+    "INTRUDER_PRESENT",
+    "MISSING_PERSON",
+    "MULTIPLE_VICTIMS",
+    "NOT_BREATHING",
+    "OCCUPANTS_TRAPPED",
+    "OVERDOSE",
+    "POISONING",
+    "POSSIBLE_PRANK",
+    "SEIZURE",
+    "SELF_HARM_RISK",
+    "SMOKE_REPORTED",
+    "STROKE_SYMPTOMS",
+    "TRAFFIC_COLLISION",
+    "UNABLE_TO_GET_UP",
+    "UNCONSCIOUS",
+    "WEAPON_PRESENT"
+  ],
+  "training_data": {
+    "path": "generated-2.0.0-seed42.jsonl",
+    "digest": "sha256:fb4290e8dfb580db23e6c1f34f7b380ddf518cfc557a46d2b10e6c22530a8f48",
+    "splits": [
+      "dev",
+      "regression"
+    ],
+    "calls": 1188
+  },
+  "params": {
+    "epochs": 15,
+    "batch_calls": 8,
+    "learning_rate": 5e-05,
+    "head_learning_rate": 0.001,
+    "positive_weight": 10.0,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.1,
+    "max_length": 64
+  },
+  "seed": 20261113,
+  "environment": {
+    "python": "3.13.16",
+    "torch": "2.14.1+cu130",
+    "transformers": "5.22.1",
+    "device": "cuda",
+    "gpu": "Tesla T4",
+    "platform": "Linux-6.6.159+-x86_64-with-glibc2.39"
+  },
+  "git_commit": "a786e6f1331d21fd399730beb321d0460236b0b8",
+  "trained_at": "2026-11-14T16:37:23.018247+00:00",
+  "files": {
+    "encoder/config.json": "sha256:ccdf0a1f3c86e08ce78ce7d6768d8ab33d8dc4425065b070e3de10c0df17c670",
+    "encoder/model.safetensors": "sha256:541a4a90dc352db018fdbc490a5bddd967d734a2baa3e430c27acf6558b25cea",
+    "encoder/tokenizer.json": "sha256:54e36b3d2e5cf6af1e2291f4c2bc8c4bdf240f640d03161f9e562baa88e58100",
+    "encoder/tokenizer_config.json": "sha256:9cd988573a9588a6085cd353eeefa09b803dba75b03f58d0c1d302aad3078193",
+    "head.safetensors": "sha256:92f83b473a826c12c3802aee42a6d4be3f1d9ef5a06cc9a48efae442146e9dd5"
+  },
+  "weights_digest": "sha256:3cf9758d086165e442e803cc2b2b6ae7246c8f389634d8a859d13f28d983bcdd"
+}
