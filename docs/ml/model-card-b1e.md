@@ -31,16 +31,19 @@ thresholds are the same as B1's and were declared in advance: a candidate at
   splits only** (300 synthetic calls, generator-intended labels). Test data is
   never read by the training code.
 - **Fixed in advance:**
-  - 6 epochs;
+  - 15 epochs;
   - batches of 8 calls;
-  - AdamW, learning rate 5e-5, weight decay 0.01;
+  - AdamW, weight decay 0.01: learning rate 5e-5 for the pretrained
+    encoder, 1e-3 for the new scoring layer;
+  - positive labels weighted 10 times (almost every output is negative, so
+    without it the model learns to answer "no" everywhere);
   - 10% linear warm-up;
   - clauses truncated to 64 tokens;
   - seed `20261113`.
 
   There is no early stopping on evaluation data.
 - **Hardware:** a free Colab or Kaggle T4 GPU trains it in minutes; a laptop
-  CPU also works, more slowly. GPU training is not bit-for-bit repeatable, so
+  CPU takes about 16 minutes. GPU training is not bit-for-bit repeatable, so
   each run's weights digest identifies that run.
 
 ## Reproducibility and integrity
@@ -90,7 +93,16 @@ Needs the `ml-encoder` extra (`uv sync --extra ml-encoder`).
 
 ## Evaluation
 
-No results are published yet. They will be added under
-`docs/evaluation/results/` from the first training run, on the curated dev and
-regression splits. The held-out test split is reserved for the pre-registered
-frozen comparison (milestone ML-10).
+[Baseline 0.1.0](../evaluation/results/README.md#b1e-010-baseline-curated-dev--regression),
+on the curated dev and regression splits:
+- B1e fits its training data completely;
+- on calls it never saw, it does no better than B1 (cue recall 0.47 against
+  0.56);
+- it misses 7 of 15 critical cues on its own;
+- it adds nothing in the hybrid with the rules.
+
+It memorised the 30 training templates of generator 1.0.0. The next step is
+broader training data (generator 2.0), not model changes.
+
+The held-out test split is reserved for the pre-registered frozen comparison
+(milestone ML-10).
