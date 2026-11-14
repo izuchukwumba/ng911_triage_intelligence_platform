@@ -2,7 +2,7 @@
 
     python -m ntip.ml.train_b1e --dataset ../data/eval/generated-2.1.0-seed42.jsonl --out b1e
     # Leave the regression split unseen, to calibrate scores on (ML layer design 6):
-    python -m ntip.ml.train_b1e --dataset ../data/eval/generated-2.1.0-seed42.jsonl --split dev \
+    python -m ntip.ml.train_b1e --dataset ../data/eval/generated-2.2.0-seed42.jsonl --split dev \
         --out b1e
 
 Runs on CPU or a GPU (a free Colab or Kaggle T4 trains it in minutes; see
