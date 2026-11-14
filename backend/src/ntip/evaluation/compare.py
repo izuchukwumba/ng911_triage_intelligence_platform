@@ -148,6 +148,10 @@ def compare(
             **manifest(dataset, splits, seed, "comparison"),
             "b1_model_version": b1.model_version,
             "b1_training_digest": b1.training_digest,
+            "extra_models": {
+                name: {"model_id": model.model_id, "model_version": model.model_version}
+                for name, model in (extra_models or {}).items()
+            },
             "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         },
         "systems": results,
@@ -184,7 +188,11 @@ def to_markdown(result: dict[str, Any]) -> str:
         "",
         f"Commit `{m['git_commit']}` · dataset `{m['dataset']['digest']}` · parser "
         f"`{m['parser']}` · engine `{m['engine']}` · ruleset `{m['ruleset']['name']}` · B1 "
-        f"`{m['b1_model_version']}` · seed `{m['seed']}`",
+        f"`{m['b1_model_version']}`"
+        + "".join(
+            f" · {name} `{x['model_version']}`" for name, x in m.get("extra_models", {}).items()
+        )
+        + f" · seed `{m['seed']}`",
         "",
         "| Metric | " + " | ".join(names) + " |",
         "|---" * (len(names) + 1) + "|",
@@ -248,6 +256,10 @@ def main() -> int:
         extra["B2"] = B2Model()
     result = compare(load_dataset(args.dataset), splits, extra_models=extra)
     stem = f"compare-{args.dataset.stem.split('-')[0]}-{'-'.join(splits)}"
+    # Reports with an extra model are named after it, so they never overwrite the B0/B1 report.
+    stem += "".join(
+        f"-{model.model_id.split('-')[0]}-{model.model_version}" for model in extra.values()
+    )
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / f"{stem}.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     markdown = to_markdown(result)
