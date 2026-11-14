@@ -1,4 +1,4 @@
-# ML layer design (v1.0)
+# ML layer design (v1.1)
 
 **For:** engineers working on the platform's ML layer, and the project owner
 deciding what to fund.
@@ -7,6 +7,9 @@ deciding what to fund.
 Intelligence Layer). It does not replace it. Where it changes a v1.2
 requirement, the change is recorded in the decision log before the work
 merges.
+**Changes in v1.1:** B1e, a small model run locally, is the primary ML path;
+the hosted language model B2 becomes an optional comparison that no
+milestone depends on (DDL-020).
 
 ## 1. Why a separate design
 
@@ -40,7 +43,7 @@ and needs its own design before it starts.
 | §3A.1 task 3: location entity extraction by ML | Rules only. No model proposes address components |
 | §3A.1 task 4: uncertainty estimation and selective abstention | B1's thresholds are fixed by hand (0.35 and 0.5). Calibration is measured (ECE 0.07 to 0.10) but never corrected |
 | §3A.4 B1: "a small encoder or sequence-labeling model" | B1 is an n-gram linear model. It has no notion of negation or tense, and cannot label spans |
-| §3A.4 B2 evaluated | Not run (needs the owner's authorisation to spend) |
+| §3A.4 B2 evaluated | Not run. Now optional (DDL-020, section 5.4) |
 | §3A.4 B3 | Not built; gated on data quality |
 | §3A.7 annotation manual with evidence spans, negation scope, location components, uncertainty class | The [labelling guide](../evaluation/labelling-guide.md) records which cues are present or absent, but no spans, statuses or location components |
 | §3A.7 independent annotation | None yet; protocol ready ([annotation protocol](../research/annotation-protocol.md)) |
@@ -65,8 +68,9 @@ The work below tests whether a better model and better fusion change that.
    recognition.
 2. Replace hand-set thresholds with calibrated scores and abstention chosen
    from data.
-3. Evaluate B2 and a real small encoder (B1e) against B0 and B1 under one
-   pre-registered protocol.
+3. Make a small encoder (B1e), trained on the project's data and run
+   locally on CPU, the primary model, and evaluate it against B0 and B1 under
+   one pre-registered protocol.
 4. Recover hybrid precision without losing the critical-recall gain.
 5. Make the labels good enough that B3 is worth building: spans,
    statuses, location components, independent annotation, a challenge set.
@@ -151,9 +155,12 @@ fails. It is not retuned against adjudicated test labels.
 Kept as the cheap baseline. It does not change, so every later model has a
 stable point of comparison.
 
-### 5.3 B1e: small encoder, multi-task (new)
+### 5.3 B1e: small encoder, multi-task (new, primary)
 
-The model §3A.4 actually describes.
+The model §3A.4 actually describes, and the platform's **primary ML path**
+(DDL-020). It is what a real deployment could run: a few milliseconds per
+call on an ordinary CPU, no cost per call, no call content leaving the
+machine, and the same output every time from weights pinned by hash.
 
 | | |
 |---|---|
@@ -168,49 +175,40 @@ Dependencies go in a new optional extra (`ml-encoder`) so the core platform
 and CI stay light. CI trains a tiny configuration only, to check the code
 path; full training is run by hand and its manifest committed.
 
-### 5.4 B2: structured-output language model
+### 5.4 B2: hosted language model (optional comparison)
 
-**Evaluation first, unchanged.** Prompt 1.0.0 is run once, as committed, on
-every split of both datasets, before anyone looks at a single B2 output. B2
-is zero-shot: nothing was tuned on any split, so this first run gives an
-honest held-out result, test split included.
+B2 sends the transcript to a hosted language model. No emergency
+communications centre would run that on real calls: call content would leave
+the building, every call would cost money and add seconds, and the hosted
+model can change underneath the platform. Design v1.2 §3B.6 already forbids
+it for real data. B2 is therefore **not on the platform's path** (DDL-020):
 
-**What the run measures**
+- the code stays, off by default, with its tests;
+- no milestone, gate, default or fusion policy depends on it;
+- it is run **at most once**, on synthetic data, only if the project owner
+  approves the cost.
 
-- Cue sensitivity and precision against B0 and B1, critical misses
-  separately.
-- Whether B2 handles denial, past tense and uncertainty, where B1 cannot.
-- How often quotes are ungrounded (not found verbatim), which measures
-  fabrication.
-- Whether its self-reported confidence is calibrated.
-- Latency and cost per case.
-- Whether hybrid B0 plus B2 keeps critical under-triage at zero (the ML-4
-  gate).
-- **Run-to-run variation:** the dev split is run three times to measure how
-  often outputs differ, because the hosted model is not guaranteed to be
-  deterministic.
+**What one run would add.** A zero-shot ceiling: how well a strong general
+model does with no training on this data. It would show whether B1e's
+remaining errors come from the data or from the model's size, and how B2
+handles denial, past tense and uncertainty. Ungrounded quotes would measure
+fabrication.
+
+**Protocol, if run.** Prompt 1.0.0, as committed, on every split of both
+datasets, once, before anyone looks at an output. Nothing was tuned on any
+split, so this is an honest held-out result. The prompt is not developed
+further.
 
 **Cost estimate.** Claude Opus 5.5 is priced at $4 per million input tokens
-and $20 per million output tokens. A case is about 1,000 input tokens (system
-prompt, schema and transcript) and about 700 to 2,200 output tokens,
-including the model's thinking at `medium` effort. That is about **$0.02 to
-$0.05 per case**:
+and $20 per million output tokens. A case is about 1,000 input tokens and 700
+to 2,200 output tokens, about $0.02 to $0.05 per case: roughly **$12 to $30**
+for the 560 cases once. A 5-case trial measures real token use first, and the
+report records the tokens actually used.
 
-| Run | Cases | Estimated cost |
-|---|---|---|
-| Curated, all splits | 50 | $1 to $3 |
-| Generated, all splits | 510 | $10 to $26 |
-| Dev split repeated twice more (variation) | 330 | $7 to $17 |
-| **Total** | | **about $20 to $45** |
-
-These are estimates. The run starts with 5 cases to measure real token use,
-and stops if the projection exceeds the approved budget. Each report records
-the actual tokens used.
-
-**Prompt 1.1 (after the first run).** Extends B2 to location components
-and victim count (§3A.1 tasks 1 and 3). It is developed on the dev split
-only, frozen, then run once on test and challenge data. The 1.0.0 results
-stay published as the zero-shot baseline.
+**Alternative without per-call cost.** The same comparison can be made with
+an open-weight language model run locally, which also keeps the data on the
+machine. It is slower to set up and needs more memory than the reference
+machine may have.
 
 ### 5.5 B3: domain-adapted model (gated)
 
@@ -218,10 +216,9 @@ Starts only when all of these hold:
 
 1. Adjudicated labels exist for at least 200 cases, and cue agreement (kappa)
    is at least 0.6 (annotation protocol §8).
-2. B1e and B2 results are published.
-3. There is a documented gap B3 is meant to close, for example "B2 handles
-   tense but costs too much and is too slow; B1e is fast but misses indirect
-   phrasing".
+2. B1e results are published.
+3. There is a documented gap B3 is meant to close, for example "B1e misses
+   indirect phrasing of critical cues".
 
 Likely forms: B1e fine-tuned further on adjudicated dev data, or a small
 open-weight generative model adapted with low-rank adapters. Licence,
@@ -235,8 +232,7 @@ change:
 
 1. **Calibrate per cue on development data only.** Temperature scaling for
    B1e. Isotonic regression where there is enough data, with cross-fitting
-   because dev data is small. B2's self-reported confidence is calibrated the
-   same way.
+   because dev data is small.
 2. **Choose abstention from the risk-coverage curve.** For each cue, choose the
    threshold that keeps selective risk under a pre-declared level on dev data.
    For critical cues, choose instead for a pre-declared recall, because a
@@ -299,7 +295,7 @@ recovers precision. The decision and its numbers go in a decision-log entry.
    - without calibration;
    - without location handling.
 6. **Cost and latency** for every system: p50 and p95, tokens and dollars
-   for B2, CPU time for B1e.
+   for B2 if it is run, CPU time for B1e.
 7. **Reports** keep the existing format: JSON and Markdown, failures listed,
    denominators and intervals, label source stated. Results against author,
    generator and adjudicated labels are reported separately, never pooled.
@@ -317,7 +313,6 @@ recovers precision. The decision and its numbers go in a decision-log entry.
 | Location-component and victim-count candidates in the contract | `ntip.ml.contract` (schema minor version bump; additive) |
 | Location candidates from models feed L1 to L3, never marked validated | `ntip.location` |
 | Fusion policy v2, versioned | `ntip.ml.fusion`, `rulesets/` |
-| Token and cost accounting in B2 reports | `ntip.ml.b2`, `ntip.evaluation.compare` |
 | Paired statistics, pre-registration digest in manifests | `ntip.evaluation` |
 | **RP-E1:** study build for the explanation study (score-only display, participant ids, per-trial timing), off unless explicitly enabled | `apps/dashboard`, `ntip.api` ([research protocol](../research/research-protocol.md) §4) |
 
@@ -331,7 +326,7 @@ The rules in v1.2 §3A.6 all still apply. New hazards:
 | Calibration fitted on too little data looks better than it is | Cross-fitting on dev; held-out ECE reported with intervals; `calibrated` stays false until shown |
 | Fusion v2 suppresses a non-critical cue that mattered | Suppressed suggestions are still shown; the gate is checked on every cue, not only critical ones |
 | Model-proposed address parts are treated as verified | They enter location handling as reported candidates and go through the same L1 to L3 checks; a model can never set `validated` |
-| B2 receives prompt-injection text | Challenge set includes it; output schema and span verification already limit the effect; results reported |
+| Prompt-injection text in a transcript | Challenge set includes it; B1e cannot follow instructions, and B2, if run, is limited by its output schema and span verification; results reported |
 | Training data leaks test families | Family-level split check at load time; manifests record training data digests; the test set is never read by training code |
 
 New safety-case claims are added when each piece merges.
@@ -341,19 +336,20 @@ New safety-case claims are added when each piece merges.
 | Milestone | Delivers | Gate | Depends on |
 |---|---|---|---|
 | **ML-6** Data foundations | Label schema 2.0; annotation tooling; dataset cards; span metrics | Existing reports reproduce unchanged; annotation workbooks round-trip | None |
-| **ML-7** B2 evaluation | B2 prompt 1.0.0 on every split, with cost and variation | Report published, including failures | **Owner's spending authorisation** |
+| ML-7 (optional) B2 comparison | B2 prompt 1.0.0 on every split, once | Report published, including failures | Owner's spending authorisation; nothing depends on it |
 | **ML-8** B1e | Encoder model, manifest, adapter, results on dev and regression | Beats B1 on dev cue F1 without lowering critical recall; p95 within target, or the miss reported | Generator 2.0 |
 | **ML-9** Calibration and fusion v2 | Calibrated scores, chosen thresholds, fusion policy v2 | Critical under-triage stays 0 on regression; precision recovered against current hybrid; decision-log entry | ML-8 |
-| **ML-10** Frozen comparison | Pre-registered test and challenge run of B0, B1, B1e, B2, and hybrids | Published with paired statistics, slices, ablations; ML-4 gate re-checked | ML-7 to ML-9; challenge set |
+| **ML-10** Frozen comparison | Pre-registered test and challenge run of B0, B1, B1e and hybrids (B2 too, if ML-7 was run) | Published with paired statistics, slices, ablations; ML-4 gate re-checked | ML-8, ML-9; challenge set |
 | **ML-11** Adjudicated re-evaluation | ML-10 repeated against adjudicated labels; author-versus-adjudicated label differences | Published | Annotation round |
 | **ML-12** B3 (gated) | See section 5.5 | Its own pre-registered comparison | ML-11 and the section 5.5 conditions |
 
-ML-6 and ML-8 can start now. ML-7 needs one decision from the owner.
+ML-6 and ML-8 can start now; no milestone on the main path needs a
+spending decision.
 
 ## 12. Decisions needed from the project owner
 
-1. **B2 spending:** approve a budget (about $50 covers the run in section 5.4
-   with margin).
+1. **Optional B2 run:** whether to spend about $12 to $30 on the one-off
+   comparison in section 5.4. Nothing depends on it.
 2. **Compute for B1e:** a small encoder trains on a laptop CPU in hours;
    a GPU (local or rented, roughly a few dollars per training run) makes
    iterating practical. Choose one.
@@ -369,6 +365,5 @@ ML-6 and ML-8 can start now. ML-7 needs one decision from the owner.
   Spanish evaluation slice enough for now?
 - Should the challenge set be written by an annotator rather than by the
   author, to keep it fully independent of development?
-- Is B2's cost per case acceptable for anything beyond evaluation, or is it
-  a research baseline only? (Its data-governance conditions, §3B.6, already
-  rule out real data.)
+- Is the zero-shot comparison worth making at all, and if so with B2 or
+  with a locally run open-weight model (section 5.4)?
