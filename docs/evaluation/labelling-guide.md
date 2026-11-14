@@ -1,4 +1,4 @@
-# Labelling guide (v1.1)
+# Labelling guide (v2.0)
 
 How to label a synthetic case in `data/eval/*.jsonl` so that labels are
 consistent and can be checked by a second annotator (design v1.2, §3A.7).
@@ -65,8 +65,31 @@ when several people are mentioned without a number, omitted when not mentioned.
 The primary service: `police`, `fire`, `ems`, `hazmat`; `other` for non-emergency
 calls such as pranks; `unknown` when it cannot be told.
 
+## 6. Finer labels (label schema 2.0, optional)
+
+Records may also carry the fields below. Independent annotators record them
+for every case ([annotation protocol](../research/annotation-protocol.md)
+section 6); older author and generator records do not have them yet.
+
+- `cue_annotations`: one entry per mentioned cue, with its `status`
+  (`affirmed`, `uncertain`, `negated`, `historical`, `hypothetical`,
+  `retracted`) and `evidence`, the shortest exact words supporting it, as a
+  span of one message (`message`, `start`, `end`, `text`). `affirmed` and
+  `uncertain` cues are the case's `cues`; every other status puts the cue in
+  `absent_cues`. When both are given they must agree.
+- `location_components`: spans for `house_number`, `street`, `unit`,
+  `intersection`, `landmark` and `locality`, in the caller's own words. Never
+  corrected or completed.
+- `case_uncertainty`: `clear`, `some_doubt` or `cannot_tell`.
+
+Spans must match the message text exactly; the dataset loader rejects any
+that do not.
+
 ## Changes
 
+- v2.0: added the optional finer labels in section 6 (cue status and
+  evidence spans, location components, case uncertainty). Sections 1 to 5
+  are unchanged, so every v1.1 label is still a valid v2.0 label.
 - v1.1: added `UNABLE_TO_GET_UP`; relabelled `fx-008` accordingly. A critical
   cue reported only in the past ("wasn't breathing earlier") stays in
   `absent_cues` and the case is labelled elevated, as before.
