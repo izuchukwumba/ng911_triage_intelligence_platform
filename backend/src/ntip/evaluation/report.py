@@ -69,6 +69,22 @@ def to_markdown(result: dict[str, Any]) -> str:
     for code, prf in x["cue_extraction"]["per_code"].items():
         cells = [code, prf["tp"], prf["fp"], prf["fn"], prf["precision"], prf["recall"]]
         lines.append("| " + " | ".join(str(c) for c in cells) + " |")
+    if spans := x.get("spans"):
+        exact, overlap = spans["span_exact"], spans["span_overlap"]
+        lines += [
+            "",
+            f"## Evidence spans and cue status ({spans['annotated_cases']} annotated cases)",
+            "",
+            f"{spans['gold_mentions']} labelled mentions, {spans['predicted_mentions']} mentioned "
+            "by the system.",
+            "",
+            "| Metric | Precision | Recall | F1 |",
+            "|---|---|---|---|",
+            f"| Span exact | {exact['precision']} | {exact['recall']} | {exact['f1']} |",
+            f"| Span overlap | {overlap['precision']} | {overlap['recall']} | {overlap['f1']} |",
+            "",
+            f"Status accuracy (codes both mention): {_rate(spans['status_accuracy'])}",
+        ]
     lines += ["", f"## Failures ({len(x['failures'])} cases)", ""]
     for case_id, errors in x["failures"].items():
         lines.append(f"- `{case_id}`: {'; '.join(errors)}")

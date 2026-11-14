@@ -179,6 +179,14 @@ def to_markdown(result: dict[str, Any]) -> str:
         ("Denied/past cues treated as live", lambda x: str(
             x["cue_extraction"]["denied_or_past_cues_treated_as_live"])),
     ]  # fmt: skip
+    if any("spans" in result["systems"][n]["metrics"] for n in result["systems"]):
+        rows += [
+            ("Evidence span F1 (exact / overlap)", lambda x: (
+                f"{x['spans']['span_exact']['f1']} / {x['spans']['span_overlap']['f1']}"
+                if "spans" in x else "n/a")),
+            ("Cue status accuracy", lambda x: (
+                _fmt(x["spans"]["status_accuracy"]) if "spans" in x else "n/a")),
+        ]  # fmt: skip
     names = list(result["systems"])
     lines = [
         f"# Comparison on {m['dataset']['path']} ({', '.join(m['dataset']['splits'])})",
