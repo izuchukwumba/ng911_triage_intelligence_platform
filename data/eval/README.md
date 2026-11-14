@@ -75,6 +75,21 @@ longer matches the generator.
   rules were not changed to fit them: results on this set measure how the
   rules cope with phrasing they were not written for.
 
+## `generated-2.1.0-seed42.jsonl`
+
+2,010 cases from `python -m ntip.generator --generator 2.1.0 --n 2010 --seed 42`. This is generator 2.0 with four additions, each closing a gap that B1e showed on curated dev (`ntip/generator/scenarios_v21.py`). It is B1e's training data from model version 0.2 on. Generator 2.0.0 and its dataset are unchanged.
+
+| Addition | Why | In the data |
+|---|---|---|
+| A denial of a cue that is not part of the call ("Nobody is hurt.", "There's no fire.", "She is still conscious.", "He is still breathing."), labelled `negated` | B1e scored "nobody is hurt" and "there is no fire" as live: 2.0 never denied a cue on its own | 330 calls (`reassured`) |
+| An all-capitals variant | B1e missed "HE IS NOT BREATHING"; no 2.0 call was in capitals | 105 calls (`shouting`) |
+| A training family with `NOT_BREATHING` alone, and unconscious patients reported as still breathing | Every 2.0 training call with `NOT_BREATHING` also had `UNCONSCIOUS` or `DROWNING`, and B1e learned to add `UNCONSCIOUS` | 67 families (dev 21) |
+| Spanish family words drawn at random, keeping their gender | Each 2.0 Spanish phrasing named one fixed person, and B1e read "mi esposo" as a child | 15 family words |
+
+Only "hijo", "hija" and "bebé" are labelled `CHILD_INVOLVED`.
+
+The additions were written after looking at B1e's errors on curated dev. Curated dev is therefore no longer an independent check of these four patterns; the test splits are.
+
 ## Running
 
 ```sh

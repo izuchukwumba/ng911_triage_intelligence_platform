@@ -129,6 +129,16 @@ that appears in two splits.
 evidence spans, speech-recognition noise. Multiple speakers and longer
 multi-message incidents are not built yet.
 
+**Generator 2.1** (`ntip.generator.generate_v21`,
+`data/eval/generated-2.1.0-seed42.jsonl`): generator 2.0 plus four
+additions, each closing a gap found in B1e's curated-dev errors. They are:
+- denials of cues that are not part of the call;
+- an all-capitals variant;
+- `NOT_BREATHING` without `UNCONSCIOUS` in training;
+- Spanish family words drawn at random.
+
+See `data/eval/README.md`.
+
 - Emits spans and statuses with each case, so generated data can train span
   models.
 - New perturbations: speech-recognition errors (homophones, dropped words,
