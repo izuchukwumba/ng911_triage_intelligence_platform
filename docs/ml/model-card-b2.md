@@ -43,10 +43,15 @@ and a cue still has to be grounded and verified before it can affect anything.
 ## Evaluation status
 
 **Not yet run.** Running B2 over the evaluation sets calls a paid external API,
-so it needs the project owner's authorisation:
+so it needs the project owner's authorisation. B2 is zero-shot and nothing was
+tuned on any split, so the first run covers every split, test included, with
+prompt 1.0.0 frozen as committed. The plan, measures and cost estimate (about
+$20 to $45) are in the [ML layer design](../design/ml-layer-design-v1.0.md),
+section 5.4 (milestone ML-7).
 
     NTIP_B2_ALLOW_EXTERNAL=1 python -m ntip.evaluation.compare \
-        --dataset ../data/eval/curated.jsonl --split test --with-b2
+        --dataset ../data/eval/curated.jsonl \
+        --split dev --split regression --split test --with-b2
 
 No B2 performance figures exist in this repository until that run is made and
 its report committed.
