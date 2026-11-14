@@ -155,3 +155,11 @@ def test_training_refuses_a_non_empty_output(
     out, _ = trained
     with pytest.raises(FileExistsError):
         train(write_dataset(tmp_path / "d.jsonl"), out, base_model="unused")
+
+
+def test_training_reads_only_the_chosen_development_splits(tmp_path: Path) -> None:
+    from ntip.ml.train_b1e import train
+
+    for splits in ((), ("test",), ("dev", "test")):
+        with pytest.raises(ValueError, match="may read only"):
+            train(write_dataset(tmp_path / "d.jsonl"), tmp_path / "m", splits=splits)
