@@ -1,6 +1,6 @@
 """Train B1e and write a model directory with a manifest.
 
-    python -m ntip.ml.train_b1e --dataset ../data/eval/generated-1.0.0-seed42.jsonl --out b1e
+    python -m ntip.ml.train_b1e --dataset ../data/eval/generated-2.0.0-seed42.jsonl --out b1e
 
 Runs on CPU or a GPU (a free Colab or Kaggle T4 trains it in minutes; see
 ``notebooks/train_b1e.ipynb``). Only the dev and regression splits are read;

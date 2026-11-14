@@ -49,6 +49,31 @@ longer matches the generator.
   §12.3). Treat results on this set as a stress test, not as accuracy.
 - Template families are not shared with `curated.jsonl`, so the curated set
   stays outside the generator's families.
+- Predates labelling guide v2.1 (DDL-021) and is kept unchanged so earlier
+  reports stay reproducible: its "fell down the stairs" family has no
+  `FALL_FROM_HEIGHT` label. B1 is still trained on it, as a stable baseline.
+
+## `generated-2.0.0-seed42.jsonl`
+
+2,010 cases from `python -m ntip.generator --generator 2.0.0 --n 2010 --seed 42`
+(generator 2.0.0, ML layer design §4.3). The training data for B1e.
+
+| | Generator 1.0.0 | Generator 2.0.0 |
+|---|---|---|
+| Scenario families | 17 | 66 (dev 20, regression 19, test 27) |
+| Base phrasings | 51 (3 per family) | 279 (3 to 6 per family), plus denials, past-tense and Spanish versions |
+| Cue codes | 20, six of them only in test families | 32 (labelling guide v2.1), every one in both a training and a test family |
+| Training calls (dev + regression) | 300 | 1,066 |
+| Labels | Cue lists | Label schema 2.0: each cue's status and exact evidence span, and the location components the caller gave |
+| Perturbations | Location form, child, several people, uncertainty, hearsay, denial, past tense, disfluency, misspelling, address correction, Spanish | The same, plus a speech-recognition-style variant (lower case, no punctuation, homophones) |
+
+- Evidence spans are kept through every perturbation: a misspelled cue word
+  stays inside its span, and a filler inserted inside a cue phrase becomes
+  part of the evidence, as written.
+- Labels are generator-intended, as for 1.0.0. The phrasings were written by
+  the project author, without reference to the rules' phrase lists, and the
+  rules were not changed to fit them: results on this set measure how the
+  rules cope with phrasing they were not written for.
 
 ## Running
 
@@ -57,4 +82,5 @@ cd backend
 python -m ntip.evaluation                                   # dev + regression
 python -m ntip.evaluation --split test --out ../docs/evaluation/results
 python -m ntip.evaluation --split regression --gate         # exit 2 on critical under-triage
+python -m ntip.evaluation --dataset ../data/eval/generated-2.0.0-seed42.jsonl     --split dev --split regression                          # rules on generator 2.0
 ```

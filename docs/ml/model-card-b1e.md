@@ -27,8 +27,10 @@ thresholds are the same as B1's and were declared in advance: a candidate at
 
 ## Training
 
-- **Data:** `data/eval/generated-1.0.0-seed42.jsonl`, **dev and regression
-  splits only** (300 synthetic calls, generator-intended labels). Test data is
+- **Data:** `data/eval/generated-2.0.0-seed42.jsonl` from version 0.2 on,
+  **dev and regression splits only** (1,066 synthetic calls from 39
+  families, generator-intended labels). The 0.1.0 baseline used
+  `generated-1.0.0-seed42.jsonl` (300 calls from 10 families). Test data is
   never read by the training code.
 - **Fixed in advance:**
   - 15 epochs;
