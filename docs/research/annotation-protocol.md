@@ -114,6 +114,15 @@ consistency.
 6. **Adjudication.** The adjudicator sees both annotators' labels for every
    case where they differ, decides the final label, and writes one sentence
    saying why.
+   - `python -m ntip.evaluation.adjudication sheet` lists only the
+     disputed cases, with the messages and each annotator's labels.
+   - The adjudicator fills in a `decision` for each case: an annotator's
+     name, or `own` if neither label fits. For `own`, they label the case
+     themselves in a label sheet with annotator `ADJ`. Every row also needs
+     a `reason`.
+   - `python -m ntip.evaluation.adjudication apply` writes the dataset
+     records, with `label_source: "adjudicated"`. It refuses a missing
+     decision, a missing reason or an unknown annotator.
 
 Do not change labels after submitting them, except through adjudication.
 
