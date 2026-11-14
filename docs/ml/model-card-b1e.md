@@ -107,8 +107,15 @@ Needs the `ml-encoder` extra (`uv sync --extra ml-encoder`).
   Generator 2.1 fixed the earlier denial and all-capitals errors.
 
   See the evaluation below.
-- **Scores are not calibrated** (`calibrated: false`); calibration is milestone
-  ML-9.
+- **Scores are not calibrated by default** (`calibrated: false`). A
+  calibration file from `python -m ntip.ml.calibrate` applies two things:
+  - one temperature for all cues;
+  - a threshold for each cue: highest recall-preserving for critical cues,
+    lowest with precision of at least 0.9 for the others.
+
+  It is fitted on a split the model never trained on, and it is bound to
+  the model's weights digest. B1e then reports `calibrated: true`
+  (milestone ML-9).
 - Research only, synthetic text only. Not a clinical or dispatch model.
 
 ## Evaluation
