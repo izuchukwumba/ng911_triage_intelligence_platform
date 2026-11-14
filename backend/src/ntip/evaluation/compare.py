@@ -111,6 +111,14 @@ def _slices(results: Sequence[Any], seed: int) -> dict[str, Any]:
     }
 
 
+def _calibration_of(model: ModelExtractor) -> dict[str, Any]:
+    calibration = getattr(model, "calibration", None)
+    if calibration is None:
+        return {}
+    return {"calibration": {"temperature": calibration.temperature,
+                            "data": calibration.document.get("data")}}  # fmt: skip
+
+
 def compare(
     dataset: Dataset,
     splits: Sequence[Split],
@@ -156,7 +164,11 @@ def compare(
             "b1_model_version": b1.model_version,
             "b1_training_digest": b1.training_digest,
             "extra_models": {
-                name: {"model_id": model.model_id, "model_version": model.model_version}
+                name: {
+                    "model_id": model.model_id,
+                    "model_version": model.model_version,
+                    **_calibration_of(model),
+                }
                 for name, model in (extra_models or {}).items()
             },
             "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -205,7 +217,9 @@ def to_markdown(result: dict[str, Any]) -> str:
         f"`{m['parser']}` · engine `{m['engine']}` · ruleset `{m['ruleset']['name']}` · B1 "
         f"`{m['b1_model_version']}`"
         + "".join(
-            f" · {name} `{x['model_version']}`" for name, x in m.get("extra_models", {}).items()
+            f" · {name} `{x['model_version']}`"
+            + (f" (calibrated, T={x['calibration']['temperature']})" if "calibration" in x else "")
+            for name, x in m.get("extra_models", {}).items()
         )
         + f" · seed `{m['seed']}`",
         "",
@@ -258,13 +272,19 @@ def main() -> int:
         metavar="MODEL_DIR",
         help="also run B1e from a trained model directory (needs the ml-encoder extra)",
     )
+    parser.add_argument(
+        "--b1e-calibration",
+        type=Path,
+        metavar="FILE",
+        help="apply this calibration file to B1e (from python -m ntip.ml.calibrate)",
+    )
     args = parser.parse_args()
     splits = [Split(s) for s in (args.split or ["test"])]
     extra: dict[str, ModelExtractor] = {}
     if args.with_b1e:
         from ntip.ml.b1e import B1eModel
 
-        extra["B1e"] = B1eModel(args.with_b1e)
+        extra["B1e"] = B1eModel(args.with_b1e, calibration=args.b1e_calibration)
     if args.with_b2:
         from ntip.ml.b2 import B2Model
 
@@ -273,7 +293,9 @@ def main() -> int:
     stem = f"compare-{args.dataset.stem.split('-')[0]}-{'-'.join(splits)}"
     # Reports with an extra model are named after it, so they never overwrite the B0/B1 report.
     stem += "".join(
-        f"-{model.model_id.split('-')[0]}-{model.model_version}" for model in extra.values()
+        f"-{model.model_id.split('-')[0]}-{model.model_version}"
+        + ("-calibrated" if getattr(model, "calibration", None) is not None else "")
+        for model in extra.values()
     )
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / f"{stem}.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
