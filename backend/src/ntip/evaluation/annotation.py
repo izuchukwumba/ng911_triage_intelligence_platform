@@ -349,8 +349,14 @@ def _case_record(
     return record, []
 
 
-def read_workbook(path: Path, round_: Round, cases: dict[str, EvalCase]) -> list[dict[str, Any]]:
-    """Validated records, one per case, in case-number order; raises WorkbookError."""
+def read_workbook(
+    path: Path, round_: Round, cases: dict[str, EvalCase], *, partial: bool = False
+) -> list[dict[str, Any]]:
+    """Validated records, one per case, in case-number order; raises WorkbookError.
+
+    ``partial`` allows a sheet that labels only some of the round's cases (the
+    adjudicator's own labels).
+    """
     with path.open(encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         missing = [c for c in LABEL_COLUMNS if c not in (reader.fieldnames or [])]
@@ -373,7 +379,7 @@ def read_workbook(path: Path, round_: Round, cases: dict[str, EvalCase]) -> list
         by_case[number].append((line, row))
     sources = {c.case_number: c for c in round_.cases}
     unlabelled = sorted(set(cases) - set(by_case))
-    if unlabelled:
+    if unlabelled and not partial:
         problems.append(f"no rows for cases {unlabelled}")
     records = []
     for number in sorted(by_case):
