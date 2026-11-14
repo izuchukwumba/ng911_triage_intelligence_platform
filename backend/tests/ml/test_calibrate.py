@@ -94,3 +94,12 @@ def test_a_calibration_file_loads_and_is_checked(tmp_path: Path) -> None:
     path.write_text("{}", "utf-8")
     with pytest.raises(ValueError, match="not a calibration file"):
         Calibration.load(path)
+
+
+def test_a_critical_threshold_never_falls_below_the_floor() -> None:
+    from ntip.ml.calibrate import CRITICAL_FLOOR
+
+    positives = [0.9] * 5 + [0.05] * 15  # recall 0.95 would need 0.05
+    threshold, info = _threshold(_scored(positives, [0.2] * 5), critical=True)
+    assert threshold == CRITICAL_FLOOR and "floor applied" in info["rule"]
+    assert info["recall"] == 0.25
