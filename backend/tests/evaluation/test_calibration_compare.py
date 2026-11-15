@@ -162,3 +162,29 @@ def test_the_test_split_needs_a_preregistration(
     monkeypatch.setattr("sys.argv", argv[:3])
     with pytest.raises(SystemExit):
         compare.main()
+
+
+def test_a_console_that_cannot_encode_the_report_does_not_fail_the_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pytest.importorskip("sklearn")
+    import io
+    import sys
+
+    from ntip.evaluation import compare
+
+    case = {
+        "case_id": "a", "split": "dev", "family": "f", "label_source": "author",
+        "messages": ["My father is not breathing. We are at 12 Oak Street."],
+        "labels": {"domain": "ems", "severity": "critical", "priority": "P0",
+                   "cues": ["NOT_BREATHING"], "location": "present"},
+    }  # fmt: skip
+    path = tmp_path / "cases.jsonl"
+    path.write_text(json.dumps(case), encoding="utf-8")
+    console = io.TextIOWrapper(io.BytesIO(), encoding="cp1252")
+    monkeypatch.setattr(sys, "stdout", console)
+    argv = ["compare", "--dataset", str(path), "--split", "dev", "--out", str(tmp_path / "out")]
+    monkeypatch.setattr("sys.argv", argv)
+
+    assert compare.main() == 0
+    assert "Δ" in (tmp_path / "out" / "compare-cases-dev.md").read_text("utf-8")
