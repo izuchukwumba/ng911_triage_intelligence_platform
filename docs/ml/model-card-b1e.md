@@ -170,5 +170,19 @@ problem, milestone ML-9.
 - the false P0 on "he's awake and talking" is gone; a vague report of a
   suspicious person is now raised from P3 to P1.
 
-This is the model carried into the comparison on the held-out test split,
-which is reserved for the pre-registered frozen comparison (milestone ML-10).
+[Pre-registered test comparison](../evaluation/results/README.md#ml-10-pre-registered-frozen-comparison-on-the-test-splits)
+(ML-10, run once), in the hybrid with the rules under fusion 1.0.0:
+- **Generator 2.2 test** (810 calls from families it never saw):
+  - P0 calls given too low a priority fall from the rules' 84 to 47 of 285;
+  - cue F1 rises from 0.786 to 0.849;
+  - over-triage rises from 77 to 106 calls.
+- **Curated test:** no call under-triaged, against the rules' 2.
+- **Challenge set:** the hybrid still misses fewer P0 calls than the rules
+  (5 against 8 of 19). But it reports three times as many denied or past
+  cues as live, and its cue F1 is below the rules'.
+- **On its own,** B1e misses more P0 calls than the rules (133 against 84).
+  It is meant to run with them.
+- **Latency:** p95 was 185 ms per call on a laptop CPU, against the 150 ms
+  target; the median was 24 ms.
+
+This is the reference configuration (DDL-023).
