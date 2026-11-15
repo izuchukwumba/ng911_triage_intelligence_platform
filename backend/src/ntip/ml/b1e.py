@@ -20,6 +20,7 @@ produces a directory with a manifest of file digests, and ``B1eModel`` refuses
 any directory whose files do not match it. Needs the ``ml-encoder`` extra.
 """
 
+import copy
 import json
 import time
 from collections.abc import Sequence
@@ -201,6 +202,16 @@ class B1eModel:
     ) -> tuple[list[tuple[InferenceMessage, SourceSpan]], list[dict[str, float]]]:
         clauses = [(m, _trim(m.text, seg)) for m in messages for seg in _clauses(m.text)]
         return clauses, self.clause_scores([m.text[s.start : s.end] for m, s in clauses])
+
+    def without_abstention(self) -> "B1eModel":
+        """The same model proposing every cue it would abstain on (an ablation).
+
+        Shares the loaded weights; only the candidate threshold drops to the
+        abstention threshold, as for B1's ablation.
+        """
+        ablated = copy.copy(self)
+        ablated.candidate_at = ABSTAIN_FROM
+        return ablated
 
     def cue_scores(self, messages: list[InferenceMessage]) -> dict[str, float]:
         """Each code's score for a conversation: its best clause (for calibration)."""
