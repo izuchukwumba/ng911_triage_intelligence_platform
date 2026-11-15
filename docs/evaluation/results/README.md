@@ -649,3 +649,70 @@ measurement taken now would be a separate experiment, reported as such.
   measure the system against its own rubric, not against real calls or
   practitioners. ML-11 repeats this comparison against independently
   adjudicated labels.
+
+### ML-10 post-hoc analyses (exploratory, not pre-registered)
+
+[Report](ml-10-posthoc.md) · `python -m ntip.evaluation.ml10_posthoc`.
+
+These analyses were added after a critical review of the ML-10 write-up.
+They do not change any pre-registered decision above; they show how much
+weight each decision can bear.
+
+**Method.** The run reproduces the ML-10 systems case by case. Its
+aggregates **match all three archived reports exactly**, which also
+independently checks those reports. It then adds the analyses below.
+
+**1. Clustering by scenario family.** The 810 generated calls are
+paraphrases within 27 families (19 of them with P0 calls), so call-level
+tests overstate the evidence. Treating the family as the unit:
+
+| Generated test | Call-level (pre-registered) | Family-level (post-hoc) |
+|---|---|---|
+| H2: hybrid vs rules, P0 calls | 37 to 0, p ≈ 1.5 × 10⁻¹¹ | Durkalski clustered McNemar p = 0.015; 11 of 19 P0 families improve, none worsen (sign test p = 0.001) |
+| Cue F1, hybrid − rules | +0.063 [+0.048, +0.079] | +0.063 [+0.028, +0.103] |
+| Over-triage, hybrid − rules | +0.036 [+0.025, +0.049] | +0.036 [+0.005, +0.079] |
+| H5: B1e hybrid vs B1 hybrid, P0 calls | 20 to 7, p = 0.019 (pass) | Clustered p = 0.12; 7 vs 2 families (p = 0.18). **Does not hold at the family level** |
+
+The benefit over the rules holds up when calls are clustered by family.
+H5 does not.
+
+**2. H5 was confounded by training data.** The pre-registered B1 was
+fitted on generator 1.0.0 (300 calls); B1e on generator 2.2 (1,800).
+Refitting B1 on generator 2.2's dev and regression splits:
+
+| Generated test | Hybrid B0+B1 (gen 1.0) | Hybrid B0+B1 (gen 2.2) | Hybrid B0+B1e |
+|---|---|---|---|
+| P0 calls missed | 60/285 | 55/285 | 47/285 |
+| Cue F1 | 0.761 | 0.830 | 0.849 |
+| Over-triage | 110 | 104 | 106 |
+
+Most of B1e's F1 advantage over the pre-registered B1 (+0.088) comes from
+the training data (+0.069 when B1 is refitted). The encoder's own advantage
+over a refitted n-gram model is small and not significant at the family
+level: 10 vs 2 P0 calls, clustered p = 0.088. On the challenge set, the
+refitted B1 hybrid misses fewer P0 calls than the B1e hybrid (2 vs 5 of
+19).
+
+**3. False P0s, and P0 at realistic prevalence.** On the generated test,
+the rules never raise a call to P0 wrongly; the B1e hybrid does so 31
+times. Treating "P0" as a screening decision:
+
+| Generated test | Sensitivity | False-positive rate | PPV at 35% P0 (as in the data) | at 10% | at 5% |
+|---|---|---|---|---|---|
+| B0 rules | 0.705 | 0.000 | 1.00 | 1.00 | 1.00 |
+| Hybrid B0+B1e | 0.835 | 0.059 | 0.88 | 0.61 | 0.43 |
+
+If 5% of calls were truly P0, fewer than half of the hybrid's P0 decisions
+would be right. The data's 35% P0 share flatters every escalation metric.
+
+**4. Where priority errors come from.** 59 of the rules' 77 over-triaged
+calls have exactly the labelled cues: they are disagreements between the
+ruleset and the generator's labelling rubric, not extraction errors. Every
+under-triage, for every system, is a cue error.
+
+**5. Latency.** Measured separately: 50 warm-up calls, then three
+repetitions over the 810 calls, on the same laptop (Intel Core, 20 logical
+CPUs, 14 PyTorch threads). The B1e hybrid's p95 was **39–41 ms** (p99
+47–51 ms), against the rules' under 1 ms. The pre-registered H6 decision
+stands as recorded (missed in the frozen run), but the 185 ms figure in
+that run reflected other load on the machine, not the system.
