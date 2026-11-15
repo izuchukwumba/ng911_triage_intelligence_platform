@@ -510,3 +510,142 @@ meaningful.
 This model (`0.1.0+7b7bb8d67713`) is the one carried into the pre-registered
 test comparison (ML-10). It trained on the most data and its errors are the
 least severe. ML-10 is where the comparison with the rules is decided.
+
+## ML-10: pre-registered frozen comparison on the test splits
+
+The first run on held-out test data with B1e. Everything below was fixed
+in advance in the
+[pre-registration](../preregistration/ml-10-frozen-comparison.md)
+(`sha256:f5f5013b2ff11209fbc5cf43a268530c361a369d64786e5fb7610df2dbec05b4`,
+merged in #92). Every report records that digest.
+
+**Run:**
+- once, at commit `7e58089`, on the reference machine (the author's laptop
+  CPU);
+- B1e `0.1.0+7b7bb8d67713`, uncalibrated; fusion policy 1.0.0.
+
+Reports:
+- [generator 2.2 test](compare-generated-test-b1e-0.1.0+7b7bb8d67713.md)
+  (primary, 810 calls);
+- [curated test](compare-curated-test-b1e-0.1.0+7b7bb8d67713.md) (20);
+- [challenge set](compare-challenge-test-b1e-0.1.0+7b7bb8d67713.md) (70).
+
+**Run note.** Each run wrote its JSON and Markdown reports and then exited
+with an error: it failed to print the report to the Windows console, which
+cannot encode "Δ". The reports were complete. The print is fixed
+separately, and nothing was rerun.
+
+### Decisions on the pre-registered hypotheses
+
+"Hybrid" is Hybrid B0+B1e under fusion 1.0.0. Figures are on generator
+2.2's 810 test calls (285 labelled P0) unless stated.
+
+| # | Hypothesis | Result | Verdict |
+|---|---|---|---|
+| H1 | Safety gate (ML-4): hybrid critical under-triage ≤ B0 on each test set | Generated 47 vs 84 of 285 · curated 0 vs 2 of 9 · challenge 5 vs 8 of 19 | **Pass** |
+| H2 | More P0 calls given P0 than B0 (McNemar, p < 0.025) | 37 calls only the hybrid got right, 0 only B0; p = 1.5 × 10⁻¹¹ | **Pass** |
+| H3 | Cue F1 gain over B0, 95% interval above 0 | +0.063 [+0.048, +0.079] (0.849 vs 0.786) | **Pass** |
+| H4 | Over-triage rises by at most 0.10 | +0.036 [+0.025, +0.049] (106 vs 77 calls) | **Pass** |
+| H5 | B1e hybrid ahead of B1 hybrid on P0 calls (McNemar, p < 0.025) | 20 vs 7 calls; p = 0.019 | **Pass** |
+| H6 | p95 per call under 150 ms (a target) | 185 ms on the primary data; 71 ms curated, 51 ms challenge; p50 24–35 ms | **Missed** (see below) |
+
+The reports print H2's p-value rounded to 0. The exact two-sided value
+for 37 discordant calls, all one way, is 2 × 0.5³⁷.
+
+### What the primary data shows
+
+| 810 test calls | B0 rules | B1e only | Hybrid B0+B1 | **Hybrid B0+B1e** |
+|---|---|---|---|---|
+| P0 calls given too low a priority | 84/285 | 133/285 | 60/285 | **47/285** |
+| Any call too low | 256 | 322 | 206 | **139** |
+| Any call too high | 77 | 99 | 110 | **106** |
+| Priority exact | 477 | 389 | 494 | **565** |
+| Cue precision / recall | 0.945 / 0.673 | 0.891 / 0.590 | 0.812 / 0.717 | 0.888 / **0.814** |
+| Denied or past cues reported live | 23 | 20 | 43 | 36 |
+
+- **The hybrid is the strongest system.**
+  - It cuts the rules' critical under-triage by 44% (84 to 47) and all
+    under-triage by 46% (256 to 139).
+  - It never misses a P0 call the rules got right.
+  - Over-triage rises by 29 calls.
+- **B1e is not useful alone.** It misses more critical calls than the rules
+  (133 against 84). Its value is in finding what the rules miss.
+- **B1e is a better partner for the rules than B1.** It misses 13 fewer P0
+  calls and over-triages 4 fewer calls.
+- **Slices:** the hybrid's cue F1 is above the rules' on 12 of the 13
+  generator slices. The exception is `shouting` (0.81 vs 0.87): in capitals,
+  B1e alone finds no critical cue.
+
+### Secondary data
+
+**Curated test (20 calls, author labels).** The hybrid under-triages no
+call, against the rules' 2. It gets 18 of 20 priorities exactly right,
+against 16, with the same over-triage (2). This set was seen once before,
+at ML-3, for the rules and B1.
+
+**Challenge set (70 calls written to mislead).** This is where the hybrid
+is weakest:
+
+| 70 calls | B0 rules | Hybrid B0+B1 | Hybrid B0+B1e |
+|---|---|---|---|
+| P0 calls given too low a priority | 8/19 | 5/19 | 5/19 |
+| Any call too high | 24 | 29 | 31 |
+| Denied or past cues reported live | 4 | 9 | 12 |
+| Cue F1 | **0.708** | 0.667 | 0.682 |
+
+- **Safety:** the hybrid still finds three P0 calls the rules miss (H1
+  holds).
+- **Cost:** it reports three times as many denied or past cues as live.
+  Its cue F1 is below the rules', and over-triage rises by 7 of 70.
+- **By kind** (ten cases each, descriptive):
+  - **Figurative language:** B1e helps. Cue F1 is 0.46 in the hybrid
+    against the rules' 0.22 (B1e alone 0.67). The report does not list
+    cases, so which idioms each system misread is not shown.
+  - **Negation:** the rules are slightly better (0.92 against 0.89).
+  - **Noisy text:** the B1 hybrid finds more critical cues (0.8) than the
+    B1e hybrid (0.4).
+- **B1e and B1 are indistinguishable here** (2 vs 2 P0 calls).
+
+### Ablations
+
+| Ablation | Result (primary data) |
+|---|---|
+| Without abstention | Hybrid B0+B1e misses 44 P0 calls instead of 47, but over-triages 120 instead of 106. Abstention trades three critical catches for 14 fewer over-triaged calls |
+| Without rules fusion | B1e only: 133 P0 calls missed; B1 only: 189. Neither model should run alone |
+| Without span verification | Not needed: span verification rejected 0 candidates on all three datasets, so removing it would change nothing on this data |
+| Without calibration | Not applicable (DDL-022) |
+| Fusion policy 2.0.0 (not adopted) | 72 P0 calls missed against fusion 1's 47. This confirms DDL-022 on unseen data |
+
+### Latency (H6)
+
+The hybrid's p95 was 185 ms per call on the primary data, against the
+150 ms target, so H6 is **missed as measured**. Two things stand out:
+
+- **The median is well under target:** 24 ms.
+- **The p95 varies between systems that do the same inference work:**
+  - 185 ms (Hybrid B0+B1e);
+  - 54 ms (B1e only);
+  - 39 ms (the fusion 2 hybrid).
+
+  B1e inference dominates the cost of all three, so this spread suggests
+  other load on the laptop during part of the run, not a property of the
+  system.
+
+The pre-registration forbids rerunning the comparison. Any latency
+measurement taken now would be a separate experiment, reported as such.
+
+### Reading
+
+- **ML-10 passes five of its six pre-registered hypotheses.** The ML-4
+  safety gate holds on all three test sets: fusion never added an unsafe
+  omission.
+- **On 810 calls from families no model trained on, B1e makes the hybrid
+  safer.** The rules alone miss 84 P0 calls; the hybrid misses 47. The cost
+  is a modest rise in over-triage.
+- **The challenge set shows the limits.** Text written to mislead
+  (denials, past events, figurative language) makes the hybrid report more
+  cues that are not live, and the rules are more precise there.
+- **These are synthetic calls with generator or author labels.** They
+  measure the system against its own rubric, not against real calls or
+  practitioners. ML-11 repeats this comparison against independently
+  adjudicated labels.
