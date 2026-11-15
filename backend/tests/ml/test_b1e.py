@@ -212,3 +212,17 @@ def test_a_calibration_file_is_applied_and_bound_to_its_model(
                 str(tmp_path / "c.json"),
             ]
         )
+
+
+def test_the_ablation_without_abstention_shares_the_model(
+    trained: tuple[Path, dict[str, Any]],
+) -> None:
+    from ntip.ml.b1e import ABSTAIN_FROM, CANDIDATE_AT, B1eModel
+
+    out, _ = trained
+    model = B1eModel(out)
+    ablated = model.without_abstention()
+    assert ablated.candidate_at == ABSTAIN_FROM
+    assert model.candidate_at == CANDIDATE_AT
+    assert ablated.scorer is model.scorer
+    assert ablated.model_version == model.model_version

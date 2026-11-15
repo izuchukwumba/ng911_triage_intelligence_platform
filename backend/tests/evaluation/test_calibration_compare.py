@@ -111,3 +111,54 @@ def test_compare_pairs_every_system_with_the_rules(tmp_path: Path) -> None:
     assert (p0["a_right_b_wrong"], p0["b_right_a_wrong"]) == (1, 0)
     assert hybrid["differences"]["critical_undertriage"]["difference"] == -1.0
     assert "## Paired comparisons" in to_markdown(result)
+
+
+def test_compare_records_the_preregistration_and_run_cost(tmp_path: Path) -> None:
+    pytest.importorskip("sklearn")
+    from ntip.evaluation.compare import compare, to_markdown
+    from ntip.evaluation.dataset import Split, load_dataset
+    from ntip.ml.extractors import RulesAsModel
+    from ntip.schema.base import sha256_digest
+
+    case = {
+        "case_id": "a", "split": "test", "family": "f", "label_source": "author",
+        "messages": ["My father is not breathing. We are at 12 Oak Street."],
+        "labels": {"domain": "ems", "severity": "critical", "priority": "P0",
+                   "cues": ["NOT_BREATHING"], "location": "present"},
+    }  # fmt: skip
+    path = tmp_path / "cases.jsonl"
+    path.write_text(json.dumps(case), encoding="utf-8")
+    prereg = tmp_path / "plan.md"
+    prereg.write_bytes(b"# Plan\r\nfixed before the run\r\n")
+
+    result = compare(
+        load_dataset(path), [Split.TEST], extra_models={"Extra": RulesAsModel()},
+        preregistration=prereg,
+    )  # fmt: skip
+
+    record = result["manifest"]["preregistration"]
+    # Line endings are normalised, so a Windows and a Linux checkout give the same digest.
+    expected = sha256_digest("# Plan\nfixed before the run\n")
+    assert record == {"path": "plan.md", "digest": expected}
+    assert record["digest"] in to_markdown(result)
+    run = result["systems"]["Hybrid B0+B1"]["run"]
+    assert run["span_verification_rejections"] == 0
+    assert run["p50_ms"] is not None
+    assert result["systems"]["B0 rules"]["run"]["span_verification_rejections"] is None
+    assert "## Run cost and verification" in to_markdown(result)
+
+
+def test_the_test_split_needs_a_preregistration(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from ntip.evaluation import compare
+
+    argv = ["compare", "--dataset", str(tmp_path / "x.jsonl"), "--split", "test"]
+    monkeypatch.setattr("sys.argv", argv)
+    with pytest.raises(SystemExit):
+        compare.main()
+    assert "pre-registration" in capsys.readouterr().err
+    # The default split is test, so leaving --split out is refused too.
+    monkeypatch.setattr("sys.argv", argv[:3])
+    with pytest.raises(SystemExit):
+        compare.main()
