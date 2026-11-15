@@ -456,3 +456,57 @@ uncalibrated model, which never saw these families):
    41 of 249) and cuts all under-triage by 61% (313 to 123). Over-triage
    rises from 48 to 80. Labels are generator-intended, so this is a stress
    test, not accuracy.
+
+## B1e on generator 2.2, dev and regression (curated dev + regression)
+
+[Report](compare-curated-dev-regression-b1e-0.1.0+7b7bb8d67713.md) · model
+manifest [`b1e-0.1.0+7b7bb8d67713`](b1e-0.1.0+7b7bb8d67713-manifest.json).
+
+- **Training:** a Colab T4 at commit `5e93e5a`, on the 1,800 dev and
+  regression calls (60 families) of `generated-2.2.0-seed42.jsonl`, with the
+  same settings as before. No split is held back for calibration, because
+  calibration is not used (DDL-022).
+- **Evaluation:** a laptop CPU run of the same model reproduced the Colab
+  metrics exactly. The 30 curated cases are now the only development data
+  this model has not trained on. Its regression-split figures measure only
+  fit (cue F1 0.999 on calls it trained on), so they are not published as
+  results.
+
+| | B0 rules | B1e (gen 2.1) | **B1e (gen 2.2)** | Hybrid B0+B1e (gen 2.1) | **Hybrid B0+B1e (gen 2.2)** |
+|---|---|---|---|---|---|
+| Critical-cue sensitivity | 15/15 | 13/15 | **11/15** | 15/15 | **15/15** |
+| Critical under-triage | 0/13 | 2/13 | **3/13** | 0/13 | **0/13** |
+| Under-triage (any) | 1/30 | 4/30 | **4/30** | 0/30 | **0/30** |
+| Over-triage (any) | 4/30 | 7/30 | **7/30** | 6/30 | **6/30** |
+| Priority exact | 25/30 | 19/30 | **19/30** | 24/30 | **24/30** |
+| Cue micro precision | 0.97 | 0.77 | **0.81** | 0.80 | **0.82** |
+| Cue micro recall | 0.97 | 0.73 | **0.78** | 1.00 | **1.00** |
+| Cue micro F1 | 0.97 | 0.75 | **0.79** | 0.89 | **0.90** |
+| Denied/past cues reported live | 0 | 1 | **0** | 1 | **0** |
+
+**Case by case**, against the generator 2.1 model:
+
+| Case | Generator 2.1 model | Generator 2.2 model |
+|---|---|---|
+| `cu-104`: "he's awake and talking" | `UNCONSCIOUS` 0.78, hybrid raises P2 to **P0** | **Fixed.** No longer scored. |
+| `cu-103`: "someone said there was a fire… yesterday" | `FIRE_REPORTED` live, P3 to P2 | **Fixed.** No longer scored live. |
+| `fx-009`: "a suspicious person walking around near the school" | Not raised | **New error.** `ACTIVE_VIOLENCE` 0.79 and `MISSING_PERSON` 0.68, so the hybrid raises P3 to P1. |
+| `fx-008`: a fall on the pavement | `FALL_FROM_HEIGHT`, P2 to P1 | Unchanged. |
+| `UNCONSCIOUS` added when someone is not breathing (`fx-011`, `fx-018`, `cu-106`) | 0.59 to 0.99 | Unchanged, 0.56 to 0.73. It does not change priority: the call is already P0. |
+| Spanish family words (`cu-115` "Mi hija") | `CHILD_INVOLVED` 0.28 | Not fixed: 0.05. |
+
+B1e on its own misses four critical cues: "people inside" (`fx-003`), "not
+responding to me" (`fx-014`), "collapsed" (`cu-105`) and "not sure if he's
+breathing" (`cu-126`). The rules find all four, so the hybrid misses none.
+
+**Reading:** on its own, the generator 2.2 model has the best cue F1 of any
+B1e run (0.79), and it no longer produces the worst error of the 2.1 model,
+a false P0. Its hybrid
+over-triage count is unchanged, but the remaining errors are milder (P3 to
+P1 rather than P2 to P0). On its own it finds two fewer critical cues than
+the 2.1 model. On 30 cases none of these differences is statistically
+meaningful.
+
+This model (`0.1.0+7b7bb8d67713`) is the one carried into the pre-registered
+test comparison (ML-10). It trained on the most data and its errors are the
+least severe. ML-10 is where the comparison with the rules is decided.

@@ -27,12 +27,15 @@ thresholds are the same as B1's and were declared in advance: a candidate at
 
 ## Training
 
-- **Data:** `data/eval/generated-2.1.0-seed42.jsonl`. From milestone ML-9
-  on, B1e trains on the **dev split only** (630 calls, 21 families) with
-  `--split dev`. The regression split (570 calls, 19 unseen families) is
-  kept for calibrating its scores and choosing per-cue thresholds (ML layer
-  design §6). Test data is never read by the training code; training
-  refuses any split but dev and regression. Earlier runs:
+- **Data:** `data/eval/generated-2.2.0-seed42.jsonl`, dev and regression
+  splits (1,800 calls, 60 families). Calibration is not used (DDL-022), so
+  no split is held back for it. Test data is never read by the training
+  code; training refuses any split but dev and regression. The current run
+  is `0.1.0+7b7bb8d67713`. Earlier runs:
+  - `0.1.0+a576fe617662` used generator 2.2, dev only (930 calls), for the
+    calibration experiment (ML-9);
+  - `0.1.0+30718f35865b` used generator 2.1, dev only (630 calls), for the
+    first calibration attempt;
   - `0.1.0+e6517d2f2406` used generator 2.1, dev and regression (1,200
     calls, 40 families);
   - `0.1.0+3cf9758d0861` used generator 2.0.0 (1,188 calls, 39 families);
@@ -91,8 +94,8 @@ Needs the `ml-encoder` extra (`uv sync --extra ml-encoder`).
 - **Absent cues are learned, not reported.** The absent output shapes the
   encoder, but only live cues are returned. The rules stay the reference for
   negation and tense.
-- **Small, synthetic training set:** 1,188 calls from 39 of generator 2.0's
-  66 scenario families, with generator-intended labels (0.1.0: 300 calls
+- **Small, synthetic training set:** 1,800 calls from 60 of generator 2.2's
+  87 scenario families, with generator-intended labels (0.1.0: 300 calls
   from 10 families).
 - **Known failure patterns** (found on curated dev):
   - denials of cues the generator only adds as side effects ("nobody is
@@ -102,9 +105,13 @@ Needs the `ml-encoder` extra (`uv sync --extra ml-encoder`).
     once scored on "he's awake and talking";
   - Spanish family words are misread ("esposo" scored as a child);
   - hearsay about a past event ("someone said there was a fire yesterday")
-    can be scored live.
+    can be scored live;
+  - a vague report ("a suspicious person walking around") can be scored as
+    violence or a missing person.
 
-  Generator 2.1 fixed the earlier denial and all-capitals errors.
+  Generator 2.1 fixed the earlier denial and all-capitals errors. The
+  generator 2.2 run no longer scores "awake and talking" or the hearsay
+  example, but adds the suspicious-person error.
 
   See the evaluation below.
 - **Scores are not calibrated by default** (`calibrated: false`). A
@@ -156,5 +163,12 @@ A new error: "he's awake and talking" is scored as `UNCONSCIOUS` (0.78), so
 the hybrid raises a P2 call to P0. That is a calibration and fusion
 problem, milestone ML-9.
 
-The held-out test split is reserved for the pre-registered frozen comparison
-(milestone ML-10).
+[Trained on generator 2.2, dev and regression](../evaluation/results/README.md#b1e-on-generator-22-dev-and-regression-curated-dev--regression)
+(`0.1.0+7b7bb8d67713`, the current run), on the same curated splits:
+- cue F1 0.79 on its own, the best B1e run; 11 of 15 critical cues found;
+- the hybrid with the rules reaches cue F1 0.90 and under-triages no case;
+- the false P0 on "he's awake and talking" is gone; a vague report of a
+  suspicious person is now raised from P3 to P1.
+
+This is the model carried into the comparison on the held-out test split,
+which is reserved for the pre-registered frozen comparison (milestone ML-10).
