@@ -1,0 +1,5866 @@
+{
+  "manifest": {
+    "system": "comparison",
+    "git_commit": "7e580895f3a0a10dd00be4dba13112a371f1d62e",
+    "dataset": {
+      "path": "data/eval/generated-2.2.0-seed42.jsonl",
+      "digest": "sha256:fc839b30cf1a8863d9689ae677f4dc94c666a8274889a53fbadc40e234394858",
+      "splits": [
+        "test"
+      ]
+    },
+    "parser": "rules-parser-1.5.0",
+    "engine": "triage-engine-1.2.0",
+    "ruleset": {
+      "name": "research-1.2.0",
+      "digest": "sha256:69fdb910c1a9f4ec5a0672482cd39352683d9778cffd706c694efcb48b4e44b2"
+    },
+    "schema_version": "2.7.0",
+    "python": "3.12.10",
+    "lockfile_digest": "sha256:9a0736a7c87bec1d86d14dc5fd57d431c56995a9dcda3735c04da78de223f020",
+    "seed": 20261109,
+    "bootstrap": "percentile, 2000 resamples, 95%",
+    "b1_model_version": "1.0.0+f764c2172d5a",
+    "b1_training_digest": "sha256:a064e9dbe885a3448314e654c2650c7e20b6e200c29c1b26c45f1bea9b045555",
+    "extra_models": {
+      "B1e": {
+        "model_id": "b1e-encoder",
+        "model_version": "0.1.0+7b7bb8d67713"
+      }
+    },
+    "generated_at": "2026-11-15T07:07:54+00:00",
+    "preregistration": {
+      "path": "docs/evaluation/preregistration/ml-10-frozen-comparison.md",
+      "digest": "sha256:f5f5013b2ff11209fbc5cf43a268530c361a369d64786e5fb7610df2dbec05b4"
+    }
+  },
+  "systems": {
+    "B0 rules": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 961,
+          "span_exact": {
+            "tp": 234,
+            "fp": 727,
+            "fn": 1179,
+            "precision": 0.2435,
+            "recall": 0.1656,
+            "f1": 0.1971
+          },
+          "span_overlap": {
+            "tp": 926,
+            "fp": 35,
+            "fn": 487,
+            "precision": 0.9636,
+            "recall": 0.6553,
+            "f1": 0.7801
+          },
+          "status_accuracy": {
+            "value": 0.9309,
+            "numerator": 862,
+            "denominator": 926,
+            "ci95": [
+              0.9147,
+              0.9471
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 628,
+              "uncertain": 26,
+              "negated": 2,
+              "historical": 6,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 7,
+              "uncertain": 168,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 9,
+              "uncertain": 1,
+              "negated": 45,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 13,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 21,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 830,
+            "fp": 48,
+            "fn": 403,
+            "precision": 0.9453,
+            "recall": 0.6732,
+            "f1": 0.7864,
+            "f1_ci95": [
+              0.7654,
+              0.8057
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 28,
+              "fp": 3,
+              "fn": 2,
+              "precision": 0.9032,
+              "recall": 0.9333,
+              "f1": 0.918
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 26,
+              "precision": 1.0,
+              "recall": 0.48,
+              "f1": 0.6486
+            },
+            "BURN_INJURY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 6,
+              "precision": 1.0,
+              "recall": 0.8,
+              "f1": 0.8889
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 6,
+              "fp": 3,
+              "fn": 20,
+              "precision": 0.6667,
+              "recall": 0.2308,
+              "f1": 0.3429
+            },
+            "CHILDBIRTH": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "CHILD_INVOLVED": {
+              "tp": 91,
+              "fp": 6,
+              "fn": 7,
+              "precision": 0.9381,
+              "recall": 0.9286,
+              "f1": 0.9333
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "DROWNING": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ELECTROCUTION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 19,
+              "precision": 1.0,
+              "recall": 0.3667,
+              "f1": 0.5366
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "FIRE_REPORTED": {
+              "tp": 46,
+              "fp": 9,
+              "fn": 14,
+              "precision": 0.8364,
+              "recall": 0.7667,
+              "f1": 0.8
+            },
+            "FIRE_SPREADING": {
+              "tp": 10,
+              "fp": 5,
+              "fn": 20,
+              "precision": 0.6667,
+              "recall": 0.3333,
+              "f1": 0.4444
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 23,
+              "fp": 0,
+              "fn": 7,
+              "precision": 1.0,
+              "recall": 0.7667,
+              "f1": 0.8679
+            },
+            "INJURY_REPORTED": {
+              "tp": 101,
+              "fp": 5,
+              "fn": 13,
+              "precision": 0.9528,
+              "recall": 0.886,
+              "f1": 0.9182
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 5,
+              "fp": 0,
+              "fn": 25,
+              "precision": 1.0,
+              "recall": 0.1667,
+              "f1": 0.2857
+            },
+            "MISSING_PERSON": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 17,
+              "precision": 1.0,
+              "recall": 0.4333,
+              "f1": 0.6047
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 55,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1.0,
+              "recall": 0.9649,
+              "f1": 0.9821
+            },
+            "NOT_BREATHING": {
+              "tp": 12,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.5455,
+              "f1": 0.7059
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 44,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.7333,
+              "f1": 0.8462
+            },
+            "OVERDOSE": {
+              "tp": 9,
+              "fp": 0,
+              "fn": 21,
+              "precision": 1.0,
+              "recall": 0.3,
+              "f1": 0.4615
+            },
+            "POISONING": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "SEIZURE": {
+              "tp": 6,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.2727,
+              "f1": 0.4286
+            },
+            "SELF_HARM_RISK": {
+              "tp": 8,
+              "fp": 0,
+              "fn": 12,
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714
+            },
+            "SMOKE_REPORTED": {
+              "tp": 30,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 0,
+              "fp": 10,
+              "fn": 20,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 26,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1.0,
+              "recall": 0.8667,
+              "f1": 0.9286
+            },
+            "UNCONSCIOUS": {
+              "tp": 80,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.8889,
+              "f1": 0.9412
+            },
+            "WEAPON_PRESENT": {
+              "tp": 14,
+              "fp": 7,
+              "fn": 16,
+              "precision": 0.6667,
+              "recall": 0.4667,
+              "f1": 0.549
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 23
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.7907,
+          "numerator": 136,
+          "denominator": 172,
+          "ci95": [
+            0.7326,
+            0.8488
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.2947,
+          "numerator": 84,
+          "denominator": 285,
+          "ci95": [
+            0.2421,
+            0.3474
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0032",
+            "g22s42-0097",
+            "g22s42-0111",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0175",
+            "g22s42-0192",
+            "g22s42-0198",
+            "g22s42-0271",
+            "g22s42-0295",
+            "g22s42-0309",
+            "g22s42-0372",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0436",
+            "g22s42-0440",
+            "g22s42-0447",
+            "g22s42-0483",
+            "g22s42-0554",
+            "g22s42-0570",
+            "g22s42-0621",
+            "g22s42-0633",
+            "g22s42-0720",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0784",
+            "g22s42-0822",
+            "g22s42-0871",
+            "g22s42-0888",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1005",
+            "g22s42-1056",
+            "g22s42-1141",
+            "g22s42-1149",
+            "g22s42-1155",
+            "g22s42-1179",
+            "g22s42-1226",
+            "g22s42-1266",
+            "g22s42-1269",
+            "g22s42-1317",
+            "g22s42-1393",
+            "g22s42-1416",
+            "g22s42-1489",
+            "g22s42-1605",
+            "g22s42-1654",
+            "g22s42-1658",
+            "g22s42-1665",
+            "g22s42-1677",
+            "g22s42-1741",
+            "g22s42-1752",
+            "g22s42-1764",
+            "g22s42-1788",
+            "g22s42-1919",
+            "g22s42-1938",
+            "g22s42-1953",
+            "g22s42-1962",
+            "g22s42-2002",
+            "g22s42-2006",
+            "g22s42-2013",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2112",
+            "g22s42-2136",
+            "g22s42-2187",
+            "g22s42-2193",
+            "g22s42-2199",
+            "g22s42-2223",
+            "g22s42-2286",
+            "g22s42-2305",
+            "g22s42-2310",
+            "g22s42-2350",
+            "g22s42-2373",
+            "g22s42-2381",
+            "g22s42-2397",
+            "g22s42-2437",
+            "g22s42-2460",
+            "g22s42-2475",
+            "g22s42-2547",
+            "g22s42-2562",
+            "g22s42-2571"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.5889,
+          "numerator": 477,
+          "denominator": 810,
+          "ci95": [
+            0.5556,
+            0.621
+          ]
+        },
+        "undertriage": {
+          "value": 0.316,
+          "numerator": 256,
+          "denominator": 810,
+          "ci95": [
+            0.2864,
+            0.3469
+          ]
+        },
+        "overtriage": {
+          "value": 0.0951,
+          "numerator": 77,
+          "denominator": 810,
+          "ci95": [
+            0.0753,
+            0.1148
+          ]
+        },
+        "severity_exact": {
+          "value": 0.5679,
+          "numerator": 460,
+          "denominator": 810,
+          "ci95": [
+            0.5346,
+            0.6
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9716,
+          "numerator": 787,
+          "denominator": 810,
+          "ci95": [
+            0.9593,
+            0.9815
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 201,
+            "P1": 14,
+            "P2": 40,
+            "P3": 30,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 0,
+            "P1": 193,
+            "P2": 127,
+            "P3": 45,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 82,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 29,
+            "P3": 1,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 13,
+            "P2": 12,
+            "P3": 23,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.8579,
+          "critical_cue_sensitivity": 0.7727
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.75,
+          "critical_cue_sensitivity": 0.8889
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.7509,
+          "critical_cue_sensitivity": 0.75
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.7152,
+          "critical_cue_sensitivity": 0.7
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.9062,
+          "critical_cue_sensitivity": 0.9333
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.0,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.7529,
+          "critical_cue_sensitivity": 0.7143
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.7059,
+          "critical_cue_sensitivity": 0.5714
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.7059,
+          "critical_cue_sensitivity": 0.8462
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.8667,
+          "critical_cue_sensitivity": 0.875
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.9139,
+          "critical_cue_sensitivity": 1.0
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.8171,
+          "critical_cue_sensitivity": 0.875
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.8,
+          "critical_cue_sensitivity": 0.8654
+        }
+      },
+      "run": {
+        "p50_ms": 0.73,
+        "p95_ms": 1.19,
+        "cpu_seconds": 9.81,
+        "span_verification_rejections": null
+      }
+    },
+    "B1 only": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 565,
+          "span_exact": {
+            "tp": 15,
+            "fp": 550,
+            "fn": 1398,
+            "precision": 0.0265,
+            "recall": 0.0106,
+            "f1": 0.0152
+          },
+          "span_overlap": {
+            "tp": 425,
+            "fp": 140,
+            "fn": 988,
+            "precision": 0.7522,
+            "recall": 0.3008,
+            "f1": 0.4297
+          },
+          "status_accuracy": {
+            "value": 0.8105,
+            "numerator": 355,
+            "denominator": 438,
+            "ci95": [
+              0.7717,
+              0.847
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 355,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 53,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 26,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 4,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 408,
+            "fp": 167,
+            "fn": 825,
+            "precision": 0.7096,
+            "recall": 0.3309,
+            "f1": 0.4513,
+            "f1_ci95": [
+              0.4169,
+              0.4811
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 19,
+              "fp": 0,
+              "fn": 11,
+              "precision": 1.0,
+              "recall": 0.6333,
+              "f1": 0.7755
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 50,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "BURN_INJURY": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 25,
+              "fp": 16,
+              "fn": 1,
+              "precision": 0.6098,
+              "recall": 0.9615,
+              "f1": 0.7463
+            },
+            "CHILDBIRTH": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "CHILD_INVOLVED": {
+              "tp": 84,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.8571,
+              "f1": 0.9231
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "DROWNING": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 24,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "ELECTROCUTION": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "FIRE_REPORTED": {
+              "tp": 23,
+              "fp": 36,
+              "fn": 37,
+              "precision": 0.3898,
+              "recall": 0.3833,
+              "f1": 0.3866
+            },
+            "FIRE_SPREADING": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 15,
+              "fp": 17,
+              "fn": 15,
+              "precision": 0.4688,
+              "recall": 0.5,
+              "f1": 0.4839
+            },
+            "INJURY_REPORTED": {
+              "tp": 71,
+              "fp": 18,
+              "fn": 43,
+              "precision": 0.7978,
+              "recall": 0.6228,
+              "f1": 0.6995
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "MISSING_PERSON": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 57,
+              "fp": 4,
+              "fn": 0,
+              "precision": 0.9344,
+              "recall": 1.0,
+              "f1": 0.9661
+            },
+            "NOT_BREATHING": {
+              "tp": 12,
+              "fp": 21,
+              "fn": 10,
+              "precision": 0.3636,
+              "recall": 0.5455,
+              "f1": 0.4364
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 37,
+              "fp": 22,
+              "fn": 23,
+              "precision": 0.6271,
+              "recall": 0.6167,
+              "f1": 0.6218
+            },
+            "OVERDOSE": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 26,
+              "precision": 1.0,
+              "recall": 0.1333,
+              "f1": 0.2353
+            },
+            "POISONING": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "SEIZURE": {
+              "tp": 3,
+              "fp": 9,
+              "fn": 19,
+              "precision": 0.25,
+              "recall": 0.1364,
+              "f1": 0.1765
+            },
+            "SELF_HARM_RISK": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 20,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "SMOKE_REPORTED": {
+              "tp": 15,
+              "fp": 2,
+              "fn": 15,
+              "precision": 0.8824,
+              "recall": 0.5,
+              "f1": 0.6383
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 20,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 30,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "UNCONSCIOUS": {
+              "tp": 21,
+              "fp": 12,
+              "fn": 69,
+              "precision": 0.6364,
+              "recall": 0.2333,
+              "f1": 0.3415
+            },
+            "WEAPON_PRESENT": {
+              "tp": 22,
+              "fp": 10,
+              "fn": 8,
+              "precision": 0.6875,
+              "recall": 0.7333,
+              "f1": 0.7097
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 30
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.407,
+          "numerator": 70,
+          "denominator": 172,
+          "ci95": [
+            0.3314,
+            0.4826
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.6632,
+          "numerator": 189,
+          "denominator": 285,
+          "ci95": [
+            0.6035,
+            0.7193
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0014",
+            "g22s42-0016",
+            "g22s42-0020",
+            "g22s42-0032",
+            "g22s42-0088",
+            "g22s42-0097",
+            "g22s42-0105",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0126",
+            "g22s42-0138",
+            "g22s42-0188",
+            "g22s42-0190",
+            "g22s42-0192",
+            "g22s42-0219",
+            "g22s42-0225",
+            "g22s42-0271",
+            "g22s42-0275",
+            "g22s42-0277",
+            "g22s42-0279",
+            "g22s42-0295",
+            "g22s42-0302",
+            "g22s42-0309",
+            "g22s42-0364",
+            "g22s42-0366",
+            "g22s42-0372",
+            "g22s42-0385",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0440",
+            "g22s42-0447",
+            "g22s42-0451",
+            "g22s42-0453",
+            "g22s42-0455",
+            "g22s42-0467",
+            "g22s42-0474",
+            "g22s42-0476",
+            "g22s42-0483",
+            "g22s42-0536",
+            "g22s42-0554",
+            "g22s42-0563",
+            "g22s42-0570",
+            "g22s42-0573",
+            "g22s42-0621",
+            "g22s42-0623",
+            "g22s42-0625",
+            "g22s42-0627",
+            "g22s42-0633",
+            "g22s42-0648",
+            "g22s42-0650",
+            "g22s42-0660",
+            "g22s42-0710",
+            "g22s42-0712",
+            "g22s42-0714",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0797",
+            "g22s42-0799",
+            "g22s42-0820",
+            "g22s42-0822",
+            "g22s42-0826",
+            "g22s42-0828",
+            "g22s42-0831",
+            "g22s42-0834",
+            "g22s42-0871",
+            "g22s42-0884",
+            "g22s42-0888",
+            "g22s42-0909",
+            "g22s42-0958",
+            "g22s42-0971",
+            "g22s42-0975",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1056",
+            "g22s42-1060",
+            "g22s42-1076",
+            "g22s42-1081",
+            "g22s42-1083",
+            "g22s42-1132",
+            "g22s42-1141",
+            "g22s42-1145",
+            "g22s42-1147",
+            "g22s42-1149",
+            "g22s42-1155",
+            "g22s42-1170",
+            "g22s42-1172",
+            "g22s42-1179",
+            "g22s42-1219",
+            "g22s42-1232",
+            "g22s42-1234",
+            "g22s42-1238",
+            "g22s42-1255",
+            "g22s42-1269",
+            "g22s42-1317",
+            "g22s42-1319",
+            "g22s42-1321",
+            "g22s42-1323",
+            "g22s42-1329",
+            "g22s42-1348",
+            "g22s42-1393",
+            "g22s42-1406",
+            "g22s42-1412",
+            "g22s42-1424",
+            "g22s42-1433",
+            "g22s42-1489",
+            "g22s42-1493",
+            "g22s42-1495",
+            "g22s42-1499",
+            "g22s42-1518",
+            "g22s42-1530",
+            "g22s42-1580",
+            "g22s42-1582",
+            "g22s42-1584",
+            "g22s42-1658",
+            "g22s42-1665",
+            "g22s42-1667",
+            "g22s42-1669",
+            "g22s42-1677",
+            "g22s42-1692",
+            "g22s42-1752",
+            "g22s42-1754",
+            "g22s42-1756",
+            "g22s42-1779",
+            "g22s42-1788",
+            "g22s42-1791",
+            "g22s42-1841",
+            "g22s42-1843",
+            "g22s42-1864",
+            "g22s42-1915",
+            "g22s42-1919",
+            "g22s42-1928",
+            "g22s42-1930",
+            "g22s42-1932",
+            "g22s42-1938",
+            "g22s42-1953",
+            "g22s42-1962",
+            "g22s42-2002",
+            "g22s42-2006",
+            "g22s42-2013",
+            "g22s42-2015",
+            "g22s42-2017",
+            "g22s42-2019",
+            "g22s42-2021",
+            "g22s42-2038",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2052",
+            "g22s42-2089",
+            "g22s42-2102",
+            "g22s42-2112",
+            "g22s42-2129",
+            "g22s42-2136",
+            "g22s42-2176",
+            "g22s42-2187",
+            "g22s42-2189",
+            "g22s42-2191",
+            "g22s42-2193",
+            "g22s42-2214",
+            "g22s42-2223",
+            "g22s42-2226",
+            "g22s42-2276",
+            "g22s42-2278",
+            "g22s42-2286",
+            "g22s42-2301",
+            "g22s42-2305",
+            "g22s42-2363",
+            "g22s42-2365",
+            "g22s42-2367",
+            "g22s42-2369",
+            "g22s42-2381",
+            "g22s42-2388",
+            "g22s42-2394",
+            "g22s42-2397",
+            "g22s42-2450",
+            "g22s42-2454",
+            "g22s42-2456",
+            "g22s42-2460",
+            "g22s42-2475",
+            "g22s42-2477",
+            "g22s42-2487",
+            "g22s42-2539",
+            "g22s42-2543",
+            "g22s42-2547",
+            "g22s42-2560",
+            "g22s42-2562",
+            "g22s42-2564"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.2469,
+          "numerator": 200,
+          "denominator": 810,
+          "ci95": [
+            0.2173,
+            0.2765
+          ]
+        },
+        "undertriage": {
+          "value": 0.6185,
+          "numerator": 501,
+          "denominator": 810,
+          "ci95": [
+            0.5864,
+            0.6543
+          ]
+        },
+        "overtriage": {
+          "value": 0.1346,
+          "numerator": 109,
+          "denominator": 810,
+          "ci95": [
+            0.1111,
+            0.158
+          ]
+        },
+        "severity_exact": {
+          "value": 0.2086,
+          "numerator": 169,
+          "denominator": 810,
+          "ci95": [
+            0.1802,
+            0.237
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9296,
+          "numerator": 753,
+          "denominator": 810,
+          "ci95": [
+            0.9111,
+            0.9469
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 96,
+            "P1": 15,
+            "P2": 61,
+            "P3": 113,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 17,
+            "P1": 56,
+            "P2": 144,
+            "P3": 148,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 5,
+            "P1": 11,
+            "P2": 46,
+            "P3": 20,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 16,
+            "P2": 12,
+            "P3": 2,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 4,
+            "P2": 22,
+            "P3": 22,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.7414,
+          "critical_cue_sensitivity": 0.3182
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.5,
+          "critical_cue_sensitivity": 0.4444
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.4854,
+          "critical_cue_sensitivity": 0.375
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.5303,
+          "critical_cue_sensitivity": 0.3
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.7942,
+          "critical_cue_sensitivity": 0.3333
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.5,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.3583,
+          "critical_cue_sensitivity": 0.5429
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.4232,
+          "critical_cue_sensitivity": 0.7143
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.443,
+          "critical_cue_sensitivity": 0.2308
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.5278,
+          "critical_cue_sensitivity": 0.5
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.2065,
+          "critical_cue_sensitivity": 0.3182
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.4889,
+          "critical_cue_sensitivity": 0.3125
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.4686,
+          "critical_cue_sensitivity": 0.3269
+        }
+      },
+      "run": {
+        "p50_ms": 4.7,
+        "p95_ms": 8.85,
+        "cpu_seconds": 15.84,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 1137,
+          "span_exact": {
+            "tp": 249,
+            "fp": 888,
+            "fn": 1164,
+            "precision": 0.219,
+            "recall": 0.1762,
+            "f1": 0.1953
+          },
+          "span_overlap": {
+            "tp": 978,
+            "fp": 159,
+            "fn": 435,
+            "precision": 0.8602,
+            "recall": 0.6921,
+            "f1": 0.7671
+          },
+          "status_accuracy": {
+            "value": 0.9196,
+            "numerator": 904,
+            "denominator": 983,
+            "ci95": [
+              0.9023,
+              0.9369
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 670,
+              "uncertain": 26,
+              "negated": 2,
+              "historical": 6,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 12,
+              "uncertain": 168,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 19,
+              "uncertain": 1,
+              "negated": 45,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 13,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 21,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 884,
+            "fp": 205,
+            "fn": 349,
+            "precision": 0.8118,
+            "recall": 0.717,
+            "f1": 0.7614,
+            "f1_ci95": [
+              0.7403,
+              0.781
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 26,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1.0,
+              "recall": 0.8667,
+              "f1": 0.9286
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 28,
+              "fp": 3,
+              "fn": 2,
+              "precision": 0.9032,
+              "recall": 0.9333,
+              "f1": 0.918
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 26,
+              "precision": 1.0,
+              "recall": 0.48,
+              "f1": 0.6486
+            },
+            "BURN_INJURY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 6,
+              "precision": 1.0,
+              "recall": 0.8,
+              "f1": 0.8889
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 25,
+              "fp": 16,
+              "fn": 1,
+              "precision": 0.6098,
+              "recall": 0.9615,
+              "f1": 0.7463
+            },
+            "CHILDBIRTH": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "CHILD_INVOLVED": {
+              "tp": 98,
+              "fp": 6,
+              "fn": 0,
+              "precision": 0.9423,
+              "recall": 1.0,
+              "f1": 0.9703
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "DROWNING": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ELECTROCUTION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 19,
+              "precision": 1.0,
+              "recall": 0.3667,
+              "f1": 0.5366
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "FIRE_REPORTED": {
+              "tp": 46,
+              "fp": 38,
+              "fn": 14,
+              "precision": 0.5476,
+              "recall": 0.7667,
+              "f1": 0.6389
+            },
+            "FIRE_SPREADING": {
+              "tp": 10,
+              "fp": 5,
+              "fn": 20,
+              "precision": 0.6667,
+              "recall": 0.3333,
+              "f1": 0.4444
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 23,
+              "fp": 17,
+              "fn": 7,
+              "precision": 0.575,
+              "recall": 0.7667,
+              "f1": 0.6571
+            },
+            "INJURY_REPORTED": {
+              "tp": 101,
+              "fp": 23,
+              "fn": 13,
+              "precision": 0.8145,
+              "recall": 0.886,
+              "f1": 0.8487
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 5,
+              "fp": 0,
+              "fn": 25,
+              "precision": 1.0,
+              "recall": 0.1667,
+              "f1": 0.2857
+            },
+            "MISSING_PERSON": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 17,
+              "precision": 1.0,
+              "recall": 0.4333,
+              "f1": 0.6047
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 57,
+              "fp": 4,
+              "fn": 0,
+              "precision": 0.9344,
+              "recall": 1.0,
+              "f1": 0.9661
+            },
+            "NOT_BREATHING": {
+              "tp": 19,
+              "fp": 21,
+              "fn": 3,
+              "precision": 0.475,
+              "recall": 0.8636,
+              "f1": 0.6129
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 48,
+              "fp": 22,
+              "fn": 12,
+              "precision": 0.6857,
+              "recall": 0.8,
+              "f1": 0.7385
+            },
+            "OVERDOSE": {
+              "tp": 9,
+              "fp": 0,
+              "fn": 21,
+              "precision": 1.0,
+              "recall": 0.3,
+              "f1": 0.4615
+            },
+            "POISONING": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "SEIZURE": {
+              "tp": 6,
+              "fp": 9,
+              "fn": 16,
+              "precision": 0.4,
+              "recall": 0.2727,
+              "f1": 0.3243
+            },
+            "SELF_HARM_RISK": {
+              "tp": 8,
+              "fp": 0,
+              "fn": 12,
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714
+            },
+            "SMOKE_REPORTED": {
+              "tp": 30,
+              "fp": 2,
+              "fn": 0,
+              "precision": 0.9375,
+              "recall": 1.0,
+              "f1": 0.9677
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 0,
+              "fp": 10,
+              "fn": 20,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 26,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1.0,
+              "recall": 0.8667,
+              "f1": 0.9286
+            },
+            "UNCONSCIOUS": {
+              "tp": 81,
+              "fp": 12,
+              "fn": 9,
+              "precision": 0.871,
+              "recall": 0.9,
+              "f1": 0.8852
+            },
+            "WEAPON_PRESENT": {
+              "tp": 22,
+              "fp": 17,
+              "fn": 8,
+              "precision": 0.5641,
+              "recall": 0.7333,
+              "f1": 0.6377
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 43
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8605,
+          "numerator": 148,
+          "denominator": 172,
+          "ci95": [
+            0.8081,
+            0.907
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.2105,
+          "numerator": 60,
+          "denominator": 285,
+          "ci95": [
+            0.1614,
+            0.2561
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0032",
+            "g22s42-0097",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0192",
+            "g22s42-0271",
+            "g22s42-0295",
+            "g22s42-0309",
+            "g22s42-0372",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0440",
+            "g22s42-0447",
+            "g22s42-0483",
+            "g22s42-0554",
+            "g22s42-0570",
+            "g22s42-0621",
+            "g22s42-0633",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0822",
+            "g22s42-0871",
+            "g22s42-0888",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1056",
+            "g22s42-1141",
+            "g22s42-1149",
+            "g22s42-1179",
+            "g22s42-1269",
+            "g22s42-1317",
+            "g22s42-1393",
+            "g22s42-1489",
+            "g22s42-1658",
+            "g22s42-1665",
+            "g22s42-1677",
+            "g22s42-1752",
+            "g22s42-1788",
+            "g22s42-1919",
+            "g22s42-1938",
+            "g22s42-1953",
+            "g22s42-1962",
+            "g22s42-2002",
+            "g22s42-2006",
+            "g22s42-2013",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2136",
+            "g22s42-2187",
+            "g22s42-2193",
+            "g22s42-2223",
+            "g22s42-2305",
+            "g22s42-2381",
+            "g22s42-2397",
+            "g22s42-2460",
+            "g22s42-2475",
+            "g22s42-2562"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.6099,
+          "numerator": 494,
+          "denominator": 810,
+          "ci95": [
+            0.5778,
+            0.6432
+          ]
+        },
+        "undertriage": {
+          "value": 0.2543,
+          "numerator": 206,
+          "denominator": 810,
+          "ci95": [
+            0.2259,
+            0.2827
+          ]
+        },
+        "overtriage": {
+          "value": 0.1358,
+          "numerator": 110,
+          "denominator": 810,
+          "ci95": [
+            0.1123,
+            0.1593
+          ]
+        },
+        "severity_exact": {
+          "value": 0.5889,
+          "numerator": 477,
+          "denominator": 810,
+          "ci95": [
+            0.5568,
+            0.6235
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9716,
+          "numerator": 787,
+          "denominator": 810,
+          "ci95": [
+            0.9593,
+            0.9815
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 225,
+            "P1": 3,
+            "P2": 34,
+            "P3": 23,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 17,
+            "P1": 202,
+            "P2": 97,
+            "P3": 49,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 5,
+            "P1": 12,
+            "P2": 65,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 16,
+            "P2": 12,
+            "P3": 2,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 14,
+            "P2": 12,
+            "P3": 22,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.8828,
+          "critical_cue_sensitivity": 0.8636
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.76,
+          "critical_cue_sensitivity": 1.0
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.7273,
+          "critical_cue_sensitivity": 0.75
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.7421,
+          "critical_cue_sensitivity": 0.7
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.9039,
+          "critical_cue_sensitivity": 1.0
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.3529,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.6957,
+          "critical_cue_sensitivity": 0.8571
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.6648,
+          "critical_cue_sensitivity": 0.7619
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.7236,
+          "critical_cue_sensitivity": 0.9231
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.8333,
+          "critical_cue_sensitivity": 0.875
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.8814,
+          "critical_cue_sensitivity": 1.0
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.7882,
+          "critical_cue_sensitivity": 0.875
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.7772,
+          "critical_cue_sensitivity": 0.8846
+        }
+      },
+      "run": {
+        "p50_ms": 5.68,
+        "p95_ms": 9.67,
+        "cpu_seconds": 14.28,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid without abstention": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 1335,
+          "span_exact": {
+            "tp": 259,
+            "fp": 1076,
+            "fn": 1154,
+            "precision": 0.194,
+            "recall": 0.1833,
+            "f1": 0.1885
+          },
+          "span_overlap": {
+            "tp": 1004,
+            "fp": 331,
+            "fn": 409,
+            "precision": 0.7521,
+            "recall": 0.7105,
+            "f1": 0.7307
+          },
+          "status_accuracy": {
+            "value": 0.909,
+            "numerator": 919,
+            "denominator": 1011,
+            "ci95": [
+              0.8912,
+              0.9258
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 685,
+              "uncertain": 26,
+              "negated": 2,
+              "historical": 6,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 14,
+              "uncertain": 168,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 30,
+              "uncertain": 1,
+              "negated": 45,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 13,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 21,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 901,
+            "fp": 416,
+            "fn": 332,
+            "precision": 0.6841,
+            "recall": 0.7307,
+            "f1": 0.7067,
+            "f1_ci95": [
+              0.6844,
+              0.7279
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 26,
+              "fp": 10,
+              "fn": 4,
+              "precision": 0.7222,
+              "recall": 0.8667,
+              "f1": 0.7879
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 28,
+              "fp": 3,
+              "fn": 2,
+              "precision": 0.9032,
+              "recall": 0.9333,
+              "f1": 0.918
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 26,
+              "precision": 1.0,
+              "recall": 0.48,
+              "f1": 0.6486
+            },
+            "BURN_INJURY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 6,
+              "precision": 1.0,
+              "recall": 0.8,
+              "f1": 0.8889
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 26,
+              "fp": 26,
+              "fn": 0,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6667
+            },
+            "CHILDBIRTH": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "CHILD_INVOLVED": {
+              "tp": 98,
+              "fp": 19,
+              "fn": 0,
+              "precision": 0.8376,
+              "recall": 1.0,
+              "f1": 0.9116
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "DROWNING": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ELECTROCUTION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 19,
+              "precision": 1.0,
+              "recall": 0.3667,
+              "f1": 0.5366
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "FIRE_REPORTED": {
+              "tp": 50,
+              "fp": 61,
+              "fn": 10,
+              "precision": 0.4505,
+              "recall": 0.8333,
+              "f1": 0.5848
+            },
+            "FIRE_SPREADING": {
+              "tp": 10,
+              "fp": 5,
+              "fn": 20,
+              "precision": 0.6667,
+              "recall": 0.3333,
+              "f1": 0.4444
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 23,
+              "fp": 32,
+              "fn": 7,
+              "precision": 0.4182,
+              "recall": 0.7667,
+              "f1": 0.5412
+            },
+            "INJURY_REPORTED": {
+              "tp": 101,
+              "fp": 44,
+              "fn": 13,
+              "precision": 0.6966,
+              "recall": 0.886,
+              "f1": 0.7799
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 5,
+              "fp": 0,
+              "fn": 25,
+              "precision": 1.0,
+              "recall": 0.1667,
+              "f1": 0.2857
+            },
+            "MISSING_PERSON": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 17,
+              "precision": 1.0,
+              "recall": 0.4333,
+              "f1": 0.6047
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 57,
+              "fp": 21,
+              "fn": 0,
+              "precision": 0.7308,
+              "recall": 1.0,
+              "f1": 0.8444
+            },
+            "NOT_BREATHING": {
+              "tp": 22,
+              "fp": 36,
+              "fn": 0,
+              "precision": 0.3793,
+              "recall": 1.0,
+              "f1": 0.55
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 51,
+              "fp": 48,
+              "fn": 9,
+              "precision": 0.5152,
+              "recall": 0.85,
+              "f1": 0.6415
+            },
+            "OVERDOSE": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 19,
+              "precision": 1.0,
+              "recall": 0.3667,
+              "f1": 0.5366
+            },
+            "POISONING": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "SEIZURE": {
+              "tp": 6,
+              "fp": 25,
+              "fn": 16,
+              "precision": 0.1935,
+              "recall": 0.2727,
+              "f1": 0.2264
+            },
+            "SELF_HARM_RISK": {
+              "tp": 8,
+              "fp": 0,
+              "fn": 12,
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714
+            },
+            "SMOKE_REPORTED": {
+              "tp": 30,
+              "fp": 9,
+              "fn": 0,
+              "precision": 0.7692,
+              "recall": 1.0,
+              "f1": 0.8696
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 0,
+              "fp": 10,
+              "fn": 20,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 26,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1.0,
+              "recall": 0.8667,
+              "f1": 0.9286
+            },
+            "UNCONSCIOUS": {
+              "tp": 81,
+              "fp": 25,
+              "fn": 9,
+              "precision": 0.7642,
+              "recall": 0.9,
+              "f1": 0.8265
+            },
+            "WEAPON_PRESENT": {
+              "tp": 26,
+              "fp": 42,
+              "fn": 4,
+              "precision": 0.3824,
+              "recall": 0.8667,
+              "f1": 0.5306
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 76
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8953,
+          "numerator": 154,
+          "denominator": 172,
+          "ci95": [
+            0.8488,
+            0.936
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.1684,
+          "numerator": 48,
+          "denominator": 285,
+          "ci95": [
+            0.1263,
+            0.2105
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0032",
+            "g22s42-0097",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0192",
+            "g22s42-0271",
+            "g22s42-0295",
+            "g22s42-0309",
+            "g22s42-0372",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0447",
+            "g22s42-0483",
+            "g22s42-0554",
+            "g22s42-0570",
+            "g22s42-0621",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0822",
+            "g22s42-0888",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1056",
+            "g22s42-1141",
+            "g22s42-1149",
+            "g22s42-1179",
+            "g22s42-1317",
+            "g22s42-1489",
+            "g22s42-1665",
+            "g22s42-1677",
+            "g22s42-1752",
+            "g22s42-1938",
+            "g22s42-1953",
+            "g22s42-1962",
+            "g22s42-2013",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2136",
+            "g22s42-2187",
+            "g22s42-2193",
+            "g22s42-2305",
+            "g22s42-2381",
+            "g22s42-2397",
+            "g22s42-2475",
+            "g22s42-2562"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.5988,
+          "numerator": 485,
+          "denominator": 810,
+          "ci95": [
+            0.5654,
+            0.6321
+          ]
+        },
+        "undertriage": {
+          "value": 0.2111,
+          "numerator": 171,
+          "denominator": 810,
+          "ci95": [
+            0.1852,
+            0.2383
+          ]
+        },
+        "overtriage": {
+          "value": 0.1901,
+          "numerator": 154,
+          "denominator": 810,
+          "ci95": [
+            0.1617,
+            0.2173
+          ]
+        },
+        "severity_exact": {
+          "value": 0.579,
+          "numerator": 469,
+          "denominator": 810,
+          "ci95": [
+            0.5444,
+            0.6111
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9716,
+          "numerator": 787,
+          "denominator": 810,
+          "ci95": [
+            0.9593,
+            0.9815
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 237,
+            "P1": 8,
+            "P2": 20,
+            "P3": 20,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 57,
+            "P1": 185,
+            "P2": 75,
+            "P3": 48,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 14,
+            "P1": 12,
+            "P2": 56,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 17,
+            "P2": 6,
+            "P3": 7,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 1,
+            "P1": 18,
+            "P2": 16,
+            "P3": 13,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.8416,
+          "critical_cue_sensitivity": 0.8636
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.7037,
+          "critical_cue_sensitivity": 1.0
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.6852,
+          "critical_cue_sensitivity": 0.7917
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.6927,
+          "critical_cue_sensitivity": 0.8
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.8706,
+          "critical_cue_sensitivity": 1.0
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.2449,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.6794,
+          "critical_cue_sensitivity": 0.9429
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.5566,
+          "critical_cue_sensitivity": 0.8571
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.6667,
+          "critical_cue_sensitivity": 0.9231
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.7767,
+          "critical_cue_sensitivity": 0.875
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.8349,
+          "critical_cue_sensitivity": 1.0
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.764,
+          "critical_cue_sensitivity": 0.875
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.7183,
+          "critical_cue_sensitivity": 0.9038
+        }
+      },
+      "run": {
+        "p50_ms": 4.33,
+        "p95_ms": 5.7,
+        "cpu_seconds": 13.98,
+        "span_verification_rejections": 0
+      }
+    },
+    "B1e only": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 814,
+          "span_exact": {
+            "tp": 6,
+            "fp": 808,
+            "fn": 1407,
+            "precision": 0.0074,
+            "recall": 0.0042,
+            "f1": 0.0054
+          },
+          "span_overlap": {
+            "tp": 733,
+            "fp": 81,
+            "fn": 680,
+            "precision": 0.9005,
+            "recall": 0.5188,
+            "f1": 0.6583
+          },
+          "status_accuracy": {
+            "value": 0.7928,
+            "numerator": 593,
+            "denominator": 748,
+            "ci95": [
+              0.7634,
+              0.8222
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 593,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 135,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 6,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 14,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 728,
+            "fp": 89,
+            "fn": 505,
+            "precision": 0.8911,
+            "recall": 0.5904,
+            "f1": 0.7102,
+            "f1_ci95": [
+              0.6864,
+              0.7332
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 30,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 5,
+              "fp": 1,
+              "fn": 25,
+              "precision": 0.8333,
+              "recall": 0.1667,
+              "f1": 0.2778
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 1,
+              "fp": 3,
+              "fn": 29,
+              "precision": 0.25,
+              "recall": 0.0333,
+              "f1": 0.0588
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 20,
+              "fp": 6,
+              "fn": 30,
+              "precision": 0.7692,
+              "recall": 0.4,
+              "f1": 0.5263
+            },
+            "BURN_INJURY": {
+              "tp": 11,
+              "fp": 7,
+              "fn": 19,
+              "precision": 0.6111,
+              "recall": 0.3667,
+              "f1": 0.4583
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 21,
+              "fp": 0,
+              "fn": 5,
+              "precision": 1.0,
+              "recall": 0.8077,
+              "f1": 0.8936
+            },
+            "CHILDBIRTH": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 19,
+              "precision": 1.0,
+              "recall": 0.3667,
+              "f1": 0.5366
+            },
+            "CHILD_INVOLVED": {
+              "tp": 96,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1.0,
+              "recall": 0.9796,
+              "f1": 0.9897
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 26,
+              "precision": 1.0,
+              "recall": 0.1333,
+              "f1": 0.2353
+            },
+            "DROWNING": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 11,
+              "precision": 1.0,
+              "recall": 0.5417,
+              "f1": 0.7027
+            },
+            "ELECTROCUTION": {
+              "tp": 12,
+              "fp": 0,
+              "fn": 18,
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 27,
+              "precision": 1.0,
+              "recall": 0.1,
+              "f1": 0.1818
+            },
+            "FIRE_REPORTED": {
+              "tp": 58,
+              "fp": 12,
+              "fn": 2,
+              "precision": 0.8286,
+              "recall": 0.9667,
+              "f1": 0.8923
+            },
+            "FIRE_SPREADING": {
+              "tp": 21,
+              "fp": 0,
+              "fn": 9,
+              "precision": 1.0,
+              "recall": 0.7,
+              "f1": 0.8235
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 8,
+              "fp": 1,
+              "fn": 22,
+              "precision": 0.8889,
+              "recall": 0.2667,
+              "f1": 0.4103
+            },
+            "INJURY_REPORTED": {
+              "tp": 101,
+              "fp": 2,
+              "fn": 13,
+              "precision": 0.9806,
+              "recall": 0.886,
+              "f1": 0.9309
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 15,
+              "fp": 0,
+              "fn": 15,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "MISSING_PERSON": {
+              "tp": 25,
+              "fp": 0,
+              "fn": 5,
+              "precision": 1.0,
+              "recall": 0.8333,
+              "f1": 0.9091
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 57,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "NOT_BREATHING": {
+              "tp": 15,
+              "fp": 8,
+              "fn": 7,
+              "precision": 0.6522,
+              "recall": 0.6818,
+              "f1": 0.6667
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 36,
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 3,
+              "fn": 27,
+              "precision": 0.5,
+              "recall": 0.1,
+              "f1": 0.1667
+            },
+            "POISONING": {
+              "tp": 6,
+              "fp": 3,
+              "fn": 24,
+              "precision": 0.6667,
+              "recall": 0.2,
+              "f1": 0.3077
+            },
+            "SEIZURE": {
+              "tp": 16,
+              "fp": 8,
+              "fn": 6,
+              "precision": 0.6667,
+              "recall": 0.7273,
+              "f1": 0.6957
+            },
+            "SELF_HARM_RISK": {
+              "tp": 8,
+              "fp": 0,
+              "fn": 12,
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714
+            },
+            "SMOKE_REPORTED": {
+              "tp": 29,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.9667,
+              "f1": 0.9831
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 6,
+              "fp": 12,
+              "fn": 14,
+              "precision": 0.3333,
+              "recall": 0.3,
+              "f1": 0.3158
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 29,
+              "precision": 1.0,
+              "recall": 0.0333,
+              "f1": 0.0645
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 28,
+              "fp": 1,
+              "fn": 2,
+              "precision": 0.9655,
+              "recall": 0.9333,
+              "f1": 0.9492
+            },
+            "UNCONSCIOUS": {
+              "tp": 47,
+              "fp": 18,
+              "fn": 43,
+              "precision": 0.7231,
+              "recall": 0.5222,
+              "f1": 0.6065
+            },
+            "WEAPON_PRESENT": {
+              "tp": 17,
+              "fp": 4,
+              "fn": 13,
+              "precision": 0.8095,
+              "recall": 0.5667,
+              "f1": 0.6667
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 20
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.5,
+          "numerator": 86,
+          "denominator": 172,
+          "ci95": [
+            0.4244,
+            0.5756
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.4667,
+          "numerator": 133,
+          "denominator": 285,
+          "ci95": [
+            0.4105,
+            0.5263
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0014",
+            "g22s42-0016",
+            "g22s42-0039",
+            "g22s42-0051",
+            "g22s42-0088",
+            "g22s42-0097",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0138",
+            "g22s42-0190",
+            "g22s42-0277",
+            "g22s42-0279",
+            "g22s42-0302",
+            "g22s42-0309",
+            "g22s42-0312",
+            "g22s42-0364",
+            "g22s42-0366",
+            "g22s42-0372",
+            "g22s42-0385",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0399",
+            "g22s42-0447",
+            "g22s42-0453",
+            "g22s42-0455",
+            "g22s42-0467",
+            "g22s42-0474",
+            "g22s42-0476",
+            "g22s42-0486",
+            "g22s42-0538",
+            "g22s42-0554",
+            "g22s42-0563",
+            "g22s42-0570",
+            "g22s42-0621",
+            "g22s42-0623",
+            "g22s42-0627",
+            "g22s42-0710",
+            "g22s42-0712",
+            "g22s42-0720",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0747",
+            "g22s42-0797",
+            "g22s42-0822",
+            "g22s42-0884",
+            "g22s42-0909",
+            "g22s42-0921",
+            "g22s42-0958",
+            "g22s42-0971",
+            "g22s42-0973",
+            "g22s42-0975",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1005",
+            "g22s42-1008",
+            "g22s42-1056",
+            "g22s42-1095",
+            "g22s42-1132",
+            "g22s42-1170",
+            "g22s42-1172",
+            "g22s42-1179",
+            "g22s42-1182",
+            "g22s42-1219",
+            "g22s42-1255",
+            "g22s42-1266",
+            "g22s42-1269",
+            "g22s42-1317",
+            "g22s42-1321",
+            "g22s42-1323",
+            "g22s42-1348",
+            "g22s42-1353",
+            "g22s42-1356",
+            "g22s42-1406",
+            "g22s42-1408",
+            "g22s42-1416",
+            "g22s42-1440",
+            "g22s42-1443",
+            "g22s42-1495",
+            "g22s42-1499",
+            "g22s42-1580",
+            "g22s42-1584",
+            "g22s42-1590",
+            "g22s42-1665",
+            "g22s42-1667",
+            "g22s42-1669",
+            "g22s42-1677",
+            "g22s42-1704",
+            "g22s42-1752",
+            "g22s42-1756",
+            "g22s42-1788",
+            "g22s42-1864",
+            "g22s42-1878",
+            "g22s42-1915",
+            "g22s42-1928",
+            "g22s42-1930",
+            "g22s42-1932",
+            "g22s42-1938",
+            "g22s42-1953",
+            "g22s42-1962",
+            "g22s42-1965",
+            "g22s42-2009",
+            "g22s42-2013",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2089",
+            "g22s42-2102",
+            "g22s42-2104",
+            "g22s42-2136",
+            "g22s42-2139",
+            "g22s42-2176",
+            "g22s42-2199",
+            "g22s42-2214",
+            "g22s42-2223",
+            "g22s42-2278",
+            "g22s42-2301",
+            "g22s42-2305",
+            "g22s42-2310",
+            "g22s42-2313",
+            "g22s42-2365",
+            "g22s42-2397",
+            "g22s42-2400",
+            "g22s42-2454",
+            "g22s42-2460",
+            "g22s42-2475",
+            "g22s42-2477",
+            "g22s42-2543",
+            "g22s42-2560",
+            "g22s42-2562",
+            "g22s42-2571",
+            "g22s42-2574"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.4802,
+          "numerator": 389,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5148
+          ]
+        },
+        "undertriage": {
+          "value": 0.3975,
+          "numerator": 322,
+          "denominator": 810,
+          "ci95": [
+            0.3642,
+            0.4309
+          ]
+        },
+        "overtriage": {
+          "value": 0.1222,
+          "numerator": 99,
+          "denominator": 810,
+          "ci95": [
+            0.1,
+            0.1444
+          ]
+        },
+        "severity_exact": {
+          "value": 0.4765,
+          "numerator": 386,
+          "denominator": 810,
+          "ci95": [
+            0.4432,
+            0.5111
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9296,
+          "numerator": 753,
+          "denominator": 810,
+          "ci95": [
+            0.9111,
+            0.9469
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 152,
+            "P1": 23,
+            "P2": 47,
+            "P3": 63,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 14,
+            "P1": 172,
+            "P2": 96,
+            "P3": 83,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 8,
+            "P1": 0,
+            "P2": 64,
+            "P3": 10,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 3,
+            "P2": 26,
+            "P3": 1,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 3,
+            "P1": 12,
+            "P2": 14,
+            "P3": 19,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.8281,
+          "critical_cue_sensitivity": 0.6364
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.7619,
+          "critical_cue_sensitivity": 0.4444
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.7185,
+          "critical_cue_sensitivity": 0.5833
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.7051,
+          "critical_cue_sensitivity": 0.5
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.8665,
+          "critical_cue_sensitivity": 0.5333
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.4138,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.7299,
+          "critical_cue_sensitivity": 0.5143
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.6951,
+          "critical_cue_sensitivity": 0.5714
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.6776,
+          "critical_cue_sensitivity": 0.3846
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.4444,
+          "critical_cue_sensitivity": 0.0
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.6609,
+          "critical_cue_sensitivity": 0.5909
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.7239,
+          "critical_cue_sensitivity": 0.3125
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.6905,
+          "critical_cue_sensitivity": 0.4808
+        }
+      },
+      "run": {
+        "p50_ms": 30.64,
+        "p95_ms": 53.71,
+        "cpu_seconds": 342.69,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1e": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 1191,
+          "span_exact": {
+            "tp": 240,
+            "fp": 951,
+            "fn": 1173,
+            "precision": 0.2015,
+            "recall": 0.1699,
+            "f1": 0.1843
+          },
+          "span_overlap": {
+            "tp": 1091,
+            "fp": 100,
+            "fn": 322,
+            "precision": 0.916,
+            "recall": 0.7721,
+            "f1": 0.8379
+          },
+          "status_accuracy": {
+            "value": 0.906,
+            "numerator": 993,
+            "denominator": 1096,
+            "ci95": [
+              0.8887,
+              0.9234
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 759,
+              "uncertain": 26,
+              "negated": 2,
+              "historical": 6,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 42,
+              "uncertain": 168,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 13,
+              "uncertain": 1,
+              "negated": 45,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 13,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 21,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 1003,
+            "fp": 126,
+            "fn": 230,
+            "precision": 0.8884,
+            "recall": 0.8135,
+            "f1": 0.8493,
+            "f1_ci95": [
+              0.833,
+              0.8657
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 30,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 28,
+              "fp": 4,
+              "fn": 2,
+              "precision": 0.875,
+              "recall": 0.9333,
+              "f1": 0.9032
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 15,
+              "fp": 3,
+              "fn": 15,
+              "precision": 0.8333,
+              "recall": 0.5,
+              "f1": 0.625
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 31,
+              "fp": 6,
+              "fn": 19,
+              "precision": 0.8378,
+              "recall": 0.62,
+              "f1": 0.7126
+            },
+            "BURN_INJURY": {
+              "tp": 24,
+              "fp": 7,
+              "fn": 6,
+              "precision": 0.7742,
+              "recall": 0.8,
+              "f1": 0.7869
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 24,
+              "fp": 3,
+              "fn": 2,
+              "precision": 0.8889,
+              "recall": 0.9231,
+              "f1": 0.9057
+            },
+            "CHILDBIRTH": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "CHILD_INVOLVED": {
+              "tp": 98,
+              "fp": 6,
+              "fn": 0,
+              "precision": 0.9423,
+              "recall": 1.0,
+              "f1": 0.9703
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "DROWNING": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ELECTROCUTION": {
+              "tp": 25,
+              "fp": 0,
+              "fn": 5,
+              "precision": 1.0,
+              "recall": 0.8333,
+              "f1": 0.9091
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 17,
+              "fp": 0,
+              "fn": 13,
+              "precision": 1.0,
+              "recall": 0.5667,
+              "f1": 0.7234
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "FIRE_REPORTED": {
+              "tp": 59,
+              "fp": 21,
+              "fn": 1,
+              "precision": 0.7375,
+              "recall": 0.9833,
+              "f1": 0.8429
+            },
+            "FIRE_SPREADING": {
+              "tp": 21,
+              "fp": 5,
+              "fn": 9,
+              "precision": 0.8077,
+              "recall": 0.7,
+              "f1": 0.75
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 23,
+              "fp": 1,
+              "fn": 7,
+              "precision": 0.9583,
+              "recall": 0.7667,
+              "f1": 0.8519
+            },
+            "INJURY_REPORTED": {
+              "tp": 110,
+              "fp": 7,
+              "fn": 4,
+              "precision": 0.9402,
+              "recall": 0.9649,
+              "f1": 0.9524
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 15,
+              "fp": 0,
+              "fn": 15,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "MISSING_PERSON": {
+              "tp": 28,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1.0,
+              "recall": 0.9333,
+              "f1": 0.9655
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 57,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "NOT_BREATHING": {
+              "tp": 22,
+              "fp": 8,
+              "fn": 0,
+              "precision": 0.7333,
+              "recall": 1.0,
+              "f1": 0.8462
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 45,
+              "fp": 0,
+              "fn": 15,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1": 0.8571
+            },
+            "OVERDOSE": {
+              "tp": 12,
+              "fp": 3,
+              "fn": 18,
+              "precision": 0.8,
+              "recall": 0.4,
+              "f1": 0.5333
+            },
+            "POISONING": {
+              "tp": 25,
+              "fp": 3,
+              "fn": 5,
+              "precision": 0.8929,
+              "recall": 0.8333,
+              "f1": 0.8621
+            },
+            "SEIZURE": {
+              "tp": 16,
+              "fp": 8,
+              "fn": 6,
+              "precision": 0.6667,
+              "recall": 0.7273,
+              "f1": 0.6957
+            },
+            "SELF_HARM_RISK": {
+              "tp": 12,
+              "fp": 0,
+              "fn": 8,
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75
+            },
+            "SMOKE_REPORTED": {
+              "tp": 30,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 6,
+              "fp": 15,
+              "fn": 14,
+              "precision": 0.2857,
+              "recall": 0.3,
+              "f1": 0.2927
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 30,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.9677,
+              "recall": 1.0,
+              "f1": 0.9836
+            },
+            "UNCONSCIOUS": {
+              "tp": 81,
+              "fp": 18,
+              "fn": 9,
+              "precision": 0.8182,
+              "recall": 0.9,
+              "f1": 0.8571
+            },
+            "WEAPON_PRESENT": {
+              "tp": 19,
+              "fp": 7,
+              "fn": 11,
+              "precision": 0.7308,
+              "recall": 0.6333,
+              "f1": 0.6786
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 36
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8605,
+          "numerator": 148,
+          "denominator": 172,
+          "ci95": [
+            0.8081,
+            0.907
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.1649,
+          "numerator": 47,
+          "denominator": 285,
+          "ci95": [
+            0.1228,
+            0.207
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0097",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0309",
+            "g22s42-0372",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0447",
+            "g22s42-0554",
+            "g22s42-0570",
+            "g22s42-0621",
+            "g22s42-0720",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0822",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1005",
+            "g22s42-1056",
+            "g22s42-1179",
+            "g22s42-1266",
+            "g22s42-1269",
+            "g22s42-1317",
+            "g22s42-1416",
+            "g22s42-1665",
+            "g22s42-1677",
+            "g22s42-1752",
+            "g22s42-1788",
+            "g22s42-1938",
+            "g22s42-1953",
+            "g22s42-1962",
+            "g22s42-2013",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2136",
+            "g22s42-2199",
+            "g22s42-2223",
+            "g22s42-2305",
+            "g22s42-2310",
+            "g22s42-2397",
+            "g22s42-2460",
+            "g22s42-2475",
+            "g22s42-2562",
+            "g22s42-2571"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.6975,
+          "numerator": 565,
+          "denominator": 810,
+          "ci95": [
+            0.6654,
+            0.7296
+          ]
+        },
+        "undertriage": {
+          "value": 0.1716,
+          "numerator": 139,
+          "denominator": 810,
+          "ci95": [
+            0.1457,
+            0.1963
+          ]
+        },
+        "overtriage": {
+          "value": 0.1309,
+          "numerator": 106,
+          "denominator": 810,
+          "ci95": [
+            0.1074,
+            0.1543
+          ]
+        },
+        "severity_exact": {
+          "value": 0.6951,
+          "numerator": 563,
+          "denominator": 810,
+          "ci95": [
+            0.663,
+            0.7272
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9716,
+          "numerator": 787,
+          "denominator": 810,
+          "ci95": [
+            0.9593,
+            0.9815
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 238,
+            "P1": 12,
+            "P2": 22,
+            "P3": 13,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 20,
+            "P1": 253,
+            "P2": 74,
+            "P3": 18,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 8,
+            "P1": 1,
+            "P2": 73,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 3,
+            "P2": 26,
+            "P3": 1,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 3,
+            "P1": 18,
+            "P2": 11,
+            "P3": 16,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.8986,
+          "critical_cue_sensitivity": 0.8636
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.8687,
+          "critical_cue_sensitivity": 0.8889
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.8312,
+          "critical_cue_sensitivity": 0.7917
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.8023,
+          "critical_cue_sensitivity": 0.7
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.9286,
+          "critical_cue_sensitivity": 1.0
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.3429,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.868,
+          "critical_cue_sensitivity": 0.9143
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.7602,
+          "critical_cue_sensitivity": 0.619
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.7962,
+          "critical_cue_sensitivity": 0.8462
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.8081,
+          "critical_cue_sensitivity": 0.875
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.9452,
+          "critical_cue_sensitivity": 1.0
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.8462,
+          "critical_cue_sensitivity": 0.875
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.8354,
+          "critical_cue_sensitivity": 0.8654
+        }
+      },
+      "run": {
+        "p50_ms": 24.24,
+        "p95_ms": 185.36,
+        "cpu_seconds": 400.72,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1e (fusion 2)": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 999,
+          "span_exact": {
+            "tp": 234,
+            "fp": 765,
+            "fn": 1179,
+            "precision": 0.2342,
+            "recall": 0.1656,
+            "f1": 0.194
+          },
+          "span_overlap": {
+            "tp": 937,
+            "fp": 62,
+            "fn": 476,
+            "precision": 0.9379,
+            "recall": 0.6631,
+            "f1": 0.7769
+          },
+          "status_accuracy": {
+            "value": 0.9278,
+            "numerator": 874,
+            "denominator": 942,
+            "ci95": [
+              0.9119,
+              0.9437
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 640,
+              "uncertain": 26,
+              "negated": 2,
+              "historical": 6,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 7,
+              "uncertain": 168,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 13,
+              "uncertain": 1,
+              "negated": 45,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 13,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 21,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 842,
+            "fp": 74,
+            "fn": 391,
+            "precision": 0.9192,
+            "recall": 0.6829,
+            "f1": 0.7836,
+            "f1_ci95": [
+              0.7632,
+              0.8021
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 28,
+              "fp": 3,
+              "fn": 2,
+              "precision": 0.9032,
+              "recall": 0.9333,
+              "f1": 0.918
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 26,
+              "precision": 1.0,
+              "recall": 0.48,
+              "f1": 0.6486
+            },
+            "BURN_INJURY": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 6,
+              "precision": 1.0,
+              "recall": 0.8,
+              "f1": 0.8889
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 6,
+              "fp": 3,
+              "fn": 20,
+              "precision": 0.6667,
+              "recall": 0.2308,
+              "f1": 0.3429
+            },
+            "CHILDBIRTH": {
+              "tp": 14,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.4667,
+              "f1": 0.6364
+            },
+            "CHILD_INVOLVED": {
+              "tp": 91,
+              "fp": 6,
+              "fn": 7,
+              "precision": 0.9381,
+              "recall": 0.9286,
+              "f1": 0.9333
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "DROWNING": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ELECTROCUTION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 11,
+              "fp": 0,
+              "fn": 19,
+              "precision": 1.0,
+              "recall": 0.3667,
+              "f1": 0.5366
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "FIRE_REPORTED": {
+              "tp": 46,
+              "fp": 9,
+              "fn": 14,
+              "precision": 0.8364,
+              "recall": 0.7667,
+              "f1": 0.8
+            },
+            "FIRE_SPREADING": {
+              "tp": 10,
+              "fp": 5,
+              "fn": 20,
+              "precision": 0.6667,
+              "recall": 0.3333,
+              "f1": 0.4444
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 23,
+              "fp": 0,
+              "fn": 7,
+              "precision": 1.0,
+              "recall": 0.7667,
+              "f1": 0.8679
+            },
+            "INJURY_REPORTED": {
+              "tp": 101,
+              "fp": 5,
+              "fn": 13,
+              "precision": 0.9528,
+              "recall": 0.886,
+              "f1": 0.9182
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 5,
+              "fp": 0,
+              "fn": 25,
+              "precision": 1.0,
+              "recall": 0.1667,
+              "f1": 0.2857
+            },
+            "MISSING_PERSON": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 17,
+              "precision": 1.0,
+              "recall": 0.4333,
+              "f1": 0.6047
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 55,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1.0,
+              "recall": 0.9649,
+              "f1": 0.9821
+            },
+            "NOT_BREATHING": {
+              "tp": 22,
+              "fp": 8,
+              "fn": 0,
+              "precision": 0.7333,
+              "recall": 1.0,
+              "f1": 0.8462
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 45,
+              "fp": 0,
+              "fn": 15,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1": 0.8571
+            },
+            "OVERDOSE": {
+              "tp": 9,
+              "fp": 0,
+              "fn": 21,
+              "precision": 1.0,
+              "recall": 0.3,
+              "f1": 0.4615
+            },
+            "POISONING": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "SEIZURE": {
+              "tp": 6,
+              "fp": 0,
+              "fn": 16,
+              "precision": 1.0,
+              "recall": 0.2727,
+              "f1": 0.4286
+            },
+            "SELF_HARM_RISK": {
+              "tp": 8,
+              "fp": 0,
+              "fn": 12,
+              "precision": 1.0,
+              "recall": 0.4,
+              "f1": 0.5714
+            },
+            "SMOKE_REPORTED": {
+              "tp": 30,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 0,
+              "fp": 10,
+              "fn": 20,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 26,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1.0,
+              "recall": 0.8667,
+              "f1": 0.9286
+            },
+            "UNCONSCIOUS": {
+              "tp": 81,
+              "fp": 18,
+              "fn": 9,
+              "precision": 0.8182,
+              "recall": 0.9,
+              "f1": 0.8571
+            },
+            "WEAPON_PRESENT": {
+              "tp": 14,
+              "fp": 7,
+              "fn": 16,
+              "precision": 0.6667,
+              "recall": 0.4667,
+              "f1": 0.549
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 27
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8605,
+          "numerator": 148,
+          "denominator": 172,
+          "ci95": [
+            0.8081,
+            0.907
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.2526,
+          "numerator": 72,
+          "denominator": 285,
+          "ci95": [
+            0.2,
+            0.3018
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0032",
+            "g22s42-0097",
+            "g22s42-0111",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0192",
+            "g22s42-0198",
+            "g22s42-0271",
+            "g22s42-0295",
+            "g22s42-0309",
+            "g22s42-0372",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0440",
+            "g22s42-0447",
+            "g22s42-0554",
+            "g22s42-0570",
+            "g22s42-0621",
+            "g22s42-0633",
+            "g22s42-0720",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0822",
+            "g22s42-0888",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1005",
+            "g22s42-1056",
+            "g22s42-1141",
+            "g22s42-1149",
+            "g22s42-1155",
+            "g22s42-1179",
+            "g22s42-1226",
+            "g22s42-1266",
+            "g22s42-1269",
+            "g22s42-1317",
+            "g22s42-1416",
+            "g22s42-1489",
+            "g22s42-1658",
+            "g22s42-1665",
+            "g22s42-1677",
+            "g22s42-1752",
+            "g22s42-1764",
+            "g22s42-1788",
+            "g22s42-1919",
+            "g22s42-1938",
+            "g22s42-1953",
+            "g22s42-1962",
+            "g22s42-2006",
+            "g22s42-2013",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2112",
+            "g22s42-2136",
+            "g22s42-2187",
+            "g22s42-2193",
+            "g22s42-2199",
+            "g22s42-2223",
+            "g22s42-2286",
+            "g22s42-2305",
+            "g22s42-2310",
+            "g22s42-2373",
+            "g22s42-2381",
+            "g22s42-2397",
+            "g22s42-2460",
+            "g22s42-2475",
+            "g22s42-2547",
+            "g22s42-2562",
+            "g22s42-2571"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.5778,
+          "numerator": 468,
+          "denominator": 810,
+          "ci95": [
+            0.5432,
+            0.6123
+          ]
+        },
+        "undertriage": {
+          "value": 0.3012,
+          "numerator": 244,
+          "denominator": 810,
+          "ci95": [
+            0.2716,
+            0.3321
+          ]
+        },
+        "overtriage": {
+          "value": 0.121,
+          "numerator": 98,
+          "denominator": 810,
+          "ci95": [
+            0.0988,
+            0.1432
+          ]
+        },
+        "severity_exact": {
+          "value": 0.558,
+          "numerator": 452,
+          "denominator": 810,
+          "ci95": [
+            0.5222,
+            0.5926
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9716,
+          "numerator": 787,
+          "denominator": 810,
+          "ci95": [
+            0.9593,
+            0.9815
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 213,
+            "P1": 14,
+            "P2": 29,
+            "P3": 29,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 13,
+            "P1": 180,
+            "P2": 127,
+            "P3": 45,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 8,
+            "P1": 0,
+            "P2": 74,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 29,
+            "P3": 1,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 13,
+            "P2": 12,
+            "P3": 23,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.8571,
+          "critical_cue_sensitivity": 0.8636
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.75,
+          "critical_cue_sensitivity": 0.8889
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.75,
+          "critical_cue_sensitivity": 0.7917
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.7059,
+          "critical_cue_sensitivity": 0.7
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.9067,
+          "critical_cue_sensitivity": 1.0
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.0,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.7649,
+          "critical_cue_sensitivity": 0.9143
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.701,
+          "critical_cue_sensitivity": 0.619
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.6984,
+          "critical_cue_sensitivity": 0.8462
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.8571,
+          "critical_cue_sensitivity": 0.875
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.9004,
+          "critical_cue_sensitivity": 1.0
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.8171,
+          "critical_cue_sensitivity": 0.875
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.7879,
+          "critical_cue_sensitivity": 0.8654
+        }
+      },
+      "run": {
+        "p50_ms": 24.92,
+        "p95_ms": 39.41,
+        "cpu_seconds": 292.27,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1e without abstention": {
+      "metrics": {
+        "spans": {
+          "annotated_cases": 790,
+          "gold_mentions": 1413,
+          "predicted_mentions": 1259,
+          "span_exact": {
+            "tp": 244,
+            "fp": 1015,
+            "fn": 1169,
+            "precision": 0.1938,
+            "recall": 0.1727,
+            "f1": 0.1826
+          },
+          "span_overlap": {
+            "tp": 1115,
+            "fp": 144,
+            "fn": 298,
+            "precision": 0.8856,
+            "recall": 0.7891,
+            "f1": 0.8346
+          },
+          "status_accuracy": {
+            "value": 0.9062,
+            "numerator": 1015,
+            "denominator": 1120,
+            "ci95": [
+              0.8875,
+              0.9223
+            ]
+          },
+          "status_confusion": {
+            "affirmed": {
+              "affirmed": 781,
+              "uncertain": 26,
+              "negated": 2,
+              "historical": 6,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "uncertain": {
+              "affirmed": 44,
+              "uncertain": 168,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "negated": {
+              "affirmed": 13,
+              "uncertain": 1,
+              "negated": 45,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "historical": {
+              "affirmed": 13,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 21,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "hypothetical": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            },
+            "retracted": {
+              "affirmed": 0,
+              "uncertain": 0,
+              "negated": 0,
+              "historical": 0,
+              "hypothetical": 0,
+              "retracted": 0
+            }
+          }
+        },
+        "cases": 810,
+        "cue_extraction": {
+          "micro": {
+            "tp": 1027,
+            "fp": 174,
+            "fn": 206,
+            "precision": 0.8551,
+            "recall": 0.8329,
+            "f1": 0.8439,
+            "f1_ci95": [
+              0.8276,
+              0.8594
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 30,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 28,
+              "fp": 4,
+              "fn": 2,
+              "precision": 0.875,
+              "recall": 0.9333,
+              "f1": 0.9032
+            },
+            "ALLERGIC_REACTION": {
+              "tp": 17,
+              "fp": 3,
+              "fn": 13,
+              "precision": 0.85,
+              "recall": 0.5667,
+              "f1": 0.68
+            },
+            "BREATHING_DIFFICULTY": {
+              "tp": 33,
+              "fp": 6,
+              "fn": 17,
+              "precision": 0.8462,
+              "recall": 0.66,
+              "f1": 0.7416
+            },
+            "BURN_INJURY": {
+              "tp": 24,
+              "fp": 7,
+              "fn": 6,
+              "precision": 0.7742,
+              "recall": 0.8,
+              "f1": 0.7869
+            },
+            "CARDIAC_SYMPTOMS": {
+              "tp": 24,
+              "fp": 3,
+              "fn": 2,
+              "precision": 0.8889,
+              "recall": 0.9231,
+              "f1": 0.9057
+            },
+            "CHILDBIRTH": {
+              "tp": 20,
+              "fp": 5,
+              "fn": 10,
+              "precision": 0.8,
+              "recall": 0.6667,
+              "f1": 0.7273
+            },
+            "CHILD_INVOLVED": {
+              "tp": 98,
+              "fp": 6,
+              "fn": 0,
+              "precision": 0.9423,
+              "recall": 1.0,
+              "f1": 0.9703
+            },
+            "DIABETIC_EMERGENCY": {
+              "tp": 22,
+              "fp": 0,
+              "fn": 8,
+              "precision": 1.0,
+              "recall": 0.7333,
+              "f1": 0.8462
+            },
+            "DROWNING": {
+              "tp": 24,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ELECTROCUTION": {
+              "tp": 28,
+              "fp": 2,
+              "fn": 2,
+              "precision": 0.9333,
+              "recall": 0.9333,
+              "f1": 0.9333
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 19,
+              "fp": 0,
+              "fn": 11,
+              "precision": 1.0,
+              "recall": 0.6333,
+              "f1": 0.7755
+            },
+            "FALL_FROM_HEIGHT": {
+              "tp": 16,
+              "fp": 0,
+              "fn": 14,
+              "precision": 1.0,
+              "recall": 0.5333,
+              "f1": 0.6957
+            },
+            "FIRE_REPORTED": {
+              "tp": 59,
+              "fp": 29,
+              "fn": 1,
+              "precision": 0.6705,
+              "recall": 0.9833,
+              "f1": 0.7973
+            },
+            "FIRE_SPREADING": {
+              "tp": 27,
+              "fp": 5,
+              "fn": 3,
+              "precision": 0.8438,
+              "recall": 0.9,
+              "f1": 0.871
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 23,
+              "fp": 1,
+              "fn": 7,
+              "precision": 0.9583,
+              "recall": 0.7667,
+              "f1": 0.8519
+            },
+            "INJURY_REPORTED": {
+              "tp": 112,
+              "fp": 9,
+              "fn": 2,
+              "precision": 0.9256,
+              "recall": 0.9825,
+              "f1": 0.9532
+            },
+            "INTRUDER_PRESENT": {
+              "tp": 15,
+              "fp": 0,
+              "fn": 15,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "MISSING_PERSON": {
+              "tp": 29,
+              "fp": 5,
+              "fn": 1,
+              "precision": 0.8529,
+              "recall": 0.9667,
+              "f1": 0.9062
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 57,
+              "fp": 9,
+              "fn": 0,
+              "precision": 0.8636,
+              "recall": 1.0,
+              "f1": 0.9268
+            },
+            "NOT_BREATHING": {
+              "tp": 22,
+              "fp": 10,
+              "fn": 0,
+              "precision": 0.6875,
+              "recall": 1.0,
+              "f1": 0.8148
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 45,
+              "fp": 0,
+              "fn": 15,
+              "precision": 1.0,
+              "recall": 0.75,
+              "f1": 0.8571
+            },
+            "OVERDOSE": {
+              "tp": 12,
+              "fp": 6,
+              "fn": 18,
+              "precision": 0.6667,
+              "recall": 0.4,
+              "f1": 0.5
+            },
+            "POISONING": {
+              "tp": 25,
+              "fp": 3,
+              "fn": 5,
+              "precision": 0.8929,
+              "recall": 0.8333,
+              "f1": 0.8621
+            },
+            "SEIZURE": {
+              "tp": 16,
+              "fp": 9,
+              "fn": 6,
+              "precision": 0.64,
+              "recall": 0.7273,
+              "f1": 0.6809
+            },
+            "SELF_HARM_RISK": {
+              "tp": 13,
+              "fp": 0,
+              "fn": 7,
+              "precision": 1.0,
+              "recall": 0.65,
+              "f1": 0.7879
+            },
+            "SMOKE_REPORTED": {
+              "tp": 30,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 8,
+              "fp": 17,
+              "fn": 12,
+              "precision": 0.32,
+              "recall": 0.4,
+              "f1": 0.3556
+            },
+            "TRAFFIC_COLLISION": {
+              "tp": 20,
+              "fp": 0,
+              "fn": 10,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "UNABLE_TO_GET_UP": {
+              "tp": 30,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.9677,
+              "recall": 1.0,
+              "f1": 0.9836
+            },
+            "UNCONSCIOUS": {
+              "tp": 81,
+              "fp": 27,
+              "fn": 9,
+              "precision": 0.75,
+              "recall": 0.9,
+              "f1": 0.8182
+            },
+            "WEAPON_PRESENT": {
+              "tp": 20,
+              "fp": 7,
+              "fn": 10,
+              "precision": 0.7407,
+              "recall": 0.6667,
+              "f1": 0.7018
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 38
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8605,
+          "numerator": 148,
+          "denominator": 172,
+          "ci95": [
+            0.8081,
+            0.907
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.1544,
+          "numerator": 44,
+          "denominator": 285,
+          "ci95": [
+            0.1123,
+            0.1965
+          ],
+          "cases": [
+            "g22s42-0010",
+            "g22s42-0012",
+            "g22s42-0097",
+            "g22s42-0119",
+            "g22s42-0124",
+            "g22s42-0309",
+            "g22s42-0372",
+            "g22s42-0387",
+            "g22s42-0391",
+            "g22s42-0396",
+            "g22s42-0554",
+            "g22s42-0570",
+            "g22s42-0621",
+            "g22s42-0720",
+            "g22s42-0735",
+            "g22s42-0739",
+            "g22s42-0822",
+            "g22s42-0981",
+            "g22s42-0996",
+            "g22s42-1005",
+            "g22s42-1179",
+            "g22s42-1266",
+            "g22s42-1269",
+            "g22s42-1317",
+            "g22s42-1416",
+            "g22s42-1665",
+            "g22s42-1677",
+            "g22s42-1752",
+            "g22s42-1788",
+            "g22s42-1938",
+            "g22s42-1962",
+            "g22s42-2013",
+            "g22s42-2040",
+            "g22s42-2049",
+            "g22s42-2136",
+            "g22s42-2199",
+            "g22s42-2223",
+            "g22s42-2305",
+            "g22s42-2310",
+            "g22s42-2397",
+            "g22s42-2460",
+            "g22s42-2475",
+            "g22s42-2562",
+            "g22s42-2571"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.7012,
+          "numerator": 568,
+          "denominator": 810,
+          "ci95": [
+            0.6679,
+            0.7346
+          ]
+        },
+        "undertriage": {
+          "value": 0.1506,
+          "numerator": 122,
+          "denominator": 810,
+          "ci95": [
+            0.1272,
+            0.1741
+          ]
+        },
+        "overtriage": {
+          "value": 0.1481,
+          "numerator": 120,
+          "denominator": 810,
+          "ci95": [
+            0.1235,
+            0.1741
+          ]
+        },
+        "severity_exact": {
+          "value": 0.7,
+          "numerator": 567,
+          "denominator": 810,
+          "ci95": [
+            0.6667,
+            0.7333
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.4815,
+          "numerator": 390,
+          "denominator": 810,
+          "ci95": [
+            0.4457,
+            0.5173
+          ]
+        },
+        "location_accuracy": {
+          "value": 0.9716,
+          "numerator": 787,
+          "denominator": 810,
+          "ci95": [
+            0.9593,
+            0.9815
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9975,
+          "numerator": 808,
+          "denominator": 810,
+          "ci95": [
+            0.9938,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 241,
+            "P1": 14,
+            "P2": 20,
+            "P3": 10,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 32,
+            "P1": 255,
+            "P2": 65,
+            "P3": 13,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 9,
+            "P1": 2,
+            "P2": 71,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 3,
+            "P2": 26,
+            "P3": 1,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 3,
+            "P1": 18,
+            "P2": 13,
+            "P3": 14,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {
+        "child": {
+          "cases": 84,
+          "micro_f1": 0.8915,
+          "critical_cue_sensitivity": 0.8636
+        },
+        "corrected_address": {
+          "cases": 36,
+          "micro_f1": 0.8713,
+          "critical_cue_sensitivity": 0.8889
+        },
+        "disfluent": {
+          "cases": 97,
+          "micro_f1": 0.825,
+          "critical_cue_sensitivity": 0.7917
+        },
+        "misspelled": {
+          "cases": 61,
+          "micro_f1": 0.7955,
+          "critical_cue_sensitivity": 0.7
+        },
+        "multiple": {
+          "cases": 57,
+          "micro_f1": 0.9266,
+          "critical_cue_sensitivity": 1.0
+        },
+        "past": {
+          "cases": 56,
+          "micro_f1": 0.3158,
+          "critical_cue_sensitivity": null
+        },
+        "plain": {
+          "cases": 153,
+          "micro_f1": 0.8717,
+          "critical_cue_sensitivity": 0.9143
+        },
+        "reassured": {
+          "cases": 124,
+          "micro_f1": 0.7649,
+          "critical_cue_sensitivity": 0.619
+        },
+        "second_hand": {
+          "cases": 75,
+          "micro_f1": 0.8073,
+          "critical_cue_sensitivity": 0.8462
+        },
+        "shouting": {
+          "cases": 30,
+          "micro_f1": 0.8,
+          "critical_cue_sensitivity": 0.875
+        },
+        "spanish": {
+          "cases": 97,
+          "micro_f1": 0.9079,
+          "critical_cue_sensitivity": 1.0
+        },
+        "speech_recognition": {
+          "cases": 57,
+          "micro_f1": 0.8404,
+          "critical_cue_sensitivity": 0.875
+        },
+        "uncertain": {
+          "cases": 198,
+          "micro_f1": 0.83,
+          "critical_cue_sensitivity": 0.8654
+        }
+      },
+      "run": {
+        "p50_ms": 32.42,
+        "p95_ms": 190.61,
+        "cpu_seconds": 424.09,
+        "span_verification_rejections": 0
+      }
+    }
+  },
+  "paired": {
+    "B1 only vs B0 rules": {
+      "a": "B1 only",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 20,
+          "b_right_a_wrong": 125,
+          "both_right": 76,
+          "both_wrong": 64,
+          "p_value": 0.0
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 38,
+          "b_right_a_wrong": 315,
+          "both_right": 162,
+          "both_wrong": 295,
+          "p_value": 0.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.4513,
+          "b": 0.7864,
+          "difference": -0.335,
+          "ci95": [
+            -0.3665,
+            -0.3025
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.407,
+          "b": 0.7907,
+          "difference": -0.3837,
+          "ci95": [
+            -0.4759,
+            -0.2889
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.6632,
+          "b": 0.2947,
+          "difference": 0.3684,
+          "ci95": [
+            0.2959,
+            0.4397
+          ]
+        },
+        "priority_exact": {
+          "a": 0.2469,
+          "b": 0.5889,
+          "difference": -0.342,
+          "ci95": [
+            -0.3827,
+            -0.3025
+          ]
+        },
+        "undertriage": {
+          "a": 0.6185,
+          "b": 0.316,
+          "difference": 0.3025,
+          "ci95": [
+            0.2617,
+            0.3444
+          ]
+        },
+        "overtriage": {
+          "a": 0.1346,
+          "b": 0.0951,
+          "difference": 0.0395,
+          "ci95": [
+            0.0259,
+            0.0543
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1 vs B0 rules": {
+      "a": "Hybrid B0+B1",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 24,
+          "b_right_a_wrong": 0,
+          "both_right": 201,
+          "both_wrong": 60,
+          "p_value": 0.0
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 42,
+          "b_right_a_wrong": 25,
+          "both_right": 452,
+          "both_wrong": 291,
+          "p_value": 0.0498
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.7614,
+          "b": 0.7864,
+          "difference": -0.0249,
+          "ci95": [
+            -0.0365,
+            -0.0125
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8605,
+          "b": 0.7907,
+          "difference": 0.0698,
+          "ci95": [
+            0.0353,
+            0.1118
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.2105,
+          "b": 0.2947,
+          "difference": -0.0842,
+          "ci95": [
+            -0.1178,
+            -0.0524
+          ]
+        },
+        "priority_exact": {
+          "a": 0.6099,
+          "b": 0.5889,
+          "difference": 0.021,
+          "ci95": [
+            0.0,
+            0.0407
+          ]
+        },
+        "undertriage": {
+          "a": 0.2543,
+          "b": 0.316,
+          "difference": -0.0617,
+          "ci95": [
+            -0.079,
+            -0.0457
+          ]
+        },
+        "overtriage": {
+          "a": 0.1358,
+          "b": 0.0951,
+          "difference": 0.0407,
+          "ci95": [
+            0.0272,
+            0.0556
+          ]
+        }
+      }
+    },
+    "Hybrid without abstention vs B0 rules": {
+      "a": "Hybrid without abstention",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 36,
+          "b_right_a_wrong": 0,
+          "both_right": 201,
+          "both_wrong": 48,
+          "p_value": 0.0
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 66,
+          "b_right_a_wrong": 58,
+          "both_right": 419,
+          "both_wrong": 267,
+          "p_value": 0.529769
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.7067,
+          "b": 0.7864,
+          "difference": -0.0797,
+          "ci95": [
+            -0.0953,
+            -0.064
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8953,
+          "b": 0.7907,
+          "difference": 0.1047,
+          "ci95": [
+            0.0613,
+            0.1538
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.1684,
+          "b": 0.2947,
+          "difference": -0.1263,
+          "ci95": [
+            -0.1672,
+            -0.0903
+          ]
+        },
+        "priority_exact": {
+          "a": 0.5988,
+          "b": 0.5889,
+          "difference": 0.0099,
+          "ci95": [
+            -0.0185,
+            0.037
+          ]
+        },
+        "undertriage": {
+          "a": 0.2111,
+          "b": 0.316,
+          "difference": -0.1049,
+          "ci95": [
+            -0.1272,
+            -0.084
+          ]
+        },
+        "overtriage": {
+          "a": 0.1901,
+          "b": 0.0951,
+          "difference": 0.0951,
+          "ci95": [
+            0.0741,
+            0.1173
+          ]
+        }
+      }
+    },
+    "B1e only vs B0 rules": {
+      "a": "B1e only",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 37,
+          "b_right_a_wrong": 86,
+          "both_right": 115,
+          "both_wrong": 47,
+          "p_value": 1.2e-05
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 117,
+          "b_right_a_wrong": 205,
+          "both_right": 272,
+          "both_wrong": 216,
+          "p_value": 1e-06
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.7102,
+          "b": 0.7864,
+          "difference": -0.0761,
+          "ci95": [
+            -0.103,
+            -0.0484
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.5,
+          "b": 0.7907,
+          "difference": -0.2907,
+          "ci95": [
+            -0.3797,
+            -0.2022
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.4667,
+          "b": 0.2947,
+          "difference": 0.1719,
+          "ci95": [
+            0.0976,
+            0.2473
+          ]
+        },
+        "priority_exact": {
+          "a": 0.4802,
+          "b": 0.5889,
+          "difference": -0.1086,
+          "ci95": [
+            -0.1506,
+            -0.0667
+          ]
+        },
+        "undertriage": {
+          "a": 0.3975,
+          "b": 0.316,
+          "difference": 0.0815,
+          "ci95": [
+            0.0395,
+            0.1235
+          ]
+        },
+        "overtriage": {
+          "a": 0.1222,
+          "b": 0.0951,
+          "difference": 0.0272,
+          "ci95": [
+            0.0173,
+            0.0395
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e vs B0 rules": {
+      "a": "Hybrid B0+B1e",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 37,
+          "b_right_a_wrong": 0,
+          "both_right": 201,
+          "both_wrong": 47,
+          "p_value": 0.0
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 111,
+          "b_right_a_wrong": 23,
+          "both_right": 454,
+          "both_wrong": 222,
+          "p_value": 0.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.8493,
+          "b": 0.7864,
+          "difference": 0.0629,
+          "ci95": [
+            0.048,
+            0.0788
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8605,
+          "b": 0.7907,
+          "difference": 0.0698,
+          "ci95": [
+            0.0328,
+            0.1098
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.1649,
+          "b": 0.2947,
+          "difference": -0.1298,
+          "ci95": [
+            -0.1717,
+            -0.0912
+          ]
+        },
+        "priority_exact": {
+          "a": 0.6975,
+          "b": 0.5889,
+          "difference": 0.1086,
+          "ci95": [
+            0.0827,
+            0.137
+          ]
+        },
+        "undertriage": {
+          "a": 0.1716,
+          "b": 0.316,
+          "difference": -0.1444,
+          "ci95": [
+            -0.1691,
+            -0.1222
+          ]
+        },
+        "overtriage": {
+          "a": 0.1309,
+          "b": 0.0951,
+          "difference": 0.0358,
+          "ci95": [
+            0.0247,
+            0.0494
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e (fusion 2) vs B0 rules": {
+      "a": "Hybrid B0+B1e (fusion 2)",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 12,
+          "b_right_a_wrong": 0,
+          "both_right": 201,
+          "both_wrong": 72,
+          "p_value": 0.000488
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 12,
+          "b_right_a_wrong": 21,
+          "both_right": 456,
+          "both_wrong": 321,
+          "p_value": 0.162756
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.7836,
+          "b": 0.7864,
+          "difference": -0.0027,
+          "ci95": [
+            -0.0083,
+            0.003
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8605,
+          "b": 0.7907,
+          "difference": 0.0698,
+          "ci95": [
+            0.0328,
+            0.1098
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.2526,
+          "b": 0.2947,
+          "difference": -0.0421,
+          "ci95": [
+            -0.0671,
+            -0.0201
+          ]
+        },
+        "priority_exact": {
+          "a": 0.5778,
+          "b": 0.5889,
+          "difference": -0.0111,
+          "ci95": [
+            -0.0259,
+            0.0025
+          ]
+        },
+        "undertriage": {
+          "a": 0.3012,
+          "b": 0.316,
+          "difference": -0.0148,
+          "ci95": [
+            -0.0235,
+            -0.0074
+          ]
+        },
+        "overtriage": {
+          "a": 0.121,
+          "b": 0.0951,
+          "difference": 0.0259,
+          "ci95": [
+            0.016,
+            0.037
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e without abstention vs B0 rules": {
+      "a": "Hybrid B0+B1e without abstention",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 40,
+          "b_right_a_wrong": 0,
+          "both_right": 201,
+          "both_wrong": 44,
+          "p_value": 0.0
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 128,
+          "b_right_a_wrong": 37,
+          "both_right": 440,
+          "both_wrong": 205,
+          "p_value": 0.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.8439,
+          "b": 0.7864,
+          "difference": 0.0575,
+          "ci95": [
+            0.0415,
+            0.0746
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8605,
+          "b": 0.7907,
+          "difference": 0.0698,
+          "ci95": [
+            0.0328,
+            0.1098
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.1544,
+          "b": 0.2947,
+          "difference": -0.1404,
+          "ci95": [
+            -0.1831,
+            -0.1015
+          ]
+        },
+        "priority_exact": {
+          "a": 0.7012,
+          "b": 0.5889,
+          "difference": 0.1123,
+          "ci95": [
+            0.0827,
+            0.1432
+          ]
+        },
+        "undertriage": {
+          "a": 0.1506,
+          "b": 0.316,
+          "difference": -0.1654,
+          "ci95": [
+            -0.1914,
+            -0.142
+          ]
+        },
+        "overtriage": {
+          "a": 0.1481,
+          "b": 0.0951,
+          "difference": 0.0531,
+          "ci95": [
+            0.0383,
+            0.0691
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e vs Hybrid B0+B1": {
+      "a": "Hybrid B0+B1e",
+      "b": "Hybrid B0+B1",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 285,
+          "a_right_b_wrong": 20,
+          "b_right_a_wrong": 7,
+          "both_right": 218,
+          "both_wrong": 40,
+          "p_value": 0.019157
+        },
+        "priority_exact": {
+          "cases": 810,
+          "a_right_b_wrong": 100,
+          "b_right_a_wrong": 29,
+          "both_right": 465,
+          "both_wrong": 216,
+          "p_value": 0.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.8493,
+          "b": 0.7614,
+          "difference": 0.0879,
+          "ci95": [
+            0.0726,
+            0.1034
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8605,
+          "b": 0.8605,
+          "difference": 0.0,
+          "ci95": [
+            -0.0329,
+            0.0311
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.1649,
+          "b": 0.2105,
+          "difference": -0.0456,
+          "ci95": [
+            -0.0815,
+            -0.0105
+          ]
+        },
+        "priority_exact": {
+          "a": 0.6975,
+          "b": 0.6099,
+          "difference": 0.0877,
+          "ci95": [
+            0.063,
+            0.1136
+          ]
+        },
+        "undertriage": {
+          "a": 0.1716,
+          "b": 0.2543,
+          "difference": -0.0827,
+          "ci95": [
+            -0.1049,
+            -0.0617
+          ]
+        },
+        "overtriage": {
+          "a": 0.1309,
+          "b": 0.1358,
+          "difference": -0.0049,
+          "ci95": [
+            -0.0222,
+            0.0136
+          ]
+        }
+      }
+    }
+  },
+  "b1_calibration": {
+    "pairs": 11340,
+    "positives": 699,
+    "brier": 0.0424,
+    "ece": 0.0871,
+    "aurc": 0.0161,
+    "risk_at": {
+      "50%": 0.0178,
+      "80%": 0.0198,
+      "100%": 0.0404
+    }
+  }
+}
