@@ -24,6 +24,7 @@ per call, CPU time and how many model candidates span verification rejected.
 
 import argparse
 import json
+import sys
 import time
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
@@ -480,6 +481,11 @@ def main() -> int:
     (args.out / f"{stem}.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     markdown = to_markdown(result)
     (args.out / f"{stem}.md").write_text(markdown, encoding="utf-8", newline="\n")
+    # The reports are written; a console that cannot encode "Δ" (Windows cp1252) must not
+    # turn a finished run into a failed one.
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if callable(reconfigure):
+        reconfigure(errors="replace")
     print(markdown)
     return 0
 
