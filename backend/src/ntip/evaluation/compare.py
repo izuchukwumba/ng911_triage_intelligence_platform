@@ -14,11 +14,17 @@ Every system is also compared with the rules case by case, and each extra
 model's hybrid with B1's (``ntip.evaluation.paired``: McNemar's exact test
 and paired bootstrap intervals).
 
-    python -m ntip.evaluation.compare --dataset ../data/eval/curated.jsonl --split test
+    python -m ntip.evaluation.compare --dataset ../data/eval/curated.jsonl --split test \\
+        --preregistration ../docs/evaluation/preregistration/<file>.md
+
+The test split is refused without a pre-registration (ML layer design 8.1); the
+report records that file's digest. Each system's report also records wall time
+per call, CPU time and how many model candidates span verification rejected.
 """
 
 import argparse
 import json
+import time
 from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -46,6 +52,7 @@ from ntip.ml.fusion import DEFAULT_FUSION_POLICY, fuse
 from ntip.ml.verify import verify
 from ntip.parser.parser import parse
 from ntip.schema.advisory import Assessment
+from ntip.schema.base import sha256_digest
 from ntip.schema.canonical import Incident, InferenceMode
 from ntip.schema.source import SourceEvent
 from ntip.triage.engine import assess
@@ -57,9 +64,20 @@ def _messages(messages: list[str]) -> list[InferenceMessage]:
     return [InferenceMessage(source_event_id=f"evt_{i}", text=m) for i, m in enumerate(messages, 1)]
 
 
+class ModelSystem:
+    """A model-backed system; counts candidates span verification rejected."""
+
+    def __init__(self, run: System) -> None:
+        self._run = run
+        self.rejected = 0
+
+    def __call__(self, messages: list[str]) -> tuple[Incident, Assessment]:
+        return self._run(messages)
+
+
 def model_system(
     model: ModelExtractor, *, model_only: bool, policy: str = DEFAULT_FUSION_POLICY
-) -> System:
+) -> ModelSystem:
     def run(messages: list[str]) -> tuple[Incident, Assessment]:
         sources = [
             SourceEvent.from_text(
@@ -72,6 +90,7 @@ def model_system(
             InferenceRequest(request_id="eval", incident_id="eval", messages=_messages(messages))
         )
         verified = verify(response, {s.source_event_id: s.text for s in sources})
+        system.rejected += len(verified.rejections)
         if model_only:
             rules = rules.model_copy(update={"observations": [], "conflicts": []})
         incident = fuse(
@@ -88,7 +107,8 @@ def model_system(
             incident = incident.model_copy(update={"conflicts": []})
         return incident, assess(incident, assessment_id="eval", assessed_at=FIXED_TIME)
 
-    return run
+    system = ModelSystem(run)
+    return system
 
 
 def _variants(case: EvalCase) -> list[str]:
@@ -120,6 +140,30 @@ def _slices(results: Sequence[Any], seed: int) -> dict[str, Any]:
 BASELINE = "B0 rules"
 
 
+def _latency(seconds: Sequence[float]) -> dict[str, Any]:
+    """Wall time per call, parser and triage included (machine-dependent)."""
+    if not seconds:
+        return {"p50_ms": None, "p95_ms": None}
+    ordered = sorted(seconds)
+
+    def at(q: float) -> float:
+        return round(1000 * ordered[min(len(ordered) - 1, int(q * len(ordered)))], 2)
+
+    return {"p50_ms": at(0.5), "p95_ms": at(0.95)}
+
+
+def preregistration_record(path: Path) -> dict[str, str]:
+    """The pre-registration a run follows: its path and digest (line endings normalised)."""
+    text = path.read_text("utf-8").replace("\r\n", "\n")
+    resolved = path.resolve()
+    shown = (
+        resolved.relative_to(REPO_ROOT).as_posix()
+        if resolved.is_relative_to(REPO_ROOT)
+        else path.name
+    )
+    return {"path": shown, "digest": sha256_digest(text)}
+
+
 def paired_comparisons(systems: Sequence[str], extra: Sequence[str]) -> list[tuple[str, str]]:
     """Every system against the rules, and each extra model's hybrid against B1's."""
     pairs = [(name, BASELINE) for name in systems if name != BASELINE]
@@ -141,6 +185,7 @@ def compare(
     *,
     seed: int = 20261109,
     extra_models: dict[str, ModelExtractor] | None = None,
+    preregistration: Path | None = None,
 ) -> dict[str, Any]:
     cases = dataset.split(*splits)
     relevant = rule_codes()
@@ -159,15 +204,30 @@ def compare(
         systems[f"Hybrid B0+{name} (fusion 2)"] = model_system(
             model, model_only=False, policy="2.0.0"
         )
+        ablate = getattr(model, "without_abstention", None)
+        if callable(ablate):
+            systems[f"Hybrid B0+{name} without abstention"] = model_system(
+                ablate(), model_only=False
+            )
     results: dict[str, Any] = {}
     counts: dict[str, list[CaseCounts]] = {}
     critical = critical_codes()
     for name, system in systems.items():
-        case_results = [evaluate_case(case, system, relevant) for case in cases]
+        case_results, seconds = [], []
+        cpu = time.process_time()
+        for case in cases:
+            started = time.perf_counter()
+            case_results.append(evaluate_case(case, system, relevant))
+            seconds.append(time.perf_counter() - started)
         metrics = score(case_results, seed=seed, critical=critical)
         results[name] = {
             "metrics": {k: v for k, v in metrics.items() if k != "failures"},
             "slices": _slices(case_results, seed),
+            "run": {
+                **_latency(seconds),
+                "cpu_seconds": round(time.process_time() - cpu, 2),
+                "span_verification_rejections": getattr(system, "rejected", None),
+            },
         }
         counts[name] = [case_counts(r, critical) for r in case_results]
 
@@ -191,6 +251,11 @@ def compare(
                 for name, model in (extra_models or {}).items()
             },
             "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
+            **(
+                {"preregistration": preregistration_record(preregistration)}
+                if preregistration
+                else {}
+            ),
         },
         "systems": results,
         "paired": {
@@ -216,6 +281,28 @@ def _diff(d: dict[str, Any]) -> str:
         return "n/a"
     ci = d["ci95"]
     return f"{d['difference']:+.3f}" + (f" [{ci[0]:+.3f}, {ci[1]:+.3f}]" if ci else "")
+
+
+def _run_markdown(systems: dict[str, Any]) -> list[str]:
+    if not any("run" in s for s in systems.values()):
+        return []
+    lines = [
+        "",
+        "## Run cost and verification",
+        "",
+        "Wall time per call on the machine that ran the report, parser and triage included.",
+        "",
+        "| System | p50 ms | p95 ms | CPU s | Candidates rejected by span verification |",
+        "|---|---|---|---|---|",
+    ]
+    for name, s in systems.items():
+        r = s.get("run", {})
+        rejected = r.get("span_verification_rejections")
+        lines.append(
+            f"| {name} | {r.get('p50_ms')} | {r.get('p95_ms')} | {r.get('cpu_seconds')} | "
+            f"{'n/a' if rejected is None else rejected} |"
+        )
+    return lines
 
 
 def _paired_markdown(paired: dict[str, Any]) -> list[str]:
@@ -289,7 +376,13 @@ def to_markdown(result: dict[str, Any]) -> str:
             + (f" (calibrated, T={x['calibration']['temperature']})" if "calibration" in x else "")
             for name, x in m.get("extra_models", {}).items()
         )
-        + f" · seed `{m['seed']}`",
+        + f" · seed `{m['seed']}`"
+        + (
+            f" · pre-registration `{m['preregistration']['path']}`"
+            f" `{m['preregistration']['digest']}`"
+            if "preregistration" in m
+            else ""
+        ),
         "",
         "| Metric | " + " | ".join(names) + " |",
         "|---" * (len(names) + 1) + "|",
@@ -307,6 +400,7 @@ def to_markdown(result: dict[str, Any]) -> str:
         f"ECE {cal['ece']}, AURC {cal['aurc']}, selective risk {cal['risk_at']}.",
     ]
     lines += _paired_markdown(result.get("paired", {}))
+    lines += _run_markdown(result["systems"])
     slice_names = sorted({s for n in names for s in result["systems"][n]["slices"]})
     if slice_names:
         header = "| Slice | " + " | ".join(names) + " |"
@@ -347,8 +441,19 @@ def main() -> int:
         metavar="FILE",
         help="apply this calibration file to B1e (from python -m ntip.ml.calibrate)",
     )
+    parser.add_argument(
+        "--preregistration",
+        type=Path,
+        metavar="FILE",
+        help="the pre-registration this run follows (required for the test split)",
+    )
     args = parser.parse_args()
     splits = [Split(s) for s in (args.split or ["test"])]
+    if Split.TEST in splits and args.preregistration is None:
+        parser.error(
+            "the test split is run only under a pre-registration "
+            "(docs/evaluation/preregistration/): pass --preregistration FILE"
+        )
     extra: dict[str, ModelExtractor] = {}
     if args.with_b1e:
         from ntip.ml.b1e import B1eModel
@@ -358,7 +463,12 @@ def main() -> int:
         from ntip.ml.b2 import B2Model
 
         extra["B2"] = B2Model()
-    result = compare(load_dataset(args.dataset), splits, extra_models=extra)
+    result = compare(
+        load_dataset(args.dataset),
+        splits,
+        extra_models=extra,
+        preregistration=args.preregistration,
+    )
     stem = f"compare-{args.dataset.stem.split('-')[0]}-{'-'.join(splits)}"
     # Reports with an extra model are named after it, so they never overwrite the B0/B1 report.
     stem += "".join(
