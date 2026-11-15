@@ -108,6 +108,16 @@ training and test, but not in both training splits. That broke calibrating
 a dev-trained B1e on regression (results README, the first calibration
 attempt). See its [card](cards/generated-2.2.0-seed42.md).
 
+## `challenge-1.0.0.jsonl`
+
+70 hand-written calls, all in the **test** split, built to mislead: ten each
+of negation, past and hypothetical events, hearsay, figurative language,
+noisy text and Spanish, compound calls, and adversarial text such as
+instructions aimed at the system. It exists for the pre-registered
+comparison (ML-10) and must never be used for training, calibration or
+changing the rules. No system was run on it before that comparison. See its
+[card](cards/challenge-1.0.0.md).
+
 ## Running
 
 ```sh
