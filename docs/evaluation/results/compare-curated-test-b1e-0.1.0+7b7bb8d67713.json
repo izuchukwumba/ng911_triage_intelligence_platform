@@ -1,0 +1,3153 @@
+{
+  "manifest": {
+    "system": "comparison",
+    "git_commit": "7e580895f3a0a10dd00be4dba13112a371f1d62e",
+    "dataset": {
+      "path": "data/eval/curated.jsonl",
+      "digest": "sha256:6694a761e9861011c85e9cacd4d065099f36778aed82c6c341833c5b688c26f7",
+      "splits": [
+        "test"
+      ]
+    },
+    "parser": "rules-parser-1.5.0",
+    "engine": "triage-engine-1.2.0",
+    "ruleset": {
+      "name": "research-1.2.0",
+      "digest": "sha256:69fdb910c1a9f4ec5a0672482cd39352683d9778cffd706c694efcb48b4e44b2"
+    },
+    "schema_version": "2.7.0",
+    "python": "3.12.10",
+    "lockfile_digest": "sha256:9a0736a7c87bec1d86d14dc5fd57d431c56995a9dcda3735c04da78de223f020",
+    "seed": 20261109,
+    "bootstrap": "percentile, 2000 resamples, 95%",
+    "b1_model_version": "1.0.0+f764c2172d5a",
+    "b1_training_digest": "sha256:a064e9dbe885a3448314e654c2650c7e20b6e200c29c1b26c45f1bea9b045555",
+    "extra_models": {
+      "B1e": {
+        "model_id": "b1e-encoder",
+        "model_version": "0.1.0+7b7bb8d67713"
+      }
+    },
+    "generated_at": "2026-11-15T07:08:29+00:00",
+    "preregistration": {
+      "path": "docs/evaluation/preregistration/ml-10-frozen-comparison.md",
+      "digest": "sha256:f5f5013b2ff11209fbc5cf43a268530c361a369d64786e5fb7610df2dbec05b4"
+    }
+  },
+  "systems": {
+    "B0 rules": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 36,
+            "fp": 0,
+            "fn": 3,
+            "precision": 1.0,
+            "recall": 0.9231,
+            "f1": 0.96,
+            "f1_ci95": [
+              0.9143,
+              1.0
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "CHILD_INVOLVED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "DROWNING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_SPREADING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75
+            },
+            "NOT_BREATHING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "UNCONSCIOUS": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "WEAPON_PRESENT": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 0
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8571,
+          "numerator": 6,
+          "denominator": 7,
+          "ci95": [
+            0.5714,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.2222,
+          "numerator": 2,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0.5556
+          ],
+          "cases": [
+            "fx-019",
+            "cu-118"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.8,
+          "numerator": 16,
+          "denominator": 20,
+          "ci95": [
+            0.6,
+            0.95
+          ]
+        },
+        "undertriage": {
+          "value": 0.1,
+          "numerator": 2,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "overtriage": {
+          "value": 0.1,
+          "numerator": 2,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "severity_exact": {
+          "value": 0.8,
+          "numerator": 16,
+          "denominator": 20,
+          "ci95": [
+            0.6,
+            0.95
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 7,
+            "P1": 2,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 0,
+            "P1": 7,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 1,
+            "P1": 0,
+            "P2": 2,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 1,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 1.04,
+        "p95_ms": 23.84,
+        "cpu_seconds": 0.11,
+        "span_verification_rejections": null
+      }
+    },
+    "B1 only": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 24,
+            "fp": 10,
+            "fn": 15,
+            "precision": 0.7059,
+            "recall": 0.6154,
+            "f1": 0.6575,
+            "f1_ci95": [
+              0.5714,
+              0.7368
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 2,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "CHILD_INVOLVED": {
+              "tp": 1,
+              "fp": 1,
+              "fn": 2,
+              "precision": 0.5,
+              "recall": 0.3333,
+              "f1": 0.4
+            },
+            "DROWNING": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8889
+            },
+            "FIRE_SPREADING": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 4,
+              "fn": 0,
+              "precision": 0.2,
+              "recall": 1.0,
+              "f1": 0.3333
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 4,
+              "fp": 1,
+              "fn": 1,
+              "precision": 0.8,
+              "recall": 0.8,
+              "f1": 0.8
+            },
+            "NOT_BREATHING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 2,
+              "fn": 0,
+              "precision": 0.6,
+              "recall": 1.0,
+              "f1": 0.75
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "UNCONSCIOUS": {
+              "tp": 0,
+              "fp": 1,
+              "fn": 2,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0
+            },
+            "WEAPON_PRESENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 1
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.5714,
+          "numerator": 4,
+          "denominator": 7,
+          "ci95": [
+            0.1429,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.3333,
+          "numerator": 3,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0.6667
+          ],
+          "cases": [
+            "fx-005",
+            "cu-112",
+            "cu-118"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.55,
+          "numerator": 11,
+          "denominator": 20,
+          "ci95": [
+            0.35,
+            0.75
+          ]
+        },
+        "undertriage": {
+          "value": 0.3,
+          "numerator": 6,
+          "denominator": 20,
+          "ci95": [
+            0.1,
+            0.5
+          ]
+        },
+        "overtriage": {
+          "value": 0.15,
+          "numerator": 3,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.3
+          ]
+        },
+        "severity_exact": {
+          "value": 0.55,
+          "numerator": 11,
+          "denominator": 20,
+          "ci95": [
+            0.35,
+            0.75
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 6,
+            "P1": 2,
+            "P2": 1,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 1,
+            "P1": 3,
+            "P2": 1,
+            "P3": 2,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 2,
+            "P1": 0,
+            "P2": 1,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 1,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 4.76,
+        "p95_ms": 10.56,
+        "cpu_seconds": 0.16,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 38,
+            "fp": 10,
+            "fn": 1,
+            "precision": 0.7917,
+            "recall": 0.9744,
+            "f1": 0.8736,
+            "f1_ci95": [
+              0.7912,
+              0.95
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "CHILD_INVOLVED": {
+              "tp": 3,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571
+            },
+            "DROWNING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8889
+            },
+            "FIRE_SPREADING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 4,
+              "fn": 0,
+              "precision": 0.2,
+              "recall": 1.0,
+              "f1": 0.3333
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 5,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.8333,
+              "recall": 1.0,
+              "f1": 0.9091
+            },
+            "NOT_BREATHING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 2,
+              "fn": 0,
+              "precision": 0.6,
+              "recall": 1.0,
+              "f1": 0.75
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "UNCONSCIOUS": {
+              "tp": 2,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8
+            },
+            "WEAPON_PRESENT": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 1
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8571,
+          "numerator": 6,
+          "denominator": 7,
+          "ci95": [
+            0.5714,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0
+          ],
+          "cases": []
+        },
+        "priority_exact": {
+          "value": 0.8,
+          "numerator": 16,
+          "denominator": 20,
+          "ci95": [
+            0.6,
+            0.95
+          ]
+        },
+        "undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0
+          ]
+        },
+        "overtriage": {
+          "value": 0.2,
+          "numerator": 4,
+          "denominator": 20,
+          "ci95": [
+            0.05,
+            0.4
+          ]
+        },
+        "severity_exact": {
+          "value": 0.8,
+          "numerator": 16,
+          "denominator": 20,
+          "ci95": [
+            0.6,
+            0.95
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 9,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 1,
+            "P1": 6,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 2,
+            "P1": 0,
+            "P2": 1,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 1,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 5.62,
+        "p95_ms": 7.26,
+        "cpu_seconds": 0.19,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid without abstention": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 38,
+            "fp": 19,
+            "fn": 1,
+            "precision": 0.6667,
+            "recall": 0.9744,
+            "f1": 0.7917,
+            "f1_ci95": [
+              0.6981,
+              0.8696
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "CHILD_INVOLVED": {
+              "tp": 3,
+              "fp": 4,
+              "fn": 0,
+              "precision": 0.4286,
+              "recall": 1.0,
+              "f1": 0.6
+            },
+            "DROWNING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.8,
+              "recall": 1.0,
+              "f1": 0.8889
+            },
+            "FIRE_SPREADING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 5,
+              "fn": 0,
+              "precision": 0.1667,
+              "recall": 1.0,
+              "f1": 0.2857
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 5,
+              "fp": 3,
+              "fn": 0,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692
+            },
+            "NOT_BREATHING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 2,
+              "fn": 0,
+              "precision": 0.6,
+              "recall": 1.0,
+              "f1": 0.75
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 2,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "UNCONSCIOUS": {
+              "tp": 2,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8
+            },
+            "WEAPON_PRESENT": {
+              "tp": 3,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 1
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8571,
+          "numerator": 6,
+          "denominator": 7,
+          "ci95": [
+            0.5714,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0
+          ],
+          "cases": []
+        },
+        "priority_exact": {
+          "value": 0.75,
+          "numerator": 15,
+          "denominator": 20,
+          "ci95": [
+            0.55,
+            0.9
+          ]
+        },
+        "undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0
+          ]
+        },
+        "overtriage": {
+          "value": 0.25,
+          "numerator": 5,
+          "denominator": 20,
+          "ci95": [
+            0.1,
+            0.45
+          ]
+        },
+        "severity_exact": {
+          "value": 0.75,
+          "numerator": 15,
+          "denominator": 20,
+          "ci95": [
+            0.55,
+            0.9
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 9,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 2,
+            "P1": 5,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 2,
+            "P1": 0,
+            "P2": 1,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 1,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 5.08,
+        "p95_ms": 8.28,
+        "cpu_seconds": 0.16,
+        "span_verification_rejections": 0
+      }
+    },
+    "B1e only": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 27,
+            "fp": 3,
+            "fn": 12,
+            "precision": 0.9,
+            "recall": 0.6923,
+            "f1": 0.7826,
+            "f1_ci95": [
+              0.6667,
+              0.8857
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 2,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "CHILDBIRTH": {
+              "tp": 0,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null
+            },
+            "CHILD_INVOLVED": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "DROWNING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_SPREADING": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6667
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 4,
+              "precision": 1.0,
+              "recall": 0.2,
+              "f1": 0.3333
+            },
+            "NOT_BREATHING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OVERDOSE": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.5,
+              "f1": 0.6667
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "UNCONSCIOUS": {
+              "tp": 1,
+              "fp": 1,
+              "fn": 1,
+              "precision": 0.5,
+              "recall": 0.5,
+              "f1": 0.5
+            },
+            "WEAPON_PRESENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.6667,
+              "f1": 0.8
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 1
+        },
+        "critical_cue_sensitivity": {
+          "value": 0.8571,
+          "numerator": 6,
+          "denominator": 7,
+          "ci95": [
+            0.5714,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.2222,
+          "numerator": 2,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0.5556
+          ],
+          "cases": [
+            "fx-016",
+            "cu-113"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.75,
+          "numerator": 15,
+          "denominator": 20,
+          "ci95": [
+            0.55,
+            0.9
+          ]
+        },
+        "undertriage": {
+          "value": 0.15,
+          "numerator": 3,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.3
+          ]
+        },
+        "overtriage": {
+          "value": 0.1,
+          "numerator": 2,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "severity_exact": {
+          "value": 0.75,
+          "numerator": 15,
+          "denominator": 20,
+          "ci95": [
+            0.55,
+            0.9
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 7,
+            "P1": 1,
+            "P2": 1,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 0,
+            "P1": 6,
+            "P2": 0,
+            "P3": 1,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 1,
+            "P1": 0,
+            "P2": 2,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 1,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 23.19,
+        "p95_ms": 118.43,
+        "cpu_seconds": 8.69,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1e": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 38,
+            "fp": 3,
+            "fn": 1,
+            "precision": 0.9268,
+            "recall": 0.9744,
+            "f1": 0.95,
+            "f1_ci95": [
+              0.8916,
+              1.0
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "CHILDBIRTH": {
+              "tp": 0,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null
+            },
+            "CHILD_INVOLVED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "DROWNING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_SPREADING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6667
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.8,
+              "f1": 0.8889
+            },
+            "NOT_BREATHING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "UNCONSCIOUS": {
+              "tp": 2,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8
+            },
+            "WEAPON_PRESENT": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 1
+        },
+        "critical_cue_sensitivity": {
+          "value": 1.0,
+          "numerator": 7,
+          "denominator": 7,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0
+          ],
+          "cases": []
+        },
+        "priority_exact": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0
+          ]
+        },
+        "overtriage": {
+          "value": 0.1,
+          "numerator": 2,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "severity_exact": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 9,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 0,
+            "P1": 7,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 1,
+            "P1": 0,
+            "P2": 2,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 1,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 35.24,
+        "p95_ms": 70.72,
+        "cpu_seconds": 9.44,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1e (fusion 2)": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 37,
+            "fp": 1,
+            "fn": 2,
+            "precision": 0.9737,
+            "recall": 0.9487,
+            "f1": 0.961,
+            "f1_ci95": [
+              0.9189,
+              1.0
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "CHILD_INVOLVED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "DROWNING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_SPREADING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 2,
+              "precision": 1.0,
+              "recall": 0.6,
+              "f1": 0.75
+            },
+            "NOT_BREATHING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "UNCONSCIOUS": {
+              "tp": 2,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8
+            },
+            "WEAPON_PRESENT": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 0
+        },
+        "critical_cue_sensitivity": {
+          "value": 1.0,
+          "numerator": 7,
+          "denominator": 7,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.1111,
+          "numerator": 1,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0.3333
+          ],
+          "cases": [
+            "cu-118"
+          ]
+        },
+        "priority_exact": {
+          "value": 0.85,
+          "numerator": 17,
+          "denominator": 20,
+          "ci95": [
+            0.65,
+            1.0
+          ]
+        },
+        "undertriage": {
+          "value": 0.05,
+          "numerator": 1,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.15
+          ]
+        },
+        "overtriage": {
+          "value": 0.1,
+          "numerator": 2,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "severity_exact": {
+          "value": 0.85,
+          "numerator": 17,
+          "denominator": 20,
+          "ci95": [
+            0.65,
+            1.0
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 8,
+            "P1": 1,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 0,
+            "P1": 7,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 1,
+            "P1": 0,
+            "P2": 2,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 0,
+            "P1": 1,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 29.96,
+        "p95_ms": 50.27,
+        "cpu_seconds": 8.73,
+        "span_verification_rejections": 0
+      }
+    },
+    "Hybrid B0+B1e without abstention": {
+      "metrics": {
+        "cases": 20,
+        "cue_extraction": {
+          "micro": {
+            "tp": 38,
+            "fp": 4,
+            "fn": 1,
+            "precision": 0.9048,
+            "recall": 0.9744,
+            "f1": 0.9383,
+            "f1_ci95": [
+              0.878,
+              0.9873
+            ]
+          },
+          "per_code": {
+            "ACTIVE_BLEEDING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "ACTIVE_VIOLENCE": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "CHILDBIRTH": {
+              "tp": 0,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null
+            },
+            "CHILD_INVOLVED": {
+              "tp": 3,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.75,
+              "recall": 1.0,
+              "f1": 0.8571
+            },
+            "DROWNING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "EXPLOSION_REPORTED": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_REPORTED": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "FIRE_SPREADING": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "HAZARDOUS_ENVIRONMENT": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "INJURY_REPORTED": {
+              "tp": 1,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6667
+            },
+            "MULTIPLE_VICTIMS": {
+              "tp": 4,
+              "fp": 0,
+              "fn": 1,
+              "precision": 1.0,
+              "recall": 0.8,
+              "f1": 0.8889
+            },
+            "NOT_BREATHING": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OCCUPANTS_TRAPPED": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "OVERDOSE": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SEIZURE": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "SMOKE_REPORTED": {
+              "tp": 2,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "STROKE_SYMPTOMS": {
+              "tp": 1,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            },
+            "UNCONSCIOUS": {
+              "tp": 2,
+              "fp": 1,
+              "fn": 0,
+              "precision": 0.6667,
+              "recall": 1.0,
+              "f1": 0.8
+            },
+            "WEAPON_PRESENT": {
+              "tp": 3,
+              "fp": 0,
+              "fn": 0,
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0
+            }
+          },
+          "denied_or_past_cues_treated_as_live": 1
+        },
+        "critical_cue_sensitivity": {
+          "value": 1.0,
+          "numerator": 7,
+          "denominator": 7,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "critical_undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 9,
+          "ci95": [
+            0.0,
+            0
+          ],
+          "cases": []
+        },
+        "priority_exact": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "undertriage": {
+          "value": 0.0,
+          "numerator": 0,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0
+          ]
+        },
+        "overtriage": {
+          "value": 0.1,
+          "numerator": 2,
+          "denominator": 20,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "severity_exact": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "domain_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "location_accuracy": {
+          "value": 1.0,
+          "numerator": 20,
+          "denominator": 20,
+          "ci95": [
+            1.0,
+            1.0
+          ]
+        },
+        "victim_count_accuracy": {
+          "value": 0.9,
+          "numerator": 18,
+          "denominator": 20,
+          "ci95": [
+            0.75,
+            1.0
+          ]
+        },
+        "priority_confusion": {
+          "P0": {
+            "P0": 9,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P1": {
+            "P0": 0,
+            "P1": 7,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P2": {
+            "P0": 1,
+            "P1": 0,
+            "P2": 2,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P3": {
+            "P0": 1,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "P4": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          },
+          "none": {
+            "P0": 0,
+            "P1": 0,
+            "P2": 0,
+            "P3": 0,
+            "P4": 0,
+            "none": 0
+          }
+        }
+      },
+      "slices": {},
+      "run": {
+        "p50_ms": 24.82,
+        "p95_ms": 52.74,
+        "cpu_seconds": 8.55,
+        "span_verification_rejections": 0
+      }
+    }
+  },
+  "paired": {
+    "B1 only vs B0 rules": {
+      "a": "B1 only",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 1,
+          "b_right_a_wrong": 2,
+          "both_right": 5,
+          "both_wrong": 1,
+          "p_value": 1.0
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 7,
+          "both_right": 9,
+          "both_wrong": 2,
+          "p_value": 0.179688
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.6575,
+          "b": 0.96,
+          "difference": -0.3025,
+          "ci95": [
+            -0.3886,
+            -0.2263
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.5714,
+          "b": 0.8571,
+          "difference": -0.2857,
+          "ci95": [
+            -0.6667,
+            0.0
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.3333,
+          "b": 0.2222,
+          "difference": 0.1111,
+          "ci95": [
+            -0.2857,
+            0.5
+          ]
+        },
+        "priority_exact": {
+          "a": 0.55,
+          "b": 0.8,
+          "difference": -0.25,
+          "ci95": [
+            -0.5,
+            0.05
+          ]
+        },
+        "undertriage": {
+          "a": 0.3,
+          "b": 0.1,
+          "difference": 0.2,
+          "ci95": [
+            -0.05,
+            0.4
+          ]
+        },
+        "overtriage": {
+          "a": 0.15,
+          "b": 0.1,
+          "difference": 0.05,
+          "ci95": [
+            -0.1,
+            0.25
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1 vs B0 rules": {
+      "a": "Hybrid B0+B1",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 0,
+          "both_right": 7,
+          "both_wrong": 0,
+          "p_value": 0.5
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 2,
+          "both_right": 14,
+          "both_wrong": 2,
+          "p_value": 1.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.8736,
+          "b": 0.96,
+          "difference": -0.0864,
+          "ci95": [
+            -0.1552,
+            -0.014
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8571,
+          "b": 0.8571,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.0,
+          "b": 0.2222,
+          "difference": -0.2222,
+          "ci95": [
+            -0.5556,
+            0.0
+          ]
+        },
+        "priority_exact": {
+          "a": 0.8,
+          "b": 0.8,
+          "difference": 0.0,
+          "ci95": [
+            -0.2,
+            0.2
+          ]
+        },
+        "undertriage": {
+          "a": 0.0,
+          "b": 0.1,
+          "difference": -0.1,
+          "ci95": [
+            -0.25,
+            0.0
+          ]
+        },
+        "overtriage": {
+          "a": 0.2,
+          "b": 0.1,
+          "difference": 0.1,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        }
+      }
+    },
+    "Hybrid without abstention vs B0 rules": {
+      "a": "Hybrid without abstention",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 0,
+          "both_right": 7,
+          "both_wrong": 0,
+          "p_value": 0.5
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 3,
+          "both_right": 13,
+          "both_wrong": 2,
+          "p_value": 1.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.7917,
+          "b": 0.96,
+          "difference": -0.1683,
+          "ci95": [
+            -0.2519,
+            -0.0814
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8571,
+          "b": 0.8571,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.0,
+          "b": 0.2222,
+          "difference": -0.2222,
+          "ci95": [
+            -0.5556,
+            0.0
+          ]
+        },
+        "priority_exact": {
+          "a": 0.75,
+          "b": 0.8,
+          "difference": -0.05,
+          "ci95": [
+            -0.25,
+            0.15
+          ]
+        },
+        "undertriage": {
+          "a": 0.0,
+          "b": 0.1,
+          "difference": -0.1,
+          "ci95": [
+            -0.25,
+            0.0
+          ]
+        },
+        "overtriage": {
+          "a": 0.25,
+          "b": 0.1,
+          "difference": 0.15,
+          "ci95": [
+            0.0,
+            0.3
+          ]
+        }
+      }
+    },
+    "B1e only vs B0 rules": {
+      "a": "B1e only",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 2,
+          "both_right": 5,
+          "both_wrong": 0,
+          "p_value": 1.0
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 3,
+          "both_right": 13,
+          "both_wrong": 2,
+          "p_value": 1.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.7826,
+          "b": 0.96,
+          "difference": -0.1774,
+          "ci95": [
+            -0.2911,
+            -0.07
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 0.8571,
+          "b": 0.8571,
+          "difference": 0.0,
+          "ci95": [
+            -0.4,
+            0.4286
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.2222,
+          "b": 0.2222,
+          "difference": 0.0,
+          "ci95": [
+            -0.4444,
+            0.4444
+          ]
+        },
+        "priority_exact": {
+          "a": 0.75,
+          "b": 0.8,
+          "difference": -0.05,
+          "ci95": [
+            -0.25,
+            0.15
+          ]
+        },
+        "undertriage": {
+          "a": 0.15,
+          "b": 0.1,
+          "difference": 0.05,
+          "ci95": [
+            -0.15,
+            0.25
+          ]
+        },
+        "overtriage": {
+          "a": 0.1,
+          "b": 0.1,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e vs B0 rules": {
+      "a": "Hybrid B0+B1e",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 0,
+          "both_right": 7,
+          "both_wrong": 0,
+          "p_value": 0.5
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 0,
+          "both_right": 16,
+          "both_wrong": 2,
+          "p_value": 0.5
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.95,
+          "b": 0.96,
+          "difference": -0.01,
+          "ci95": [
+            -0.0499,
+            0.0312
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 1.0,
+          "b": 0.8571,
+          "difference": 0.1429,
+          "ci95": [
+            0.0,
+            0.4444
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.0,
+          "b": 0.2222,
+          "difference": -0.2222,
+          "ci95": [
+            -0.5556,
+            0.0
+          ]
+        },
+        "priority_exact": {
+          "a": 0.9,
+          "b": 0.8,
+          "difference": 0.1,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "undertriage": {
+          "a": 0.0,
+          "b": 0.1,
+          "difference": -0.1,
+          "ci95": [
+            -0.25,
+            0.0
+          ]
+        },
+        "overtriage": {
+          "a": 0.1,
+          "b": 0.1,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e (fusion 2) vs B0 rules": {
+      "a": "Hybrid B0+B1e (fusion 2)",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 1,
+          "b_right_a_wrong": 0,
+          "both_right": 7,
+          "both_wrong": 1,
+          "p_value": 1.0
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 1,
+          "b_right_a_wrong": 0,
+          "both_right": 16,
+          "both_wrong": 3,
+          "p_value": 1.0
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.961,
+          "b": 0.96,
+          "difference": 0.001,
+          "ci95": [
+            0.0,
+            0.0064
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 1.0,
+          "b": 0.8571,
+          "difference": 0.1429,
+          "ci95": [
+            0.0,
+            0.4444
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.1111,
+          "b": 0.2222,
+          "difference": -0.1111,
+          "ci95": [
+            -0.375,
+            0.0
+          ]
+        },
+        "priority_exact": {
+          "a": 0.85,
+          "b": 0.8,
+          "difference": 0.05,
+          "ci95": [
+            0.0,
+            0.15
+          ]
+        },
+        "undertriage": {
+          "a": 0.05,
+          "b": 0.1,
+          "difference": -0.05,
+          "ci95": [
+            -0.15,
+            0.0
+          ]
+        },
+        "overtriage": {
+          "a": 0.1,
+          "b": 0.1,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e without abstention vs B0 rules": {
+      "a": "Hybrid B0+B1e without abstention",
+      "b": "B0 rules",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 0,
+          "both_right": 7,
+          "both_wrong": 0,
+          "p_value": 0.5
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 0,
+          "both_right": 16,
+          "both_wrong": 2,
+          "p_value": 0.5
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.9383,
+          "b": 0.96,
+          "difference": -0.0217,
+          "ci95": [
+            -0.0684,
+            0.0249
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 1.0,
+          "b": 0.8571,
+          "difference": 0.1429,
+          "ci95": [
+            0.0,
+            0.4444
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.0,
+          "b": 0.2222,
+          "difference": -0.2222,
+          "ci95": [
+            -0.5556,
+            0.0
+          ]
+        },
+        "priority_exact": {
+          "a": 0.9,
+          "b": 0.8,
+          "difference": 0.1,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "undertriage": {
+          "a": 0.0,
+          "b": 0.1,
+          "difference": -0.1,
+          "ci95": [
+            -0.25,
+            0.0
+          ]
+        },
+        "overtriage": {
+          "a": 0.1,
+          "b": 0.1,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "Hybrid B0+B1e vs Hybrid B0+B1": {
+      "a": "Hybrid B0+B1e",
+      "b": "Hybrid B0+B1",
+      "mcnemar": {
+        "critical_calls_given_p0": {
+          "cases": 9,
+          "a_right_b_wrong": 0,
+          "b_right_a_wrong": 0,
+          "both_right": 9,
+          "both_wrong": 0,
+          "p_value": 1.0
+        },
+        "priority_exact": {
+          "cases": 20,
+          "a_right_b_wrong": 2,
+          "b_right_a_wrong": 0,
+          "both_right": 16,
+          "both_wrong": 2,
+          "p_value": 0.5
+        }
+      },
+      "differences": {
+        "cue_micro_f1": {
+          "a": 0.95,
+          "b": 0.8736,
+          "difference": 0.0764,
+          "ci95": [
+            0.0353,
+            0.1167
+          ]
+        },
+        "critical_cue_sensitivity": {
+          "a": 1.0,
+          "b": 0.8571,
+          "difference": 0.1429,
+          "ci95": [
+            0.0,
+            0.4444
+          ]
+        },
+        "critical_undertriage": {
+          "a": 0.0,
+          "b": 0.0,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "priority_exact": {
+          "a": 0.9,
+          "b": 0.8,
+          "difference": 0.1,
+          "ci95": [
+            0.0,
+            0.25
+          ]
+        },
+        "undertriage": {
+          "a": 0.0,
+          "b": 0.0,
+          "difference": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "overtriage": {
+          "a": 0.1,
+          "b": 0.2,
+          "difference": -0.1,
+          "ci95": [
+            -0.25,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "b1_calibration": {
+    "pairs": 280,
+    "positives": 33,
+    "brier": 0.052,
+    "ece": 0.0659,
+    "aurc": 0.009,
+    "risk_at": {
+      "50%": 0.0,
+      "80%": 0.0179,
+      "100%": 0.0679
+    }
+  }
+}

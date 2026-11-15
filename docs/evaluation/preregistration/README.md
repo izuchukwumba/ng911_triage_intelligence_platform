@@ -9,4 +9,4 @@ split without one.
 
 | File | Comparison | Status |
 |---|---|---|
-| [ml-10-frozen-comparison.md](ml-10-frozen-comparison.md) | ML-10: B0, B1, B1e and hybrids on the generated, curated and challenge test splits | Registered |
+| [ml-10-frozen-comparison.md](ml-10-frozen-comparison.md) | ML-10: B0, B1, B1e and hybrids on the generated, curated and challenge test splits | Run once at `7e58089`; [results](../results/README.md#ml-10-pre-registered-frozen-comparison-on-the-test-splits): H1 to H5 pass, H6 (latency target) missed |

@@ -400,3 +400,38 @@ rules' 48), but it also has by far the least under-triage (123 against 313).
 priority" as critical, rather than a fixed code list. Calibration is worth
 retrying once adjudicated labels exist (ML-11) or B1e trains on much more
 varied data.
+
+## DDL-023: Hybrid B0+B1e under fusion 1.0.0 is the reference ML configuration
+
+**Decision:** the hybrid of the rules and B1e `0.1.0+7b7bb8d67713`, under
+fusion policy 1.0.0 and without calibration, is the platform's reference ML
+configuration. Later milestones compare against it: ML-11 repeats ML-10
+against adjudicated labels. The platform's default inference mode does not
+change. A model still runs only when an operator selects it, and every
+model cue is shown as model-extracted for review.
+
+**Evidence:** the pre-registered ML-10 comparison
+([pre-registration](../evaluation/preregistration/ml-10-frozen-comparison.md),
+[results](../evaluation/results/README.md#ml-10-pre-registered-frozen-comparison-on-the-test-splits)),
+run once on three test sets:
+- **Primary data:** 810 generator 2.2 test calls from families no model
+  trained on, 285 of them P0. Against the rules alone, the hybrid:
+  - misses 47 P0 calls instead of 84 (McNemar 37 to 0);
+  - raises cue F1 from 0.786 to 0.849;
+  - over-triages 106 calls instead of 77.
+
+  It also beats the B1 hybrid on P0 calls (20 to 7, p = 0.019).
+- **H1 to H5 pass, including the ML-4 safety gate** on every test set. H6,
+  a p95 latency target of 150 ms, is missed as measured (185 ms; median
+  24 ms).
+
+**Limits:**
+- **Challenge set:** written to mislead. There the hybrid reports three
+  times as many denied or past cues as live, and its cue F1 is below the
+  rules'. Its critical under-triage is still lower.
+- **Labels:** all labels come from the generator or the author.
+- **Status:** none of this is a claim about real calls.
+
+**Revisit when:** ML-11 (adjudicated labels) disagrees, a retrained B1e is
+compared under a new pre-registration, or a fusion policy targets the
+challenge set's denial and past-tense errors.
