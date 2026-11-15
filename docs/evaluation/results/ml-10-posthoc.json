@@ -1,0 +1,1248 @@
+{
+  "kind": "exploratory post-hoc analysis of the ML-10 frozen comparison",
+  "preregistration": {
+    "path": "docs/evaluation/preregistration/ml-10-frozen-comparison.md",
+    "digest": "sha256:f5f5013b2ff11209fbc5cf43a268530c361a369d64786e5fb7610df2dbec05b4"
+  },
+  "systems": [
+    "B0 rules",
+    "Hybrid B0+B1",
+    "B1e only",
+    "Hybrid B0+B1e",
+    "Hybrid B0+B1 (refit on generator 2.2)"
+  ],
+  "datasets": {
+    "generated": {
+      "dataset": "data/eval/generated-2.2.0-seed42.jsonl",
+      "digest": "sha256:fc839b30cf1a8863d9689ae677f4dc94c666a8274889a53fbadc40e234394858",
+      "calls": 810,
+      "families": 27,
+      "p0_families": 19,
+      "reproduction": {
+        "archived_report": "compare-generated-test-b1e-0.1.0+7b7bb8d67713.json",
+        "matches": true,
+        "differences": []
+      },
+      "per_system": {
+        "B0 rules": {
+          "critical_undertriage": 84,
+          "overtriage": 77,
+          "cue_f1": 0.7864,
+          "denied_or_past_live": 23,
+          "screening": {
+            "p0_labelled": 285,
+            "false_p0": 0,
+            "false_p0_from": {},
+            "sensitivity": 0.7053,
+            "false_positive_rate": 0.0,
+            "ppv_at_prevalence": {
+              "0.35": 1.0,
+              "0.1": 1.0,
+              "0.05": 1.0
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 18,
+            "over: cues right (rubric/engine)": 59,
+            "under: cue error": 256
+          }
+        },
+        "Hybrid B0+B1": {
+          "critical_undertriage": 60,
+          "overtriage": 110,
+          "cue_f1": 0.7614,
+          "denied_or_past_live": 43,
+          "screening": {
+            "p0_labelled": 285,
+            "false_p0": 22,
+            "false_p0_from": {
+              "P1": 17,
+              "P2": 5
+            },
+            "sensitivity": 0.7895,
+            "false_positive_rate": 0.0419,
+            "ppv_at_prevalence": {
+              "0.35": 0.9103,
+              "0.1": 0.6767,
+              "0.05": 0.4979
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 71,
+            "over: cues right (rubric/engine)": 39,
+            "under: cue error": 206
+          }
+        },
+        "B1e only": {
+          "critical_undertriage": 133,
+          "overtriage": 99,
+          "cue_f1": 0.7102,
+          "denied_or_past_live": 20,
+          "screening": {
+            "p0_labelled": 285,
+            "false_p0": 25,
+            "false_p0_from": {
+              "P4": 3,
+              "P1": 14,
+              "P2": 8
+            },
+            "sensitivity": 0.5333,
+            "false_positive_rate": 0.0476,
+            "ppv_at_prevalence": {
+              "0.35": 0.8578,
+              "0.1": 0.5545,
+              "0.05": 0.3709
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 42,
+            "over: cues right (rubric/engine)": 57,
+            "under: cue error": 314,
+            "under: cues right (rubric/engine)": 8
+          }
+        },
+        "Hybrid B0+B1e": {
+          "critical_undertriage": 47,
+          "overtriage": 106,
+          "cue_f1": 0.8493,
+          "denied_or_past_live": 36,
+          "screening": {
+            "p0_labelled": 285,
+            "false_p0": 31,
+            "false_p0_from": {
+              "P1": 20,
+              "P4": 3,
+              "P2": 8
+            },
+            "sensitivity": 0.8351,
+            "false_positive_rate": 0.059,
+            "ppv_at_prevalence": {
+              "0.35": 0.8839,
+              "0.1": 0.6111,
+              "0.05": 0.4267
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 54,
+            "over: cues right (rubric/engine)": 52,
+            "under: cue error": 139
+          }
+        },
+        "Hybrid B0+B1 (refit on generator 2.2)": {
+          "critical_undertriage": 55,
+          "overtriage": 104,
+          "cue_f1": 0.83,
+          "denied_or_past_live": 59,
+          "screening": {
+            "p0_labelled": 285,
+            "false_p0": 29,
+            "false_p0_from": {
+              "P2": 18,
+              "P1": 9,
+              "P4": 2
+            },
+            "sensitivity": 0.807,
+            "false_positive_rate": 0.0552,
+            "ppv_at_prevalence": {
+              "0.35": 0.8872,
+              "0.1": 0.6188,
+              "0.05": 0.4347
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 54,
+            "over: cues right (rubric/engine)": 50,
+            "under: cue error": 166
+          }
+        }
+      },
+      "comparisons": {
+        "Hybrid B0+B1e vs B0 rules": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 11,
+            "a_right_b_wrong": 37,
+            "b_right_a_wrong": 0,
+            "chi_square": 5.9264,
+            "p_value": 0.0149
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 11,
+            "b_better": 0,
+            "ties": 8,
+            "p_value": 0.000977
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0629,
+              "ci95": [
+                0.0281,
+                0.1029
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.0698,
+              "ci95": [
+                0.0,
+                0.2381
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.1298,
+              "ci95": [
+                -0.2328,
+                -0.0496
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.1086,
+              "ci95": [
+                0.0395,
+                0.1753
+              ]
+            },
+            "undertriage": {
+              "difference": -0.1444,
+              "ci95": [
+                -0.1988,
+                -0.0889
+              ]
+            },
+            "overtriage": {
+              "difference": 0.0358,
+              "ci95": [
+                0.0049,
+                0.079
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1e vs Hybrid B0+B1": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 9,
+            "a_right_b_wrong": 20,
+            "b_right_a_wrong": 7,
+            "chi_square": 2.4493,
+            "p_value": 0.118
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 7,
+            "b_better": 2,
+            "ties": 10,
+            "p_value": 0.18
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0879,
+              "ci95": [
+                0.0584,
+                0.1256
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.0,
+              "ci95": [
+                -0.05,
+                0.0577
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.0456,
+              "ci95": [
+                -0.1222,
+                0.0035
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.0877,
+              "ci95": [
+                0.0173,
+                0.163
+              ]
+            },
+            "undertriage": {
+              "difference": -0.0827,
+              "ci95": [
+                -0.1321,
+                -0.037
+              ]
+            },
+            "overtriage": {
+              "difference": -0.0049,
+              "ci95": [
+                -0.0506,
+                0.0469
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1e vs Hybrid B0+B1 (refit on generator 2.2)": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 6,
+            "a_right_b_wrong": 10,
+            "b_right_a_wrong": 2,
+            "chi_square": 2.9091,
+            "p_value": 0.0881
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 5,
+            "b_better": 1,
+            "ties": 13,
+            "p_value": 0.219
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0193,
+              "ci95": [
+                -0.0001,
+                0.0379
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.0058,
+              "ci95": [
+                0.0,
+                0.0179
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.0281,
+              "ci95": [
+                -0.0646,
+                -0.0029
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.0309,
+              "ci95": [
+                -0.0062,
+                0.0679
+              ]
+            },
+            "undertriage": {
+              "difference": -0.0333,
+              "ci95": [
+                -0.0605,
+                -0.0099
+              ]
+            },
+            "overtriage": {
+              "difference": 0.0025,
+              "ci95": [
+                -0.0259,
+                0.0296
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1 (refit on generator 2.2) vs Hybrid B0+B1": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 9,
+            "a_right_b_wrong": 14,
+            "b_right_a_wrong": 9,
+            "chi_square": 0.3333,
+            "p_value": 0.564
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 7,
+            "b_better": 2,
+            "ties": 10,
+            "p_value": 0.18
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0685,
+              "ci95": [
+                0.0387,
+                0.108
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": -0.0058,
+              "ci95": [
+                -0.0667,
+                0.0577
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.0175,
+              "ci95": [
+                -0.0891,
+                0.0382
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.0568,
+              "ci95": [
+                0.0012,
+                0.1173
+              ]
+            },
+            "undertriage": {
+              "difference": -0.0494,
+              "ci95": [
+                -0.0938,
+                -0.0111
+              ]
+            },
+            "overtriage": {
+              "difference": -0.0074,
+              "ci95": [
+                -0.0494,
+                0.0321
+              ]
+            }
+          }
+        }
+      }
+    },
+    "curated": {
+      "dataset": "data/eval/curated.jsonl",
+      "digest": "sha256:6694a761e9861011c85e9cacd4d065099f36778aed82c6c341833c5b688c26f7",
+      "calls": 20,
+      "families": 20,
+      "p0_families": 9,
+      "reproduction": {
+        "archived_report": "compare-curated-test-b1e-0.1.0+7b7bb8d67713.json",
+        "matches": true,
+        "differences": []
+      },
+      "per_system": {
+        "B0 rules": {
+          "critical_undertriage": 2,
+          "overtriage": 2,
+          "cue_f1": 0.96,
+          "denied_or_past_live": 0,
+          "screening": {
+            "p0_labelled": 9,
+            "false_p0": 1,
+            "false_p0_from": {
+              "P2": 1
+            },
+            "sensitivity": 0.7778,
+            "false_positive_rate": 0.0909,
+            "ppv_at_prevalence": {
+              "0.35": 0.8216,
+              "0.1": 0.4873,
+              "0.05": 0.3105
+            }
+          },
+          "priority_error_sources": {
+            "over: cues right (rubric/engine)": 2,
+            "under: cue error": 2
+          }
+        },
+        "Hybrid B0+B1": {
+          "critical_undertriage": 0,
+          "overtriage": 4,
+          "cue_f1": 0.8736,
+          "denied_or_past_live": 1,
+          "screening": {
+            "p0_labelled": 9,
+            "false_p0": 3,
+            "false_p0_from": {
+              "P2": 2,
+              "P1": 1
+            },
+            "sensitivity": 1.0,
+            "false_positive_rate": 0.2727,
+            "ppv_at_prevalence": {
+              "0.35": 0.6638,
+              "0.1": 0.2895,
+              "0.05": 0.1618
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 3,
+            "over: cues right (rubric/engine)": 1
+          }
+        },
+        "B1e only": {
+          "critical_undertriage": 2,
+          "overtriage": 2,
+          "cue_f1": 0.7826,
+          "denied_or_past_live": 1,
+          "screening": {
+            "p0_labelled": 9,
+            "false_p0": 1,
+            "false_p0_from": {
+              "P2": 1
+            },
+            "sensitivity": 0.7778,
+            "false_positive_rate": 0.0909,
+            "ppv_at_prevalence": {
+              "0.35": 0.8216,
+              "0.1": 0.4873,
+              "0.05": 0.3105
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 1,
+            "over: cues right (rubric/engine)": 1,
+            "under: cue error": 3
+          }
+        },
+        "Hybrid B0+B1e": {
+          "critical_undertriage": 0,
+          "overtriage": 2,
+          "cue_f1": 0.95,
+          "denied_or_past_live": 1,
+          "screening": {
+            "p0_labelled": 9,
+            "false_p0": 1,
+            "false_p0_from": {
+              "P2": 1
+            },
+            "sensitivity": 1.0,
+            "false_positive_rate": 0.0909,
+            "ppv_at_prevalence": {
+              "0.35": 0.8556,
+              "0.1": 0.55,
+              "0.05": 0.3667
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 1,
+            "over: cues right (rubric/engine)": 1
+          }
+        },
+        "Hybrid B0+B1 (refit on generator 2.2)": {
+          "critical_undertriage": 1,
+          "overtriage": 3,
+          "cue_f1": 0.8941,
+          "denied_or_past_live": 1,
+          "screening": {
+            "p0_labelled": 9,
+            "false_p0": 2,
+            "false_p0_from": {
+              "P2": 2
+            },
+            "sensitivity": 0.8889,
+            "false_positive_rate": 0.1818,
+            "ppv_at_prevalence": {
+              "0.35": 0.7247,
+              "0.1": 0.352,
+              "0.05": 0.2047
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 2,
+            "over: cues right (rubric/engine)": 1,
+            "under: cue error": 1
+          }
+        }
+      },
+      "comparisons": {
+        "Hybrid B0+B1e vs B0 rules": {
+          "clustered_mcnemar_p0": {
+            "clusters": 9,
+            "clusters_with_discordance": 2,
+            "a_right_b_wrong": 2,
+            "b_right_a_wrong": 0,
+            "chi_square": 2.0,
+            "p_value": 0.157
+          },
+          "family_sign_test_p0": {
+            "families": 9,
+            "a_better": 2,
+            "b_better": 0,
+            "ties": 7,
+            "p_value": 0.5
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": -0.01,
+              "ci95": [
+                -0.0499,
+                0.0312
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.1429,
+              "ci95": [
+                0.0,
+                0.4444
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.2222,
+              "ci95": [
+                -0.5556,
+                0.0
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.1,
+              "ci95": [
+                0.0,
+                0.25
+              ]
+            },
+            "undertriage": {
+              "difference": -0.1,
+              "ci95": [
+                -0.25,
+                0.0
+              ]
+            },
+            "overtriage": {
+              "difference": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1e vs Hybrid B0+B1": {
+          "clustered_mcnemar_p0": {
+            "clusters": 9,
+            "clusters_with_discordance": 0,
+            "a_right_b_wrong": 0,
+            "b_right_a_wrong": 0,
+            "chi_square": 0.0,
+            "p_value": 1.0
+          },
+          "family_sign_test_p0": {
+            "families": 9,
+            "a_better": 0,
+            "b_better": 0,
+            "ties": 9,
+            "p_value": 1.0
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0764,
+              "ci95": [
+                0.0353,
+                0.1167
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.1429,
+              "ci95": [
+                0.0,
+                0.4444
+              ]
+            },
+            "critical_undertriage": {
+              "difference": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.1,
+              "ci95": [
+                0.0,
+                0.25
+              ]
+            },
+            "undertriage": {
+              "difference": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "overtriage": {
+              "difference": -0.1,
+              "ci95": [
+                -0.25,
+                0.0
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1e vs Hybrid B0+B1 (refit on generator 2.2)": {
+          "clustered_mcnemar_p0": {
+            "clusters": 9,
+            "clusters_with_discordance": 1,
+            "a_right_b_wrong": 1,
+            "b_right_a_wrong": 0,
+            "chi_square": 1.0,
+            "p_value": 0.317
+          },
+          "family_sign_test_p0": {
+            "families": 9,
+            "a_better": 1,
+            "b_better": 0,
+            "ties": 8,
+            "p_value": 1.0
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0559,
+              "ci95": [
+                0.0133,
+                0.1046
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.1111,
+              "ci95": [
+                -0.375,
+                0.0
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.1,
+              "ci95": [
+                0.0,
+                0.25
+              ]
+            },
+            "undertriage": {
+              "difference": -0.05,
+              "ci95": [
+                -0.15,
+                0.0
+              ]
+            },
+            "overtriage": {
+              "difference": -0.05,
+              "ci95": [
+                -0.15,
+                0.0
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1 (refit on generator 2.2) vs Hybrid B0+B1": {
+          "clustered_mcnemar_p0": {
+            "clusters": 9,
+            "clusters_with_discordance": 1,
+            "a_right_b_wrong": 0,
+            "b_right_a_wrong": 1,
+            "chi_square": 1.0,
+            "p_value": 0.317
+          },
+          "family_sign_test_p0": {
+            "families": 9,
+            "a_better": 0,
+            "b_better": 1,
+            "ties": 8,
+            "p_value": 1.0
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0206,
+              "ci95": [
+                -0.0429,
+                0.0788
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.1429,
+              "ci95": [
+                0.0,
+                0.4444
+              ]
+            },
+            "critical_undertriage": {
+              "difference": 0.1111,
+              "ci95": [
+                0.0,
+                0.375
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.0,
+              "ci95": [
+                -0.15,
+                0.15
+              ]
+            },
+            "undertriage": {
+              "difference": 0.05,
+              "ci95": [
+                0.0,
+                0.15
+              ]
+            },
+            "overtriage": {
+              "difference": -0.05,
+              "ci95": [
+                -0.15,
+                0.0
+              ]
+            }
+          }
+        }
+      }
+    },
+    "challenge": {
+      "dataset": "data/eval/challenge-1.0.0.jsonl",
+      "digest": "sha256:febf06e3533051dd11382e36c4c209b626d9a81b8255fb562e2eeea71dbaac43",
+      "calls": 70,
+      "families": 70,
+      "p0_families": 19,
+      "reproduction": {
+        "archived_report": "compare-challenge-test-b1e-0.1.0+7b7bb8d67713.json",
+        "matches": true,
+        "differences": []
+      },
+      "per_system": {
+        "B0 rules": {
+          "critical_undertriage": 8,
+          "overtriage": 24,
+          "cue_f1": 0.7083,
+          "denied_or_past_live": 4,
+          "screening": {
+            "p0_labelled": 19,
+            "false_p0": 5,
+            "false_p0_from": {
+              "P1": 1,
+              "P3": 2,
+              "P2": 2
+            },
+            "sensitivity": 0.5789,
+            "false_positive_rate": 0.098,
+            "ppv_at_prevalence": {
+              "0.35": 0.7608,
+              "0.1": 0.3962,
+              "0.05": 0.2371
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 10,
+            "over: cues right (rubric/engine)": 14,
+            "under: cue error": 14
+          }
+        },
+        "Hybrid B0+B1": {
+          "critical_undertriage": 5,
+          "overtriage": 29,
+          "cue_f1": 0.6667,
+          "denied_or_past_live": 9,
+          "screening": {
+            "p0_labelled": 19,
+            "false_p0": 11,
+            "false_p0_from": {
+              "P3": 3,
+              "P1": 3,
+              "P4": 2,
+              "P2": 3
+            },
+            "sensitivity": 0.7368,
+            "false_positive_rate": 0.2157,
+            "ppv_at_prevalence": {
+              "0.35": 0.6478,
+              "0.1": 0.2751,
+              "0.05": 0.1524
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 17,
+            "over: cues right (rubric/engine)": 12,
+            "under: cue error": 8
+          }
+        },
+        "B1e only": {
+          "critical_undertriage": 10,
+          "overtriage": 26,
+          "cue_f1": 0.5493,
+          "denied_or_past_live": 11,
+          "screening": {
+            "p0_labelled": 19,
+            "false_p0": 5,
+            "false_p0_from": {
+              "P4": 1,
+              "P1": 1,
+              "P2": 3
+            },
+            "sensitivity": 0.4737,
+            "false_positive_rate": 0.098,
+            "ppv_at_prevalence": {
+              "0.35": 0.7223,
+              "0.1": 0.3493,
+              "0.05": 0.2027
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 19,
+            "over: cues right (rubric/engine)": 7,
+            "under: cue error": 17
+          }
+        },
+        "Hybrid B0+B1e": {
+          "critical_undertriage": 5,
+          "overtriage": 31,
+          "cue_f1": 0.6821,
+          "denied_or_past_live": 12,
+          "screening": {
+            "p0_labelled": 19,
+            "false_p0": 9,
+            "false_p0_from": {
+              "P4": 1,
+              "P1": 2,
+              "P3": 2,
+              "P2": 4
+            },
+            "sensitivity": 0.7368,
+            "false_positive_rate": 0.1765,
+            "ppv_at_prevalence": {
+              "0.35": 0.6921,
+              "0.1": 0.3169,
+              "0.05": 0.1802
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 24,
+            "over: cues right (rubric/engine)": 7,
+            "under: cue error": 8
+          }
+        },
+        "Hybrid B0+B1 (refit on generator 2.2)": {
+          "critical_undertriage": 2,
+          "overtriage": 28,
+          "cue_f1": 0.6778,
+          "denied_or_past_live": 13,
+          "screening": {
+            "p0_labelled": 19,
+            "false_p0": 10,
+            "false_p0_from": {
+              "P3": 3,
+              "P2": 4,
+              "P4": 2,
+              "P1": 1
+            },
+            "sensitivity": 0.8947,
+            "false_positive_rate": 0.1961,
+            "ppv_at_prevalence": {
+              "0.35": 0.7107,
+              "0.1": 0.3364,
+              "0.05": 0.1937
+            }
+          },
+          "priority_error_sources": {
+            "over: cue error": 20,
+            "over: cues right (rubric/engine)": 8,
+            "under: cue error": 7
+          }
+        }
+      },
+      "comparisons": {
+        "Hybrid B0+B1e vs B0 rules": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 3,
+            "a_right_b_wrong": 3,
+            "b_right_a_wrong": 0,
+            "chi_square": 3.0,
+            "p_value": 0.0833
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 3,
+            "b_better": 0,
+            "ties": 16,
+            "p_value": 0.25
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": -0.0263,
+              "ci95": [
+                -0.092,
+                0.0342
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.0,
+              "ci95": [
+                0.0,
+                0.0
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.1579,
+              "ci95": [
+                -0.3333,
+                0.0
+              ]
+            },
+            "priority_exact": {
+              "difference": -0.0143,
+              "ci95": [
+                -0.1143,
+                0.0857
+              ]
+            },
+            "undertriage": {
+              "difference": -0.0857,
+              "ci95": [
+                -0.1571,
+                -0.0286
+              ]
+            },
+            "overtriage": {
+              "difference": 0.1,
+              "ci95": [
+                0.0429,
+                0.1714
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1e vs Hybrid B0+B1": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 4,
+            "a_right_b_wrong": 2,
+            "b_right_a_wrong": 2,
+            "chi_square": 0.0,
+            "p_value": 1.0
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 2,
+            "b_better": 2,
+            "ties": 15,
+            "p_value": 1.0
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0154,
+              "ci95": [
+                -0.0442,
+                0.0777
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": -0.1333,
+              "ci95": [
+                -0.3333,
+                0.0
+              ]
+            },
+            "critical_undertriage": {
+              "difference": 0.0,
+              "ci95": [
+                -0.2105,
+                0.2
+              ]
+            },
+            "priority_exact": {
+              "difference": -0.0286,
+              "ci95": [
+                -0.1286,
+                0.0714
+              ]
+            },
+            "undertriage": {
+              "difference": 0.0,
+              "ci95": [
+                -0.0714,
+                0.0857
+              ]
+            },
+            "overtriage": {
+              "difference": 0.0286,
+              "ci95": [
+                -0.0429,
+                0.1
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1e vs Hybrid B0+B1 (refit on generator 2.2)": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 3,
+            "a_right_b_wrong": 0,
+            "b_right_a_wrong": 3,
+            "chi_square": 3.0,
+            "p_value": 0.0833
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 0,
+            "b_better": 3,
+            "ties": 16,
+            "p_value": 0.25
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0043,
+              "ci95": [
+                -0.0523,
+                0.0603
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": -0.2,
+              "ci95": [
+                -0.4444,
+                0.0
+              ]
+            },
+            "critical_undertriage": {
+              "difference": 0.1579,
+              "ci95": [
+                0.0,
+                0.3333
+              ]
+            },
+            "priority_exact": {
+              "difference": -0.0571,
+              "ci95": [
+                -0.1571,
+                0.0429
+              ]
+            },
+            "undertriage": {
+              "difference": 0.0143,
+              "ci95": [
+                -0.0571,
+                0.0857
+              ]
+            },
+            "overtriage": {
+              "difference": 0.0429,
+              "ci95": [
+                -0.0143,
+                0.1
+              ]
+            }
+          }
+        },
+        "Hybrid B0+B1 (refit on generator 2.2) vs Hybrid B0+B1": {
+          "clustered_mcnemar_p0": {
+            "clusters": 19,
+            "clusters_with_discordance": 3,
+            "a_right_b_wrong": 3,
+            "b_right_a_wrong": 0,
+            "chi_square": 3.0,
+            "p_value": 0.0833
+          },
+          "family_sign_test_p0": {
+            "families": 19,
+            "a_better": 3,
+            "b_better": 0,
+            "ties": 16,
+            "p_value": 0.25
+          },
+          "cluster_bootstrap": {
+            "cue_micro_f1": {
+              "difference": 0.0111,
+              "ci95": [
+                -0.0414,
+                0.0642
+              ]
+            },
+            "critical_cue_sensitivity": {
+              "difference": 0.0667,
+              "ci95": [
+                0.0,
+                0.2308
+              ]
+            },
+            "critical_undertriage": {
+              "difference": -0.1579,
+              "ci95": [
+                -0.3333,
+                0.0
+              ]
+            },
+            "priority_exact": {
+              "difference": 0.0286,
+              "ci95": [
+                -0.0429,
+                0.1143
+              ]
+            },
+            "undertriage": {
+              "difference": -0.0143,
+              "ci95": [
+                -0.0714,
+                0.0429
+              ]
+            },
+            "overtriage": {
+              "difference": -0.0143,
+              "ci95": [
+                -0.0571,
+                0.0286
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "latency": {
+    "machine": {
+      "platform": "Windows-11-10.0.26300-SP0",
+      "processor": "Intel64 Family 6 Model 186 Stepping 2, GenuineIntel",
+      "cpu_count": 20,
+      "python": "3.12.10",
+      "torch_threads": 14
+    },
+    "calls": 810,
+    "warmup_calls": 50,
+    "repeats": 3,
+    "systems": {
+      "B0 rules": {
+        "runs": [
+          {
+            "p50_ms": 0.61,
+            "p95_ms": 0.95,
+            "p99_ms": 1.06,
+            "max_ms": 1.21
+          },
+          {
+            "p50_ms": 0.62,
+            "p95_ms": 0.96,
+            "p99_ms": 1.06,
+            "max_ms": 1.4
+          },
+          {
+            "p50_ms": 0.61,
+            "p95_ms": 0.91,
+            "p99_ms": 1.08,
+            "max_ms": 1.47
+          }
+        ],
+        "median_of_p95_ms": 0.95
+      },
+      "Hybrid B0+B1e": {
+        "runs": [
+          {
+            "p50_ms": 24.38,
+            "p95_ms": 39.07,
+            "p99_ms": 47.38,
+            "max_ms": 78.32
+          },
+          {
+            "p50_ms": 25.51,
+            "p95_ms": 40.86,
+            "p99_ms": 50.82,
+            "max_ms": 68.18
+          },
+          {
+            "p50_ms": 25.15,
+            "p95_ms": 39.94,
+            "p99_ms": 49.26,
+            "max_ms": 68.0
+          }
+        ],
+        "median_of_p95_ms": 39.94
+      }
+    }
+  }
+}
