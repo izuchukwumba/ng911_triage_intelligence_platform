@@ -83,3 +83,31 @@ def test_compare_records_extra_models(tmp_path: Path) -> None:
     }
     assert {"Extra only", "Hybrid B0+Extra"} <= set(result["systems"])
     assert f"Extra `{extra.model_version}`" in to_markdown(result)
+
+
+def test_compare_pairs_every_system_with_the_rules(tmp_path: Path) -> None:
+    pytest.importorskip("sklearn")
+    from ntip.evaluation.compare import compare, paired_comparisons, to_markdown
+    from ntip.evaluation.dataset import Split, load_dataset
+    from ntip.ml.extractors import RulesAsModel
+
+    case = {
+        "case_id": "a", "split": "dev", "family": "f", "label_source": "author",
+        "messages": ["My father is not breathign. We are at 12 Oak Street."],
+        "labels": {"domain": "ems", "severity": "critical", "priority": "P0",
+                   "cues": ["NOT_BREATHING"], "location": "present"},
+    }  # fmt: skip
+    path = tmp_path / "cases.jsonl"
+    path.write_text(json.dumps(case), encoding="utf-8")
+
+    result = compare(load_dataset(path), [Split.DEV], extra_models={"Extra": RulesAsModel()})
+
+    expected = paired_comparisons(list(result["systems"]), ["Extra"])
+    assert ("Hybrid B0+Extra", "Hybrid B0+B1") in expected
+    assert set(result["paired"]) == {f"{a} vs {b}" for a, b in expected}
+    hybrid = result["paired"]["Hybrid B0+B1 vs B0 rules"]
+    # The misspelling hides the cue from the rules but not from B1: one discordant P0 call.
+    p0 = hybrid["mcnemar"]["critical_calls_given_p0"]
+    assert (p0["a_right_b_wrong"], p0["b_right_a_wrong"]) == (1, 0)
+    assert hybrid["differences"]["critical_undertriage"]["difference"] == -1.0
+    assert "## Paired comparisons" in to_markdown(result)

@@ -10,6 +10,10 @@ Systems:
 - Ablation: hybrid with B1's candidate threshold lowered to the abstention
   threshold, i.e. without abstention.
 
+Every system is also compared with the rules case by case, and each extra
+model's hybrid with B1's (``ntip.evaluation.paired``: McNemar's exact test
+and paired bootstrap intervals).
+
     python -m ntip.evaluation.compare --dataset ../data/eval/curated.jsonl --split test
 """
 
@@ -22,10 +26,12 @@ from typing import Any
 
 from ntip.evaluation.calibration import summarise
 from ntip.evaluation.dataset import Dataset, EvalCase, Split, load_dataset
+from ntip.evaluation.paired import CaseCounts, compare_pair
 from ntip.evaluation.runner import (
     FIXED_TIME,
     REPO_ROOT,
     System,
+    case_counts,
     critical_codes,
     evaluate_case,
     manifest,
@@ -111,6 +117,16 @@ def _slices(results: Sequence[Any], seed: int) -> dict[str, Any]:
     }
 
 
+BASELINE = "B0 rules"
+
+
+def paired_comparisons(systems: Sequence[str], extra: Sequence[str]) -> list[tuple[str, str]]:
+    """Every system against the rules, and each extra model's hybrid against B1's."""
+    pairs = [(name, BASELINE) for name in systems if name != BASELINE]
+    pairs += [(f"Hybrid B0+{name}", "Hybrid B0+B1") for name in extra]
+    return pairs
+
+
 def _calibration_of(model: ModelExtractor) -> dict[str, Any]:
     calibration = getattr(model, "calibration", None)
     if calibration is None:
@@ -144,13 +160,16 @@ def compare(
             model, model_only=False, policy="2.0.0"
         )
     results: dict[str, Any] = {}
+    counts: dict[str, list[CaseCounts]] = {}
+    critical = critical_codes()
     for name, system in systems.items():
         case_results = [evaluate_case(case, system, relevant) for case in cases]
-        metrics = score(case_results, seed=seed, critical=critical_codes())
+        metrics = score(case_results, seed=seed, critical=critical)
         results[name] = {
             "metrics": {k: v for k, v in metrics.items() if k != "failures"},
             "slices": _slices(case_results, seed),
         }
+        counts[name] = [case_counts(r, critical) for r in case_results]
 
     # Calibration of B1's scores against the labels, for the cues B1 knows.
     pairs = [
@@ -174,6 +193,10 @@ def compare(
             "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         },
         "systems": results,
+        "paired": {
+            f"{a} vs {b}": {"a": a, "b": b, **compare_pair(counts[a], counts[b], seed=seed)}
+            for a, b in paired_comparisons(list(systems), list(extra_models or {}))
+        },
         "b1_calibration": summarise(pairs),
     }
 
@@ -182,6 +205,51 @@ def _fmt(rate: dict[str, Any]) -> str:
     if rate["value"] is None:
         return "n/a"
     return f"{rate['value']:.3f} ({rate['numerator']}/{rate['denominator']})"
+
+
+def _test(m: dict[str, Any]) -> str:
+    return f"{m['a_right_b_wrong']} / {m['b_right_a_wrong']} (p={m['p_value']:.3g})"
+
+
+def _diff(d: dict[str, Any]) -> str:
+    if d["difference"] is None:
+        return "n/a"
+    ci = d["ci95"]
+    return f"{d['difference']:+.3f}" + (f" [{ci[0]:+.3f}, {ci[1]:+.3f}]" if ci else "")
+
+
+def _paired_markdown(paired: dict[str, Any]) -> list[str]:
+    if not paired:
+        return []
+    lines = [
+        "",
+        "## Paired comparisons (A vs B, same cases)",
+        "",
+        "McNemar columns: cases only A got right / cases only B got right, exact two-sided p."
+        " Differences are A minus B with a 95% paired bootstrap interval.",
+        "",
+        "| A vs B | P0 calls given P0 | Priority exact | Δ critical under-triage"
+        " | Δ critical-cue sensitivity | Δ cue F1 | Δ under-triage | Δ over-triage |",
+        "|---" * 8 + "|",
+    ]
+    for name, p in paired.items():
+        d = p["differences"]
+        lines.append(
+            f"| {name} | {_test(p['mcnemar']['critical_calls_given_p0'])} | "
+            f"{_test(p['mcnemar']['priority_exact'])} | "
+            + " | ".join(
+                _diff(d[k])
+                for k in (
+                    "critical_undertriage",
+                    "critical_cue_sensitivity",
+                    "cue_micro_f1",
+                    "undertriage",
+                    "overtriage",
+                )
+            )
+            + " |"
+        )
+    return lines
 
 
 def to_markdown(result: dict[str, Any]) -> str:
@@ -238,6 +306,7 @@ def to_markdown(result: dict[str, Any]) -> str:
         f"{cal['pairs']} (case, cue) pairs, {cal['positives']} positive. Brier {cal['brier']}, "
         f"ECE {cal['ece']}, AURC {cal['aurc']}, selective risk {cal['risk_at']}.",
     ]
+    lines += _paired_markdown(result.get("paired", {}))
     slice_names = sorted({s for n in names for s in result["systems"][n]["slices"]})
     if slice_names:
         header = "| Slice | " + " | ".join(names) + " |"
