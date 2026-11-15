@@ -14,6 +14,7 @@ from typing import Any
 
 from ntip.evaluation.dataset import Dataset, EvalCase, Split
 from ntip.evaluation.metrics import PRF, bootstrap_metric, confusion, rate
+from ntip.evaluation.paired import CaseCounts
 from ntip.evaluation.spans import Mention, predicted_mentions, score_spans
 from ntip.parser.parser import PARSER_ID, PARSER_VERSION, parse
 from ntip.schema.advisory import Assessment, SeverityBand
@@ -93,6 +94,26 @@ def _victims(incident: Incident) -> int | str | None:
 
 def _priority_rank(p: str | None) -> int:
     return int(p[1]) if p else 9
+
+
+def case_counts(result: CaseResult, critical: set[str]) -> CaseCounts:
+    """One case's counts for paired comparisons (``ntip.evaluation.paired``)."""
+    expected = set(result.case.labels.cues)
+    predicted = result.predicted_cues
+    labelled_critical = expected & critical
+    gold, given = result.case.labels.priority, result.predicted_priority
+    return CaseCounts(
+        tp=len(expected & predicted),
+        fp=len(predicted - expected),
+        fn=len(expected - predicted),
+        critical_found=len(labelled_critical & predicted),
+        critical_labelled=len(labelled_critical),
+        p0_labelled=gold == "P0",
+        p0_missed=gold == "P0" and given != "P0",
+        priority_exact=given == gold,
+        under=_priority_rank(given) > _priority_rank(gold),
+        over=_priority_rank(given) < _priority_rank(gold),
+    )
 
 
 def evaluate_case(case: EvalCase, system: System, relevant: set[str]) -> CaseResult:
