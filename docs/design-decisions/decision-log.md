@@ -435,3 +435,19 @@ run once on three test sets:
 **Revisit when:** ML-11 (adjudicated labels) disagrees, a retrained B1e is
 compared under a new pre-registration, or a fusion policy targets the
 challenge set's denial and past-tense errors.
+
+**Post-hoc note (2026-11-15):** exploratory analyses
+([results](../evaluation/results/README.md#ml-10-post-hoc-analyses-exploratory-not-pre-registered))
+qualify this entry without changing the decision.
+- **Holds at the family level:** the hybrid's gain over the rules
+  (clustered McNemar p = 0.015).
+- **Does not hold at the family level:** "beats the B1 hybrid"
+  (clustered p = 0.12). Most of that gap was training data: a B1 refitted
+  on generator 2.2 comes close to B1e.
+- **Cost at realistic prevalence:** the hybrid raises 31 false P0s on the
+  generated test, so its P0 decisions are less than half right if 5% of
+  calls are truly P0.
+
+The reference configuration stands. The choice of encoder over a refitted
+n-gram model is now an open question for the next pre-registered
+comparison.
